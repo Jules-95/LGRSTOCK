@@ -1,13 +1,13 @@
 # LGR Stock 
 
-Outils interne de gestion et de visulation des réserves déstiné aux équipes de La Grande Récré (Tours centre et Tours Nord)
+Outil interne de gestion et de visualisation des réserves, destiné aux équipes de La Grande Récré (Tours centre et Tours Nord)
 
 --- 
 
 ## Description 
 
 **LGR Stock** est une application web interne permettant de consulter, localiser et mettre à jour les stocks de produits stockés sur le site externe de Colombe.  
-L'objectif principal est de faciliter l'accès aux informations de stock pour les équipes afin d'optimiser le temps passé à la recherche produit. 
+L'objectif principal est de faciliter l'accès aux informations de stock afin d'optimiser le temps passé à la recherche produits. 
 
 --- 
 
@@ -21,7 +21,7 @@ Il répond à un besoin réel de l'entreprise en proposant un outil simple et ad
 ## ⚙️ Fonctionnalités principales (V1)
 
 - Recherche de produits par code EAN (scan ou saisie manuelle), par libellé ou par emplacement. 
-- Affichage d'une liste (libellé + Quantité) en cas de résulat multiple et selection du produit consultable.
+- Affichage d'une liste (libellé + Quantité) en cas de résulat multiple avec sélection du produit à consulter.
 - Affichage des informations produit : 
     - libellé
     - code EAN
@@ -55,10 +55,10 @@ Il répond à un besoin réel de l'entreprise en proposant un outil simple et ad
 ### **Backend** 
 - **Laravel 11**
     - Framework PHP moderne et robuste
-    - Choisit pour la facilité de création d'API REST, gestion automatique de la sécurité et simplification des interractions avec la BDD
+    - Choisi pour la facilité de création d'API REST, gestion automatique de la sécurité et simplification des interractions avec la BDD
 
 - **Laravel EXcel** (maatwebsite/excel)
-    - Package pour l'import/export de fichiers CSC/Excel
+    - Package pour l'import/export de fichiers CSC / Excel
 
 - **Composer** 
     - Gestionnaire des dépendances PHP
@@ -106,7 +106,7 @@ Il répond à un besoin réel de l'entreprise en proposant un outil simple et ad
 
 ### **Avantages de l'architecture**
 - Séparation des responsabilités (frontend ≠ backend)
-- API réutilisable 
+- API réutilisable (évolutive vers d'autres usages internes)
 - Responsive (fonctionne sur mobile, tablette, desktop)
 - Sécurisé (validation coté serveur, protection Laravel)
 
@@ -118,9 +118,9 @@ Il répond à un besoin réel de l'entreprise en proposant un outil simple et ad
 
 Initialement prévu pour la reseve "Colombe", d'autres reserves pourraient être implantées.
 
-**Feature liste utilisateur**
+**Feature liste utilisateur / action différées**
 
-Problème de connexion dans la reserve. Possibilité de préparer les ajouts et les retraits d'articles en amont. Un utilisateur peut créer une liste nominative avec des actions en attente de validation. Après retrait/ajout l'utilisateur valide les actions réalisées ce qui va agir sur les quantités restantes.
+Fonctionnalité envisagée permettant de préparer des actions (ajouts/retraits) en amont en cas de contrainte de connexion, avec validation ultérieure.
 
 ---
 

@@ -34,13 +34,93 @@ Il répond à un besoin réel de l'entreprise en proposant un outil simple et ad
 
 ## 🛠️ Technologies utilisées
 
-- 
+### **Frontend**
+- **Vue.js 3** (composition API)
+    - Framework Javascript progressif et réactif 
+    - Simplicité d'apprentissage
+    - Interface fluide et responsive sans rechargement de page
+
+- **Vue Router**
+    - Gestion de la navigation entre les différentes pages de l'application 
+
+- **Axios**
+    - Librairie pour effectuer les requêtes HTTP vers l'API backend
+    - Gestion simplifiée des appels asynchrones. 
+
+- **Tailwind CSS**
+    - Framework CSS utility-first pour un développement rapide
+    - Permet un design moderne et responsive sans CSS custom 
+    - Optimisé pour la performance 
+
+### **Backend** 
+- **Laravel 11**
+    - Framework PHP moderne et robuste
+    - Choisit pour la facilité de création d'API REST, gestion automatique de la sécurité et simplification des interractions avec la BDD
+
+- **Laravel EXcel** (maatwebsite/excel)
+    - Package pour l'import/export de fichiers CSC/Excel
+
+- **Composer** 
+    - Gestionnaire des dépendances PHP
+
+### **Base de données**
+- **MySQL 8.0**
+    - Système de gestion de base de données relationnelle
+    - Choisi pour les performances et l'apprentissage 
+    - Supporte les accès multiples simultanés
+
+### **Outils de développements**
+-**XAMPP / Laragon**
+    - Environnement de développement local
+
+- **Postman** 
+    - Tests et documentation de l'API REST
+
+- **Git / Github** 
+    - Pour le versionning
+
+- **Looping**
+    - Pour la modélisation de la BDD (MCD/MLD)
+
+- **npm / pnpm**
+    - Gestionnaire de paquet Javascript
 
 ---
 
-## Fonctionnalités avancées 
+## **Architecture**
 
-- 
+```
+┌──────────────┐                    ┌──────────────┐
+│   Vue.js     │  ←── HTTP/JSON ──→ │   Laravel    │
+│  (Frontend)  │                    │  (Backend)   │
+└──────────────┘                    └──────┬───────┘
+  Interface web                            │
+  Recherche produits                       │
+  Affichage + MAJ stock                    ▼
+                                    ┌──────────────┐
+                                    │    MySQL     │
+                                    │  (Database)  │
+                                    └──────────────┘
+                                      Table products
+```
+
+### **Avantages de l'architecture**
+- Séparation des responsabilités (frontend ≠ backend)
+- API réutilisable 
+- Responsive (fonctionne sur mobile, tablette, desktop)
+- Sécurisé (validation coté serveur, protection Laravel)
+
+---
+
+## Fonctionnalités secondaires avancées (V2)
+
+**Feature "Changer de stock"**
+
+Initialement prévu pour la reseve "Colombe", d'autres reserves pourraient être implantées.
+
+**Feature liste utilisateur**
+
+Problème de connexion dans la reserve. Possibilité de préparer les ajouts et les retraits d'articles en amont. Un utilisateur peut créer une liste nominative avec des actions en attente de validation. Après retrait/ajout l'utilisateur valide les actions réalisées ce qui va agir sur les quantités restantes.
 
 ---
 

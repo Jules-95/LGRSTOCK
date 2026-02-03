@@ -53,9 +53,7 @@ Il répond à un besoin réel de l'entreprise en proposant un outil simple et ad
     - Optimisé pour la performance 
 
 ### **Backend** 
-- **Laravel 11**
-    - Framework PHP moderne et robuste
-    - Choisi pour la facilité de création d'API REST, gestion automatique de la sécurité et simplification des interractions avec la BDD
+- **Symphony**
 
 - **Laravel EXcel** (maatwebsite/excel)
     - Package pour l'import/export de fichiers CSC / Excel

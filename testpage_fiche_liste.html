@@ -1,0 +1,874 @@
+<!-- Page de test pour les pads de l'entreprise / Visualisation de l'ajout  d'un article via sa fiche produit à une liste existante  -->
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LGR Stock - Fiche Produit</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        /* FICHE PRODUIT */
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .product-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .product-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-meta {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        .product-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 12px;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.95rem;
+        }
+
+        .detail-value {
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        /* Section Quantité */
+        .quantity-section {
+            background: linear-gradient(135deg, #f9fafb, #f3f4f6);
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            border: 2px solid #e5e7eb;
+        }
+
+        .quantity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .quantity-label {
+            font-weight: 600;
+            color: #374151;
+            font-size: 1rem;
+        }
+
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            background: white;
+            padding: 0.75rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .qty-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            color: #374151;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .qty-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .qty-display {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #667eea;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Section Disponibilité */
+        .availability-section {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .availability-title {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .availability-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .availability-item {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e5e7eb;
+        }
+
+        .availability-item.available {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        .availability-item.unavailable {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+
+        .availability-store {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .availability-status {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .availability-status.yes {
+            color: #10b981;
+        }
+
+        .availability-status.no {
+            color: #ef4444;
+        }
+
+        /* Section Emplacement */
+        .location-section {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+
+        .location-title {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+
+        .location-info {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .location-badge {
+            flex: 1;
+            background: white;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #667eea;
+        }
+
+        .location-badge-label {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+        }
+
+        .location-badge-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 200px;
+            background: #f3f4f6;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            border: 2px dashed #d1d5db;
+        }
+
+        /* Actions */
+        .actions-section {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-accent {
+            background: #10b981;
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-accent:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        /* POPUP AJOUT À UNE LISTE */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.2s ease;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal {
+            background: white;
+            width: 560px;
+            max-width: 90vw;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 2rem 2rem 1.5rem 2rem;
+            border-bottom: 2px solid #f3f4f6;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .modal-subtitle {
+            color: #6b7280;
+            font-size: 0.95rem;
+        }
+
+        .product-info-compact {
+            background: #f9fafb;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .product-name-compact {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+
+        .product-meta-compact {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .list-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .list-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 1.25rem;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .list-option:hover {
+            border-color: #667eea;
+            background: #f3f4f6;
+        }
+
+        .list-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 1rem;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .list-info {
+            flex: 1;
+        }
+
+        .list-name {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
+        }
+
+        .list-meta {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .list-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-brouillon {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-prete {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .movement-type-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .movement-type {
+            padding: 1.25rem;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .movement-type:hover {
+            border-color: #667eea;
+            background: #f3f4f6;
+        }
+
+        .movement-type input[type="radio"] {
+            display: none;
+        }
+
+        .movement-type input[type="radio"]:checked + .movement-content {
+            border-color: #667eea;
+            background: white;
+        }
+
+        .movement-type.selected {
+            border-color: #667eea;
+            background: white;
+        }
+
+        .movement-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .movement-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.25rem;
+        }
+
+        .movement-desc {
+            font-size: 0.8rem;
+            color: #6b7280;
+        }
+
+        .quantity-input-section {
+            background: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .quantity-input-label {
+            font-size: 0.9rem;
+            color: #6b7280;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .quantity-input-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .qty-btn-modal {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+            background: white;
+            color: #374151;
+            font-size: 1.5rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .qty-btn-modal:hover {
+            border-color: #667eea;
+            color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .qty-input-display {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #667eea;
+            min-width: 100px;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem 2rem 2rem;
+            border-top: 2px solid #f3f4f6;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-cancel:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-confirm {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .new-list-hint {
+            background: #f0fdf4;
+            border: 2px dashed #10b981;
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+            color: #065f46;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .availability-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .actions-section {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .movement-type-selector {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- FICHE PRODUIT -->
+        <div class="product-card">
+            <div class="product-header">
+                <div class="product-icon">📦</div>
+                <h1 class="product-title">Lego Classic - Boîte 500 pièces</h1>
+                <div class="product-meta">
+                    EAN : 3700523456789 • Fournisseur : LEGO Group
+                </div>
+            </div>
+
+            <div class="product-details">
+                <div class="detail-row">
+                    <span class="detail-label">Code EAN</span>
+                    <span class="detail-value">3700523456789</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Fournisseur</span>
+                    <span class="detail-value">LEGO Group</span>
+                </div>
+            </div>
+
+            <!-- Section Quantité -->
+            <div class="quantity-section">
+                <div class="quantity-header">
+                    <span class="quantity-label">Quantité en stock Colombe</span>
+                </div>
+                <div class="quantity-controls">
+                    <button class="qty-btn" onclick="updateProductQty(-1)">−</button>
+                    <span class="qty-display" id="productQty">42</span>
+                    <button class="qty-btn" onclick="updateProductQty(1)">+</button>
+                </div>
+            </div>
+
+            <!-- Section Disponibilité -->
+            <div class="availability-section">
+                <div class="availability-title">Disponibilité magasins</div>
+                <div class="availability-grid">
+                    <div class="availability-item available">
+                        <div class="availability-store">Tours Centre</div>
+                        <div class="availability-status yes">✅ Disponible</div>
+                    </div>
+                    <div class="availability-item unavailable">
+                        <div class="availability-store">Tours Nord</div>
+                        <div class="availability-status no">❌ Indisponible</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Emplacement -->
+            <div class="location-section">
+                <div class="location-title">📍 Emplacement dans la réserve</div>
+                <div class="location-info">
+                    <div class="location-badge">
+                        <div class="location-badge-label">Allée</div>
+                        <div class="location-badge-value">A3</div>
+                    </div>
+                    <div class="location-badge">
+                        <div class="location-badge-label">Étagère</div>
+                        <div class="location-badge-value">E2</div>
+                    </div>
+                </div>
+                <div class="image-placeholder">
+                    📷 Photo de l'emplacement
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions-section">
+                <button class="btn btn-primary">
+                    💾 Enregistrer les modifications
+                </button>
+                <button class="btn btn-accent" onclick="openAddToListModal()">
+                    ➕ Ajouter à une liste
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- POPUP : Ajouter à une liste -->
+    <div class="modal-overlay" id="addToListModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <span>➕</span>
+                    Ajouter à une liste
+                </div>
+                <div class="modal-subtitle">
+                    Sélectionnez une liste et définissez le mouvement
+                </div>
+                <div class="product-info-compact">
+                    <div class="product-name-compact">Lego Classic - Boîte 500 pièces</div>
+                    <div class="product-meta-compact">EAN : 3700523456789 • Stock actuel : 42 unités</div>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <!-- Sélection de la liste -->
+                <div class="form-section">
+                    <label class="form-label">Choisir une liste</label>
+                    <div class="list-selector">
+                        <label class="list-option">
+                            <input type="radio" name="targetList" value="1" checked>
+                            <div class="list-info">
+                                <div class="list-name">Réassort hebdomadaire</div>
+                                <div class="list-meta">Tours Centre • Marie D. • 5 produits</div>
+                            </div>
+                            <span class="list-badge badge-brouillon">📝 Brouillon</span>
+                        </label>
+
+                        <label class="list-option">
+                            <input type="radio" name="targetList" value="2">
+                            <div class="list-info">
+                                <div class="list-name">Inventaire mensuel</div>
+                                <div class="list-meta">Tours Nord • Jean M. • 3 produits</div>
+                            </div>
+                            <span class="list-badge badge-prete">🚀 Prête</span>
+                        </label>
+                    </div>
+
+                    <div class="new-list-hint">
+                        💡 Pas la bonne liste ? <strong>Créez-en une nouvelle</strong> depuis l'écran principal
+                    </div>
+                </div>
+
+                <!-- Type de mouvement -->
+                <div class="form-section">
+                    <label class="form-label">Type de mouvement</label>
+                    <div class="movement-type-selector">
+                        <label class="movement-type" onclick="selectMovementType('sortie')">
+                            <input type="radio" name="movementType" value="sortie" checked>
+                            <div class="movement-content">
+                                <div class="movement-icon">📤</div>
+                                <div class="movement-label">Sortie</div>
+                                <div class="movement-desc">Prendre du stock</div>
+                            </div>
+                        </label>
+
+                        <label class="movement-type" onclick="selectMovementType('entree')">
+                            <input type="radio" name="movementType" value="entree">
+                            <div class="movement-content">
+                                <div class="movement-icon">📥</div>
+                                <div class="movement-label">Entrée</div>
+                                <div class="movement-desc">Ajouter du stock</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Quantité -->
+                <div class="form-section">
+                    <label class="form-label">Quantité</label>
+                    <div class="quantity-input-section">
+                        <div class="quantity-input-label">Nombre d'unités</div>
+                        <div class="quantity-input-controls">
+                            <button class="qty-btn-modal" onclick="updateModalQty(-1)">−</button>
+                            <span class="qty-input-display" id="modalQty">5</span>
+                            <button class="qty-btn-modal" onclick="updateModalQty(1)">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-cancel" onclick="closeAddToListModal()">
+                    Annuler
+                </button>
+                <button class="btn btn-confirm" onclick="confirmAddToList()">
+                    Ajouter à la liste
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let productQtyValue = 42;
+        let modalQtyValue = 5;
+
+        // Gestion quantité produit
+        function updateProductQty(delta) {
+            productQtyValue = Math.max(0, productQtyValue + delta);
+            document.getElementById('productQty').textContent = productQtyValue;
+        }
+
+        // Gestion quantité modal
+        function updateModalQty(delta) {
+            modalQtyValue = Math.max(1, modalQtyValue + delta);
+            document.getElementById('modalQty').textContent = modalQtyValue;
+        }
+
+        // Sélection type de mouvement
+        function selectMovementType(type) {
+            document.querySelectorAll('.movement-type').forEach(el => {
+                el.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+        }
+
+        // Gestion modal
+        function openAddToListModal() {
+            document.getElementById('addToListModal').classList.add('active');
+        }
+
+        function closeAddToListModal() {
+            document.getElementById('addToListModal').classList.remove('active');
+        }
+
+        function confirmAddToList() {
+            const listId = document.querySelector('input[name="targetList"]:checked').value;
+            const movementType = document.querySelector('input[name="movementType"]:checked').value;
+            const quantity = modalQtyValue;
+
+            alert(`✅ Produit ajouté !\n\nListe : ${listId}\nType : ${movementType}\nQuantité : ${quantity}`);
+            closeAddToListModal();
+        }
+
+        // Fermer en cliquant sur l'overlay
+        document.getElementById('addToListModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAddToListModal();
+            }
+        });
+
+        // Fermer avec Échap
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeAddToListModal();
+            }
+        });
+    </script>
+</body>
+</html>

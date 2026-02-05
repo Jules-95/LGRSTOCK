@@ -45,12 +45,7 @@ Il répond à un besoin réel de l'entreprise en proposant un outil simple et ad
 
 - **Axios**
     - Librairie pour effectuer les requêtes HTTP vers l'API backend
-    - Gestion simplifiée des appels asynchrones. 
-
-- **Tailwind CSS**
-    - Framework CSS utility-first pour un développement rapide
-    - Permet un design moderne et responsive sans CSS custom 
-    - Optimisé pour la performance 
+    - Gestion simplifiée des appels asynchrones.  
 
 ### **Backend** 
 - **Symphony**

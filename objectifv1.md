@@ -6,7 +6,7 @@ Outil interne de gestion et de visualisation des réserves, destiné aux équipe
 
 ## Description 
 
-**LGR Stock** est une application web interne permettant de consulter, localiser et mettre à jour les stocks de produits stockés sur le site externe de Colombe.  
+**LGR Stock** est une application web interne permettant de consulter, localiser et mettre à jour les stocks de produits sur le site externe de la réserve "Colombe".  
 L'objectif principal est de faciliter l'accès aux informations de stock afin d'optimiser le temps passé à la recherche produits. 
 
 --- 
@@ -20,15 +20,16 @@ Il répond à un besoin réel de l'entreprise en proposant un outil simple et ad
 
 ## ⚙️ Fonctionnalités principales (V1)
 
-- Recherche de produits par code EAN (scan ou saisie manuelle), par libellé ou par emplacement. 
-- Affichage d'une liste (libellé + Quantité) en cas de résulat multiple avec sélection du produit à consulter.
+- Recherche de produits par code EAN (scan ou saisie manuelle), par libellé ou par fournisseur. 
+- Affichage d'une liste d'item(mini fiche produit) en cas de résulat multiple (Recherche par libelle similaire ou fournisseur) avec sélection du produit à consulter.
 - Affichage des informations produit : 
     - libellé
     - code EAN
+    - fournisseur
     - quantité disponible 
-    - emplacement (allée / étagère)
 - Mise à jour manuelle des quantités 
-- Visualisation d'une image d'emplacement (si disponible)
+    - Modifications par btn "+" / "-" ou par saisie manuelle (en cas de gros transfert)
+    - Ajout d'un bouton de validation des changements / Confirmation (Eviter les modifications accidentelles)
 
 --- 
 
@@ -48,10 +49,15 @@ Il répond à un besoin réel de l'entreprise en proposant un outil simple et ad
     - Gestion simplifiée des appels asynchrones.  
 
 ### **Backend** 
-- **Symphony**
 
-- **Laravel EXcel** (maatwebsite/excel)
-    - Package pour l'import/export de fichiers CSC / Excel
+- **Symfony**
+
+- **PhpSpreadsheet** 
+    - Librairie officielle (ex-PHPExcel)
+    - Compatible Symfony
+    - Installation via Composer : 
+    bash : composer require phpoffice/phpspreadsheet
+    - Supporte : .xlsx / .xls / .csv
 
 - **Composer** 
     - Gestionnaire des dépendances PHP
@@ -78,13 +84,16 @@ Il répond à un besoin réel de l'entreprise en proposant un outil simple et ad
 - **npm / pnpm**
     - Gestionnaire de paquet Javascript
 
+- **Docker**
+    - Si besoin
+
 ---
 
 ## **Architecture**
 
 ```
 ┌──────────────┐                    ┌──────────────┐
-│   Vue.js     │  ←── HTTP/JSON ──→ │   Laravel    │
+│   Vue.js     │  ←── HTTP/JSON ──→ │   Symphony   │
 │  (Frontend)  │                    │  (Backend)   │
 └──────────────┘                    └──────┬───────┘
   Interface web                            │
@@ -101,19 +110,23 @@ Il répond à un besoin réel de l'entreprise en proposant un outil simple et ad
 - Séparation des responsabilités (frontend ≠ backend)
 - API réutilisable (évolutive vers d'autres usages internes)
 - Responsive (fonctionne sur mobile, tablette, desktop)
-- Sécurisé (validation coté serveur, protection Laravel)
+- Sécurisé (validation coté serveur, protection Symfony)
 
 ---
 
 ## Fonctionnalités secondaires avancées (V2)
 
-**Feature "Changer de stock"**
-
-Initialement prévu pour la reseve "Colombe", d'autres reserves pourraient être implantées.
-
 **Feature liste utilisateur / action différées**
 
 Fonctionnalité envisagée permettant de préparer des actions (ajouts/retraits) en amont en cas de contrainte de connexion, avec validation ultérieure.
+ - Système de liste à valider avant transfert 
+ - Transfert terminer = Liste dans un historique
+ - Possibilité d'ajouter un produit à une liste de transfert via la fiche produit.
+ - Fonctionnalité déja maquettée
+
+**Feature "Changer de stock"**
+
+Initialement prévu pour la reseve "Colombe", d'autres reserves pourraient être implantées.
 
 ---
 

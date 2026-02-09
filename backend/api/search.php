@@ -38,6 +38,32 @@ try {
         exit;
     }
 
+    // NOUVELLE VALIDATION : Vérification du format EAN
+    if ($ean !== null) {
+        // Verification que l'ean contient 13 caractères
+        if (strlen($ean) !== 13) {
+            http_response_code(400);
+            echo json_encode ([
+                'error' => true,
+                'message' => 'Le code EAN doit contenir exactement 13 chiffres' ,
+                'details' => 'Code EAN fourni :"' . $ean . '" (' . strlen($ean) . ' caractères)'
+            ]);
+            exit;
+        }
+
+        // Verification que l'an ne soit composé que de chiffres
+        if (!ctype_digit($ean)) {
+            http_response_code(400);
+            echo json_encode([
+                'error' => true,
+                'message' => 'Le code EAN ne doit contenir que des chiffres (0-9)',
+                'details' => 'Code EAN fourni : "' . $ean . '"'
+            ]);
+            exit;
+        }
+    }
+
+
     // Construire la requête SQL selon les critères
     $sql = "SELECT * FROM products WHERE 1=1";
     $params = [];

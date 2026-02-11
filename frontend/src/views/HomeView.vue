@@ -2,8 +2,8 @@
   <div class="home">
     <div class="container">
       <header class="header">
-        <h1 class="logo">LGS</h1>
-        <p class="subtitle">Le Grand Stock</p>
+        <h1 class="logo">LGR STOCK</h1>
+        <p class="subtitle">Site interne de visualition du stock de la réserve Colombe</p>
       </header>
 
       <div class="search-card">
@@ -13,7 +13,12 @@
         </p>
 
         <!-- Formulaire de recherche -->
-        <form @submit.prevent="handleSearch">
+        <form @submit.prevent="handleSearch"> 
+            <!-- 
+            @submit = écoute l'évènement "soumission du formulaire"
+            Prevent = equivalent de event.preventDefault() qui empêche le rechargement de page) 
+            handleSearch = fonction appelée lors du clic sur "Rechercher"
+            -->
           <div class="form-group">
             <label>Code EAN</label>
             <input 
@@ -41,6 +46,7 @@
               placeholder="Ex: LEGO Group, Mattel..."
             />
           </div>
+          <!-- v-model = Liaison bidirectionnelle (two-way-binding) -> Ce que l'utilisateur tape est automatiquement stocké dans searchEAN -->
 
           <button type="submit" class="btn-search">
             🔍 Rechercher
@@ -59,6 +65,9 @@
         <!-- Résultats -->
         <div v-if="products.length > 0" class="results">
           <h3>📦 Résultats ({{ products.length }})</h3>
+
+          <!-- v-if = Affichage conditionnel (comme un if en javascript)
+           si loading === true ALORS ce bloc s'affiche-->
           
           <div class="product-list">
             <div 
@@ -66,6 +75,10 @@
               :key="product.id"
               class="product-item"
             >
+            <!-- v-for = boucle (comme un for en js) 
+             Crée une div pour chaque produit du tableai
+             :key = identifiant unique pour optimiser les mises à jour DOM -->
+
               <div class="product-info">
                 <h4>{{ product.libelle }}</h4>
                 <p>EAN : {{ product.ean }}</p>
@@ -96,6 +109,13 @@ const products = ref([])
 const loading = ref(false)
 const error = ref(null)
 const searched = ref(false)
+// Décalartion des variables réactives
+// ref () 
+    //Transforme une valeur normale en valeur réactive
+    // Vue surveille automatiquement les changements
+    // Pour lire/modifier -> Utiliser .value
+    //Pourquoi pas "let" ? 
+        // let ne déclenche pas de mise à jour de l'interface, ref rend la variable "réactive"
 
 // Fonction de recherche
 async function handleSearch() {
@@ -103,19 +123,24 @@ async function handleSearch() {
   error.value = null
   products.value = []
   searched.value = true
+// Pourquoi une fonction async ? Car permet d'utiliser await pour attendre les réponses API, evite de bloquer l'interface pendant le chargement.
+// Réinitialisation = Efface les anciens messages d'erreur, vide la liste de produit précédente, indique qu'une recherche a été lancée (pour afficher "Aucun résulat")
   
   // Vérifier qu'au moins un champ est rempli
   if (!searchEAN.value && !searchLibelle.value && !searchFournisseur.value) {
     error.value = 'Veuillez remplir au moins un champ de recherche'
     return
   }
+  // Evite d'appeller l'API si aucun champ n'est rempli. (return : arrête la fonction ici)
   
   // Construire l'URL de l'API
   const params = new URLSearchParams()
   if (searchEAN.value) params.append('ean', searchEAN.value)
   if (searchLibelle.value) params.append('libelle', searchLibelle.value)
   if (searchFournisseur.value) params.append('fournisseur', searchFournisseur.value)
-  
+  // URLSearchParams() : Crée une chaine de carctère GET
+  // params.append : ('ean', 123) -> ajoute `?ean=123` à l'url 
+
   const apiURL = `http://localhost/LGRSTOCK/backend/api/search.php?${params.toString()}`
   
   // Afficher l'URL dans la console (pour déboguer)
@@ -124,23 +149,32 @@ async function handleSearch() {
   loading.value = true
   
   try {
-    const response = await fetch(apiURL)
+    const response = await fetch(apiURL)    
     const data = await response.json()
+    // fetch : envoie une requête HTTP GET vers PHP
+    // await : attend la réponse du serveur 
+    // response.json: transforme le JSON en objet JavaScript
+    
     
     console.log('Réponse API :', data)
+
     
     if (data.error) {
       error.value = data.message
     } else {
       products.value = data.data
     }
+    // si erreur coté backend -> affiche message d'erreur 
+    // Sinon -> Remplit le tableau product (Vue met à jours l'affichage automatiquement)
     
   } catch (err) {
     console.error('Erreur :', err)
-    error.value = 'Erreur lors de la recherche. Vérifiez que le backend est actif.'
+    error.value = 'Erreur lors de la recherche. Vérifiez que le backend est actif (XAMPP...).'
   } finally {
     loading.value = false
   }
+  // try/catch -> capture les erreurs réseau (backend eteint, timout)
+  // finally -> exécuté dans tous les cas -> Arrête le spinner de chargement (succès ou erreur)
 }
 </script>
 

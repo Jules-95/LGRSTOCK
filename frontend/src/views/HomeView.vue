@@ -41,7 +41,42 @@
                     <button class="search-btn" type="submit">🔍 Rechercher</button>
                 </form>
 
+                <!-- Message de chargement -->
+                <div v-if="loading" class="message info">
+                ⏳ Recherche en cours...
+                </div>
+
+                 <!-- Meesage d'erreur -->
+                <div v-if="error" class="message error">
+                ❌ {{ error }}
+                </div>
+
+                <!-- Résultat -->
+                <div v-if="products.length > 0" class="results">
+                    <h3>📦 Résultats ({{ products.length }})</h3>
+
+                    <div class="product-list">
+                        <div
+                        v-for="product in products"
+                        :key="product.id"
+                        class="product-item"
+                        >
+                        <div class="product-info">
+                            <h4>{{ product.libelle }}</h4>
+                            <p>EAN : {{ product.ean }}</p>
+                            <p>Fournisseur : {{ product.fournisseur || 'Non reseigné' }}</p>
+                            <p class="stock">Stock : {{ product.quantite }}</p>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aucun résulat -->
+                <div v-if="!loading && searched && products.length === 0" class="message info">
+                    ℹ️ Aucun produit trouvé
+                </div> 
             </div>
+
         </div>
     </div>
 </template>
@@ -190,9 +225,79 @@ async function handleSearch() {
     font-weight: 600;
     cursor: pointer;
     width: 100%;
+    transition: all ease  1s;
+}
+
+
+/* Messages d'état */
+
+.message {
+    padding: 1rem;
+    border-radius: 10px;
+    margin-top: 1.5rem;
+    font-weight: 500;
+}
+
+.message.info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.message.error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* Résultats */
+.results {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top : 2px solid #f3f4f6;
+}
+
+.results h3 {
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+}
+
+.product-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.product-item {
+    background: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 2px solid #e5e7eb;
+    transition: all 0.2s;
+}
+
+.product-item:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.product-info h4 {
+    color:#1f2937;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-info p {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem
+}
+
+.product-info .stock {
+    color:#667eea;
+    font-weight: 600;
+    margin: top 0.5rem;
 }
 
 </style>
 
-
+<!-- Reste à limiter le nombre de cartères rentrable dans le champ EAN. (13 Max) -->
 

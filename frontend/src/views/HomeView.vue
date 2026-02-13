@@ -13,10 +13,11 @@
                 <form @submit.prevent="handleSearch">
                     <div class="form-group">
                         <label>Code EAN</label>
-                        <input 
+                        <input
                             v-model="searchEAN"
                             type="text"
                             placeholder="3700523456789"
+                            maxlength="13"
                             />
                     </div>
 
@@ -231,7 +232,12 @@ async function handleSearch() {
     font-weight: 600;
     cursor: pointer;
     width: 100%;
-    transition: all ease  1s;
+    transition: all ease 0.3s;
+}
+
+.search-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
 }
 
 
@@ -304,6 +310,3 @@ async function handleSearch() {
 }
 
 </style>
-
-<!-- Reste à limiter le nombre de cartères rentrable dans le champ EAN. (13 Max) -->
-

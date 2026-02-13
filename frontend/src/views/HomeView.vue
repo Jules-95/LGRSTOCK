@@ -213,6 +213,12 @@ async function handleSearch() {
     font-size: 1rem;
 }
 
+.form-group input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
 /* --- BOUTON --- */
 
 .search-btn {

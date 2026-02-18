@@ -17,6 +17,7 @@
                             v-model="searchEAN"
                             type="text"
                             placeholder="3700523456789"
+                            maxlength="13"
                             />
                     </div>
 
@@ -60,6 +61,7 @@
                         v-for="product in products"
                         :key="product.id"
                         class="product-item"
+                        @click="goToProduct(product.id)"
                         >
                         <div class="product-info">
                             <h4>{{ product.libelle }}</h4>
@@ -85,6 +87,10 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+// Hook Vue Router qui donne accès à l'objet de navigation
+const router = useRouter()
 
 // Variables réactives pour stocker ce que l'utilisateur entre dans un champ
 const searchEAN = ref('')
@@ -141,6 +147,16 @@ async function handleSearch() {
     loading.value = false
     }
 
+}
+
+/**
+ * Navigation vers la page de détails d'un produit 
+ * @param {numbner} productId - L''ID du produit à afficher'
+ */
+
+function goToProduct(productId) {
+    router.push(`/product/${productId}`)
+    // Si productId = 5 -> résultat : "/product/5"
 }
 </script>
 
@@ -278,11 +294,13 @@ async function handleSearch() {
     border-radius: 12px;
     border: 2px solid #e5e7eb;
     transition: all 0.2s;
+    cursor: pointer;
 }
 
 .product-item:hover {
     border-color: #667eea;
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
 }
 
 .product-info h4 {
@@ -304,6 +322,3 @@ async function handleSearch() {
 }
 
 </style>
-
-<!-- Reste à limiter le nombre de cartères rentrable dans le champ EAN. (13 Max) -->
-

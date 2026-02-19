@@ -137,7 +137,14 @@ async function handleSearch() {
     if (data.error) {
       error.value = data.message
     } else {
-      products.value = data.data
+        // Si un seul résultat : Redirection automatique vers fiche produit
+        if (data.count === 1) {
+            console.log ('Redirection auto vers produit', data.data[0].id)
+            router.push(`/product/${data.data[0].id}`)
+        } else {
+            // Sinon affichage de la liste
+         products.value = data.data
+        }
     }
     
     } catch (err) {

@@ -60,3 +60,62 @@
         </div>
     </div>
 </template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router';
+
+const route = useRoute()
+const router = useRouter()
+
+// Etats réactifs 
+const product = ref(null)
+const loading = ref(false)
+const error = ref(null)
+
+// Computed : class CSS selon le stock 
+const stockClass = computed(() => {
+    if (stock === 0) return 'stock-empty'
+    if (stock < 5) return 'stock-low'
+    return 'stock-ok'
+})
+
+/**
+ * Récupère les données du produit depuis l'API 
+ */
+
+async function fetchProduct() {
+    const productId = route.params.id
+    
+    loading.value = true
+    error.value = null
+
+    const apiURL = `http://localhost/LGRSTOCK/backend/api/product.php?id=${productId}`
+
+    console.log('Récupération du produit :', productId)
+
+    try {
+        const response = await fetch(apiURL)
+        const data = await response.json()
+
+        console.log('Réponse API:', data)
+
+        if(data.error) {
+            error.value = data.message
+        } else {
+            product.value =data.data
+        }
+
+    } catch (err) {
+        console.error('Erreur :', err)
+        error.value = 'Erreur lors du chargement du produit'
+    } finally {
+        loading.value = false
+    }
+}
+
+// Hook de lifecycle : exécuté au montage du composant
+onMounted(() => {
+    fetchProduct()
+})
+</script>

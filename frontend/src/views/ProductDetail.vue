@@ -75,8 +75,11 @@ const error = ref(null)
 
 // Computed : class CSS selon le stock 
 const stockClass = computed(() => {
+    if (!product.value) return ''
+
+    const stock = product.value.quantite
     if (stock === 0) return 'stock-empty'
-    if (stock < 5) return 'stock-low'
+    if (stock < 10) return 'stock-low'
     return 'stock-ok'
 })
 

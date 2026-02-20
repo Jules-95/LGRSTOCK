@@ -1,13 +1,13 @@
 <template>
-    <div class="page">
+    <main class="page">
         <div class="container">
 
             <!-- Bouton retour -->
-            <div class="back-button">
+            <nav class="back-button">
                 <button @click="$router.back()" class="btn-back">
                     ← Retour à la recherche
                 </button>
-            </div>
+            </nav>
 
             <!-- Message de chargement -->
             <div v-if="loading" class="message info">
@@ -20,15 +20,15 @@
             </div>
 
             <!-- fiche produit -->
-            <div v-if="product" class="card-item">
-                <div class="product-header">
+            <article v-if="product" class="card-item">
+                <header class="product-header">
                     <h1>{{ product.libelle }}</h1>
                     <span class="stock-badge" :class="stockClass">
                     {{ product.quantite }} unités
                     </span>
-                </div>
+                </header>
 
-                <div class="product-details">
+                <section class="product-details">
                     <div class="detail-row">
                         <span class="detail-label">Code EAN</span>
                         <span class="detail-value">{{ product.ean }}</span>
@@ -53,22 +53,22 @@
                         <span class="detail-label">Modifié le</span>
                         <span class="detail-value">{{ product.updated_at }}</span>
                     </div>
-                </div>
+                </section>
 
                 <!-- Prévision btn modifier quantité / btn ajouter à une liste -->
-                <div class="product-actions">
+                <section class="product-actions">
                     <button class="btn-action" disabled>
                         ✏️ Modifier la quantité
                     </button>
                     <button class="btn-action" disabled>
                         📋 Ajouter à une liste
                     </button>
-                </div>
+                </section>
 
-            </div>
+            </article>
 
         </div>
-    </div>
+    </main>
 </template>
 
 <script setup>

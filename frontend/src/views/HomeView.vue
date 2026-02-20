@@ -1,5 +1,5 @@
 <template>
-    <div class="home">
+    <main class="home">
         <div class="container">
 
             <header class="header">
@@ -7,7 +7,7 @@
                 <p class="subtitle">Outil de visualisation et de manipulation de stock de la reserve Colombe</p>
             </header>
 
-            <div class="card-item">
+            <section class="card-item">
                 <h2>🔍 Recherche de produits</h2>
 
                 <form @submit.prevent="handleSearch">
@@ -54,11 +54,11 @@
                 </div>
 
                 <!-- Résultat -->
-                <div v-if="products.length > 0" class="results">
+                <section v-if="products.length > 0" class="results">
                     <h3>📦 Résultats ({{ products.length }})</h3>
 
                     <div class="product-list">
-                        <div
+                        <article
                         v-for="product in products"
                         :key="product.id"
                         class="product-item"
@@ -70,18 +70,18 @@
                             <p>Fournisseur : {{ product.fournisseur || 'Non reseigné' }}</p>
                             <p class="stock">Stock : {{ product.quantite }}</p>
                         </div>
-                        </div>
+                        </article>
                     </div>
-                </div>
+                </section>
 
                 <!-- Aucun résulat -->
                 <div v-if="!loading && searched && products.length === 0" class="message info">
                     ℹ️ Aucun produit trouvé
                 </div> 
-            </div>
+            </section>
 
         </div>
-    </div>
+    </main>
 </template>
 
 

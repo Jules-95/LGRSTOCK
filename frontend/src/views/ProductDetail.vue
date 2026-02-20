@@ -43,6 +43,16 @@
                         <span class="detail-label">Quantité en stock</span>
                         <span class="detail-value">{{ product.quantite }} unités</span>
                     </div>
+                    
+                    <div class="detail-row">
+                        <span class="detail-label">Créé le</span>
+                        <span class="detail-value">{{ product.created_at }}</span>
+                    </div>
+
+                    <div class="detail-row">
+                        <span class="detail-label">Modifié le</span>
+                        <span class="detail-value">{{ product.updated_at }}</span>
+                    </div>
                 </div>
 
                 <!-- Prévision btn modifier quantité / btn ajouter à une liste -->

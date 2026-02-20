@@ -18,6 +18,7 @@
                             type="text"
                             placeholder="3700523456789"
                             maxlength="13"
+                            autofocus
                             />
                     </div>
 

@@ -63,13 +63,15 @@ class Product {
         }
 
         if ($libelle) {
+            $escaped = addcslashes($libelle, '%_');
             $sql .= " AND libelle LIKE :libelle";
-            $params[':libelle'] = '%' . $libelle . '%';
+            $params[':libelle'] = '%' . $escaped . '%';
         }
 
         if ($fournisseur) {
+            $escaped = addcslashes($fournisseur, '%_');
             $sql .= " AND fournisseur LIKE :fournisseur";
-            $params[':fournisseur'] = '%' . $fournisseur . '%';
+            $params[':fournisseur'] = '%' . $escaped . '%';
         }
 
         // Limiter le nombre de résultat 

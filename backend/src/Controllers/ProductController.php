@@ -88,8 +88,8 @@ class ProductController {
         } catch (Exception $e) {
             $this->sendResponse(400,[
                 'error' => true,
-                'message' => 'Erreur lors de la recherche',
-                'details' => $e->getMessage()
+                'message' => $e->getMessage(),
+                'details' => 'Erreur lors de la recherche'
             ]);
         }
 

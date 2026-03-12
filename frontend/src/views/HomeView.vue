@@ -87,6 +87,7 @@
 
 
 <script setup>
+import { API_BASE_URL } from '@/config'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
@@ -123,7 +124,7 @@ async function handleSearch() {
     if (searchLibelle.value) params.append('libelle', searchLibelle.value)
     if (searchFournisseur.value) params.append('fournisseur', searchFournisseur.value)
 
-    const apiURL = `http://localhost/LGRSTOCK/backend/api/search.php?${params.toString()}`
+    const apiURL = `${API_BASE_URL}/search.php?${params.toString()}`
 
     console.log('URL appelée :', apiURL)
 

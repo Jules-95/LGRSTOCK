@@ -72,6 +72,7 @@
 </template>
 
 <script setup>
+import { API_BASE_URL } from '@/config'
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router';
 
@@ -103,7 +104,7 @@ async function fetchProduct() {
     loading.value = true
     error.value = null
 
-    const apiURL = `http://localhost/LGRSTOCK/backend/api/product.php?id=${productId}`
+    const apiURL = `${API_BASE_URL}/product.php?id=${productId}`
 
     console.log('Récupération du produit :', productId)
 

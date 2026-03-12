@@ -103,8 +103,6 @@ async function fetchProduct() {
   loading.value = true;
   error.value = null;
 
-  console.log("Récupération du produit :", productId);
-
   try {
     product.value = await getProductById(productId)
 

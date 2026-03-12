@@ -134,7 +134,6 @@ async function handleSearch() {
 
     //Redirection automatique : Cas où un seul résultat
     if (data.count === 1) {
-      console.log("Redirection auto vers produit", data.data[0].id);
       router.push(`/product/${data.data[0].id}`);
     } else {
       // Sinon affichage de la liste de résultat

@@ -1,11 +1,13 @@
-<?php 
+<?php
 /**
- * Controller qui gère les requêtes HTTP liées aux produits : 
+ * Controller qui gère les requêtes HTTP liées aux produits :
  * - Récupère les données de la requête ($_GET, $_POST)
  * - Valide les données HTTP
  * - Appelle le Model Product.php
  * - Formate et renvoie les réponses Json
  */
+
+require_once __DIR__ . '/../Models/Product.php';
 
 class ProductController {
     private $productModel;
@@ -17,10 +19,7 @@ class ProductController {
      */
 
     public function __construct($pdo) {
-        // Chargement du model Product.php
-        require_once __DIR__ . '/../Models/Product.php';
-
-        // Instancier le Model 
+        // Instancier le Model
         $this->productModel = new Product($pdo);
     }
 

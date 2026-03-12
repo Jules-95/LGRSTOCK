@@ -71,6 +71,8 @@ import { API_BASE_URL } from "@/config";
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
+import { getProductById } from '@/services/api'
+
 import MessageBox from "@/components/MessageBox.vue";
 
 const route = useRoute();
@@ -101,24 +103,13 @@ async function fetchProduct() {
   loading.value = true;
   error.value = null;
 
-  const apiURL = `${API_BASE_URL}/product.php?id=${productId}`;
-
   console.log("Récupération du produit :", productId);
 
   try {
-    const response = await fetch(apiURL);
-    const data = await response.json();
+    product.value = await getProductById(productId)
 
-    console.log("Réponse API:", data);
-
-    if (data.error) {
-      error.value = data.message;
-    } else {
-      product.value = data.data;
-    }
   } catch (err) {
-    console.error("Erreur :", err);
-    error.value = "Erreur lors du chargement du produit";
+    error.value = err.message;
   } finally {
     loading.value = false;
   }

@@ -92,6 +92,8 @@ import { API_BASE_URL } from "@/config";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 
+import { searchProducts } from "@/services/api";
+
 import MessageBox from "@/components/MessageBox.vue";
 
 // Hook Vue Router qui donne accès à l'objet de navigation
@@ -121,41 +123,26 @@ async function handleSearch() {
     return;
   }
 
-  // Construire l'URL de l'API avec les paramètres
-  const params = new URLSearchParams();
-  if (searchEAN.value) params.append("ean", searchEAN.value);
-  if (searchLibelle.value) params.append("libelle", searchLibelle.value);
-  if (searchFournisseur.value)
-    params.append("fournisseur", searchFournisseur.value);
-
-  const apiURL = `${API_BASE_URL}/search.php?${params.toString()}`;
-
-  console.log("URL appelée :", apiURL);
-
   loading.value = true;
 
   try {
-    const response = await fetch(apiURL);
-    const data = await response.json();
+    const data = await searchProducts({
+      ean: searchEAN.value,
+      libelle: searchLibelle.value,
+      fournisseur: searchFournisseur.value,
+    });
 
-    console.log("Réponse API :", data);
-
-    if (data.error) {
-      error.value = data.message;
+    //Redirection automatique : Cas où un seul résultat
+    if (data.count === 1) {
+      console.log("Redirection auto vers produit", data.data[0].id);
+      router.push(`/product/${data.data[0].id}`);
     } else {
-      // Si un seul résultat : Redirection automatique vers fiche produit
-      if (data.count === 1) {
-        console.log("Redirection auto vers produit", data.data[0].id);
-        router.push(`/product/${data.data[0].id}`);
-      } else {
-        // Sinon affichage de la liste
-        products.value = data.data;
-      }
+      // Sinon affichage de la liste de résultat
+      products.value = data.data;
     }
   } catch (err) {
-    console.error("Erreur :", err);
-    error.value =
-      "Erreur lors de la recherche. Vérifiez que le backend est actif.";
+    // Le service a lancé une erreur (throw new Error)
+    error.value = err.message;
   } finally {
     loading.value = false;
   }
@@ -173,7 +160,7 @@ function goToProduct(productId) {
 </script>
 
 <style scoped>
-/* Style qui sera commun (UTILISATION DE COMPOSANT ?) */
+
 
 /* Mis en page de toutes les vues  */
 .home {

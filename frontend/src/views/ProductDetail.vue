@@ -1,137 +1,133 @@
 <template>
-    <main class="page">
-        <div class="container">
+  <main class="page">
+    <div class="container">
+      <!-- Bouton retour -->
+      <nav class="back-button">
+        <button @click="$router.back()" class="btn-back">
+          ← Retour à la recherche
+        </button>
+      </nav>
 
-            <!-- Bouton retour -->
-            <nav class="back-button">
-                <button @click="$router.back()" class="btn-back">
-                    ← Retour à la recherche
-                </button>
-            </nav>
+      <!-- Message de chargement -->
+      <MessageBox
+        v-if="loading"
+        type="loading"
+        message="Chargement du produit..."
+      />
 
-            <!-- Message de chargement -->
-            <div v-if="loading" class="message info">
-                ⏳ Chargement du produit...
-            </div>
+      <!-- Message d'erreur -->
+      <MessageBox v-if="error" type="error" :message="error" />
 
-            <!-- Message d'erreur -->
-            <div v-if="error" class="message error">
-                ❌ {{ error }}
-            </div>
+      <!-- fiche produit -->
+      <article v-if="product" class="card-item">
+        <header class="product-header">
+          <h1>{{ product.libelle }}</h1>
+          <span class="stock-badge" :class="stockClass">
+            {{ product.quantite }} unités
+          </span>
+        </header>
 
-            <!-- fiche produit -->
-            <article v-if="product" class="card-item">
-                <header class="product-header">
-                    <h1>{{ product.libelle }}</h1>
-                    <span class="stock-badge" :class="stockClass">
-                    {{ product.quantite }} unités
-                    </span>
-                </header>
+        <section class="product-details">
+          <div class="detail-row">
+            <span class="detail-label">Code EAN</span>
+            <span class="detail-value">{{ product.ean }}</span>
+          </div>
 
-                <section class="product-details">
-                    <div class="detail-row">
-                        <span class="detail-label">Code EAN</span>
-                        <span class="detail-value">{{ product.ean }}</span>
-                    </div>
+          <div class="detail-row">
+            <span class="detail-label">Fournisseur</span>
+            <span class="detail-value">{{
+              product.fournisseur || "Non renseigné"
+            }}</span>
+          </div>
 
-                    <div class="detail-row">
-                        <span class="detail-label">Fournisseur</span>
-                        <span class="detail-value">{{ product.fournisseur || 'Non renseigné'}}</span>
-                    </div>
+          <div class="detail-row">
+            <span class="detail-label">Quantité en stock</span>
+            <span class="detail-value">{{ product.quantite }} unités</span>
+          </div>
 
-                    <div class="detail-row">
-                        <span class="detail-label">Quantité en stock</span>
-                        <span class="detail-value">{{ product.quantite }} unités</span>
-                    </div>
-                    
-                    <div class="detail-row">
-                        <span class="detail-label">Créé le</span>
-                        <span class="detail-value">{{ product.created_at }}</span>
-                    </div>
+          <div class="detail-row">
+            <span class="detail-label">Créé le</span>
+            <span class="detail-value">{{ product.created_at }}</span>
+          </div>
 
-                    <div class="detail-row">
-                        <span class="detail-label">Modifié le</span>
-                        <span class="detail-value">{{ product.updated_at }}</span>
-                    </div>
-                </section>
+          <div class="detail-row">
+            <span class="detail-label">Modifié le</span>
+            <span class="detail-value">{{ product.updated_at }}</span>
+          </div>
+        </section>
 
-                <!-- Prévision btn modifier quantité / btn ajouter à une liste -->
-                <section class="product-actions">
-                    <button class="btn-action" disabled>
-                        ✏️ Modifier la quantité
-                    </button>
-                    <button class="btn-action" disabled>
-                        📋 Ajouter à une liste
-                    </button>
-                </section>
-
-            </article>
-
-        </div>
-    </main>
+        <!-- Prévision btn modifier quantité / btn ajouter à une liste -->
+        <section class="product-actions">
+          <button class="btn-action" disabled>✏️ Modifier la quantité</button>
+          <button class="btn-action" disabled>📋 Ajouter à une liste</button>
+        </section>
+      </article>
+    </div>
+  </main>
 </template>
 
 <script setup>
-import { API_BASE_URL } from '@/config'
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router';
+import { API_BASE_URL } from "@/config";
+import { ref, computed, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 
-const route = useRoute()
-const router = useRouter()
+import MessageBox from "@/components/MessageBox.vue";
 
-// Etats réactifs 
-const product = ref(null)
-const loading = ref(false)
-const error = ref(null)
+const route = useRoute();
+const router = useRouter();
 
-// Computed : class CSS selon le stock 
+// Etats réactifs
+const product = ref(null);
+const loading = ref(false);
+const error = ref(null);
+
+// Computed : class CSS selon le stock
 const stockClass = computed(() => {
-    if (!product.value) return ''
+  if (!product.value) return "";
 
-    const stock = product.value.quantite
-    if (stock === 0) return 'stock-empty'
-    if (stock < 10) return 'stock-low'
-    return 'stock-ok'
-})
+  const stock = product.value.quantite;
+  if (stock === 0) return "stock-empty";
+  if (stock < 10) return "stock-low";
+  return "stock-ok";
+});
 
 /**
- * Récupère les données du produit depuis l'API 
+ * Récupère les données du produit depuis l'API
  */
 
 async function fetchProduct() {
-    const productId = route.params.id
-    
-    loading.value = true
-    error.value = null
+  const productId = route.params.id;
 
-    const apiURL = `${API_BASE_URL}/product.php?id=${productId}`
+  loading.value = true;
+  error.value = null;
 
-    console.log('Récupération du produit :', productId)
+  const apiURL = `${API_BASE_URL}/product.php?id=${productId}`;
 
-    try {
-        const response = await fetch(apiURL)
-        const data = await response.json()
+  console.log("Récupération du produit :", productId);
 
-        console.log('Réponse API:', data)
+  try {
+    const response = await fetch(apiURL);
+    const data = await response.json();
 
-        if(data.error) {
-            error.value = data.message
-        } else {
-            product.value =data.data
-        }
+    console.log("Réponse API:", data);
 
-    } catch (err) {
-        console.error('Erreur :', err)
-        error.value = 'Erreur lors du chargement du produit'
-    } finally {
-        loading.value = false
+    if (data.error) {
+      error.value = data.message;
+    } else {
+      product.value = data.data;
     }
+  } catch (err) {
+    console.error("Erreur :", err);
+    error.value = "Erreur lors du chargement du produit";
+  } finally {
+    loading.value = false;
+  }
 }
 
 // Hook de lifecycle : exécuté au montage du composant
 onMounted(() => {
-    fetchProduct()
-})
+  fetchProduct();
+});
 </script>
 
 <style scoped>
@@ -165,30 +161,12 @@ onMounted(() => {
   transform: translateX(-3px);
 }
 
-/* Messages d'état */
-.message {
-  padding: 1rem;
-  border-radius: 10px;
-  margin-bottom: 1.5rem;
-  font-weight: 500;
-}
-
-.message.info {
-  background: #dbeafe;
-  color: #1e40af;
-}
-
-.message.error {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
 /* Card principale */
 .card-item {
   background: white;
   border-radius: 20px;
   padding: 2.5rem;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 /* Header avec titre et badge stock */

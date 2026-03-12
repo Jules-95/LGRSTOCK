@@ -106,7 +106,7 @@ LGRSTOCK/
 
 ---
 
-## Installation
+## Installation (temporaire)
 
 ### Prérequis
 

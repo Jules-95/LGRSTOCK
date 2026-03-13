@@ -34,6 +34,39 @@ class Product {
 
 
     /**
+     * Mise à jour de la quantité d'un produit
+     * @param int $id
+     * @param int $quantite
+     * @return bool true si la mise à jour a réussi
+     * @throws Exception si données invalides
+     */
+    public function updateQuantite($id, $quantite) {
+        if (empty($id) || !is_numeric($id)) {
+            throw new Exception("L'ID du produit doit être valide");
+        }
+
+        if (!is_numeric($quantite) || $quantite < 0) {
+            throw new Exception("La quantité doit être un nombre positif ou nul");
+        }
+
+        $sql = "UPDATE products SET quantite = :quantite, updated_at = NOW() WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':quantite' => (int) $quantite,
+            ':id' => (int) $id
+        ]);
+
+        //rowCountretourne le nombre de lignes affectées par l'UPDATE
+        // Si 0 : l'ID n'existe pas en BDD
+        if ($stmt->rowCount() === 0) {
+            throw new Exception("Produit introuvable ou quantité inchangée");
+        }
+
+        return true;
+    }
+
+
+    /**
      * Recherche d'un produit selon critères
      * @param array $filters ['ean' => '', 'libelle' => '', 'fournisseur' => '']
      * @return array Tableau de produit (Peut etre vide)

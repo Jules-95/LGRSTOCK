@@ -58,11 +58,40 @@
 
         <!-- Prévision btn modifier quantité / btn ajouter à une liste -->
         <section class="product-actions">
-          <button class="btn-action" disabled>✏️ Modifier la quantité</button>
+          <button class="btn-action" @click="ouvrirModal">
+            ✏️ Modifier la quantité
+          </button>
           <button class="btn-action" disabled>📋 Ajouter à une liste</button>
         </section>
       </article>
     </div>
+
+    <Modal
+      v-if="showModal"
+      title="Modifier la quantité"
+      @close="showModal = false"
+    >
+      <div class="form-quantite">
+        <p class="product-name">{{ product.libelle }}</p>
+
+        <p class="quantite-label">Nombre d'unités ({{ product.quantite }}) </p>
+
+        <div class="quantite-controls">
+          <button class="btn-compteur" @click="nouvelleQuantite--">-</button>
+          <span class="quantite-valeur">{{ nouvelleQuantite }}</span>
+          <button class="btn-compteur" @click="nouvelleQuantite++">+</button>
+        </div>
+
+          <div class="form-actions">
+            <button class="btn-annuler" @click="showModal = false">
+              Annuler
+            </button>
+            <button class="btn-valider" @click="modifierQuantite">
+              Valider
+            </button>
+          </div>
+      </div>
+    </Modal>
   </main>
 </template>
 
@@ -71,9 +100,10 @@ import { API_BASE_URL } from "@/config";
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-import { getProductById } from '@/services/api'
+import { getProductById } from "@/services/api";
 
 import MessageBox from "@/components/MessageBox.vue";
+import Modal from "@/components/Modal.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -82,6 +112,10 @@ const router = useRouter();
 const product = ref(null);
 const loading = ref(false);
 const error = ref(null);
+
+// Modale et Modification quantite
+const showModal = ref(false);
+const nouvelleQuantite = ref(product.value?.quantite ?? 0);
 
 // Computed : class CSS selon le stock
 const stockClass = computed(() => {
@@ -104,13 +138,23 @@ async function fetchProduct() {
   error.value = null;
 
   try {
-    product.value = await getProductById(productId)
-
+    product.value = await getProductById(productId);
   } catch (err) {
     error.value = err.message;
   } finally {
     loading.value = false;
   }
+}
+
+function ouvrirModal() {
+  nouvelleQuantite.value = product.value.quantite
+  showModal.value = true
+}
+
+async function modifierQuantite() {
+  // On verra le contenu ici à l'étape PHP
+  // Pour l'instant on ferme juste la modale
+  showModal.value = false;
 }
 
 // Hook de lifecycle : exécuté au montage du composant
@@ -248,5 +292,89 @@ onMounted(() => {
 .btn-action:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+
+/* Modale Modif quantite */
+
+.form-quantite {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.product-name {
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0;
+}
+
+.quantite-label {
+  text-align: center;
+  font-weight: 700;
+}
+
+.quantite-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fce4e4;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.btn-compteur {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  border: none;
+  background: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #1f2937;
+}
+
+.btn-compteur:hover {
+  background: #f3f4f6;
+}
+
+
+.quantite-valeur {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #667eea;
+}
+
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.btn-annuler {
+  flex : 1;
+  padding: 0.75rem;
+  border : 2px solid #e5e7eb;
+  border-radius: 10px;
+  background: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-valider {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 10px;
+  background: #667eea;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-valider:hover {
+  background: #5a67d8;
 }
 </style>

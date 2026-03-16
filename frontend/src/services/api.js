@@ -59,10 +59,7 @@ export async function getProductById(id) {
 export async function updateStock(id, quantite) {
     const response = await fetch (`${API_BASE_URL}/update-stock.php` , {
         method: 'POST',
-        headers: {
-            'Content-Type' : 'application/json'
-        },
-        body: JSON.stringify({id, quantite})
+        body: new URLSearchParams({ id, quantite})
     })
 
     const data = await response.json()

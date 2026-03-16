@@ -104,12 +104,9 @@ class ProductController
     public function updateStock()
     {
         try {
-            // file_get_contents('php://input') lit le corps brut de la requête HTTP
-            // C'est comme ça qu'on reçoit du json envoyé par fetch() coté VUE
-            $body = json_decode(file_get_contents('php://input'), true);
-
-            $id       = $body['id']        ?? null;
-            $quantite = $body['quantite'] ?? null;
+            // On va lire le $_POST au lieu du JSON brut (plus simple + debug)
+            $id       = $_POST['id']        ?? null;
+            $quantite = $_POST['quantite'] ?? null;
 
             $this->productModel->updateQuantite($id, $quantite);
 

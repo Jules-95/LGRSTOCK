@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Controller qui gère les requêtes HTTP liées aux produits :
  * - Récupère les données de la requête ($_GET, $_POST)
@@ -9,7 +10,8 @@
 
 require_once __DIR__ . '/../Models/Product.php';
 
-class ProductController {
+class ProductController
+{
     private $productModel;
 
 
@@ -18,7 +20,8 @@ class ProductController {
      * @param PDO $pdo Connexion à la BDD
      */
 
-    public function __construct($pdo) {
+    public function __construct($pdo)
+    {
         // Instancier le Model
         $this->productModel = new Product($pdo);
     }
@@ -26,7 +29,8 @@ class ProductController {
 
     // 1. METHODES PUBLIQUES (Une par endpoint API)
 
-    public function getById() {
+    public function getById()
+    {
         try {
             //a. Récup l'id depuis l'url 
             $id = $_GET['id'] ?? null;
@@ -47,7 +51,6 @@ class ProductController {
                 'error' => false,
                 'data' => $product
             ]);
-
         } catch (Exception $e) {
             // Erreur (Validation ou autre)
             $this->sendResponse(400, [
@@ -65,13 +68,14 @@ class ProductController {
      * 
      * @return void
      */
-    public function search() {
+    public function search()
+    {
         try {
             //a. Récup les critères depuis l'url
             $filters = [
                 'ean' => $_GET['ean'] ?? null,
-                'libelle' => $_GET['libelle'] ?? null, 
-                'fournisseur' => $_GET['fournisseur'] ?? null  
+                'libelle' => $_GET['libelle'] ?? null,
+                'fournisseur' => $_GET['fournisseur'] ?? null
             ];
 
             //b. Appeler le Model (Qui fait la validation) 
@@ -83,19 +87,43 @@ class ProductController {
                 'count' => count($products),
                 'data' => $products
             ]);
-
         } catch (Exception $e) {
-            $this->sendResponse(400,[
+            $this->sendResponse(400, [
                 'error' => true,
                 'message' => $e->getMessage(),
                 'details' => 'Erreur lors de la recherche'
             ]);
         }
-
-        
     }
 
 
+    /**
+     * Mise à jour de la quantite d'un produit 
+     * Utilisé par : POST /api/update-stock.php
+     */
+    public function updateStock()
+    {
+        try {
+            // file_get_contents('php://input') lit le corps brut de la requête HTTP
+            // C'est comme ça qu'on reçoit du json envoyé par fetch() coté VUE
+            $body = json_decode(file_get_contents('php://input'), true);
+
+            $id       = $body['id']        ?? null;
+            $quantite = $body['quantite'] ?? null;
+
+            $this->productModel->updateQuantite($id, $quantite);
+
+            $this->sendResponse(200, [
+                'error' => false,
+                'message' => 'Quantité mise à jour avec succès'
+            ]);
+        } catch (Exception $e) {
+            $this->sendResponse(400, [
+                'error' => true,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
 
     // 2. METHODES PRIVATE (utilitaires)
 
@@ -106,16 +134,17 @@ class ProductController {
      * @param array $data Données a renvoyer en JSON
      * @return void
      */
-    private function sendResponse($statusCode, $data) {
+    private function sendResponse($statusCode, $data)
+    {
         // Definir le code HTTP 
-        http_response_code($statusCode); 
+        http_response_code($statusCode);
 
         // Définir les headers (Métadonnées -> Dit au navigateur :)
         header('Content-Type: application/json; charset=utf-8'); // "J'envoie du JSON en UTF-8
         header('Access-Control-Allow-Origin: *'); // "Le front (localhost:5173) a le droit de m'appeler 
 
         // Envoyer le JSON 
-        echo json_encode($data, JSON_UNESCAPED_UNICODE); 
+        echo json_encode($data, JSON_UNESCAPED_UNICODE);
 
         //Arrêter l'exécution
         exit;

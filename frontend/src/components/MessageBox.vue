@@ -27,6 +27,7 @@ const icon = computed(() => {
 
 .message {
   padding: 1rem;
+  margin-bottom: 1rem;
   border-radius: 10px;
   margin-top: 1.5rem;
   font-weight: 500;

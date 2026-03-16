@@ -49,3 +49,27 @@ export async function getProductById(id) {
     
     return data.data
 }
+
+
+/** 
+ * Met à jour la quantite d'un produit 
+ * @param {number} id - L'ID du produit 
+ * @param {number} quantite - La nouvelle quantité
+ */
+export async function updateStock(id, quantite) {
+    const response = await fetch (`${API_BASE_URL}/update-stock.php` , {
+        method: 'POST',
+        headers: {
+            'Content-Type' : 'application/json'
+        },
+        body: JSON.stringify({id, quantite})
+    })
+
+    const data = await response.json()
+
+    if (data.error) {
+        throw new Error(data.message)
+    }
+
+    return data
+}

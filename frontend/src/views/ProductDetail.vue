@@ -100,7 +100,7 @@ import { API_BASE_URL } from "@/config";
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-import { getProductById } from "@/services/api";
+import { getProductById, updateStock } from "@/services/api";
 
 import MessageBox from "@/components/MessageBox.vue";
 import Modal from "@/components/Modal.vue";
@@ -152,9 +152,14 @@ function ouvrirModal() {
 }
 
 async function modifierQuantite() {
-  // On verra le contenu ici à l'étape PHP
-  // Pour l'instant on ferme juste la modale
-  showModal.value = false;
+  try {
+    await updateStock(product.value.id, nouvelleQuantite.value)
+    // Mettre à jour l'affichage sans recharger la page
+    product.value.quantite = nouvelleQuantite.value
+    showModal.value = false;
+  } catch (err) {
+    error.value = err.message
+  }
 }
 
 // Hook de lifecycle : exécuté au montage du composant

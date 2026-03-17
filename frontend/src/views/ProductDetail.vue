@@ -3,7 +3,7 @@
     <div class="container">
       <!-- Bouton retour -->
       <nav class="back-button">
-        <button @click="$router.back()" class="btn-back">
+        <button @click="$router.push('/')" class="btn-back">
           ← Retour à la recherche
         </button>
       </nav>

@@ -45,6 +45,10 @@
           <button class="search-btn" type="submit">🔍 Rechercher</button>
         </form>
 
+        <button class="search-btn" type="button" @click="router.push('/ajouter-produit')" style="margin-top: 1rem;">
+          + Ajouter un produit
+        </button>
+
         <!-- Message de chargement -->
         <MessageBox
           v-if="loading"

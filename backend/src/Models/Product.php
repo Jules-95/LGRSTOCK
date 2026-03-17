@@ -57,6 +57,12 @@ class Product {
         // Réutilisation de la validation EAN 
         $this->validateEan($ean);
 
+        // Double Validation front/back pour la valeur et et le type de "quantite"
+        if (!is_numeric($quantite) || $quantite < 0) {
+            throw new Exception("La quantité doit être un nombre positif ou nul");
+        }
+
+        try {
         // Requête préparée INSERT 
         // NOW() remplit automatiuement created_at et updated_at
 
@@ -70,8 +76,25 @@ class Product {
             ':quantite'    => (int) $quantite
         ]);
 
-        // On va retourner l'ID généré par MySQL pour la ligne qu'on vient d'insérer. 
+        // On va retourner l'ID généré par MySQL pour la ligne qu'on vient d'insérer. (Pour afficher la nouvelle fiche détaillée en cas de produit ajouté)
         return $this->pdo->lastInsertId();
+
+        } catch (PDOException $e) {
+            // Code 23000 = Violation de contrainte unique qui se déclenche quand un code EAN existe déjà
+            if ($e->getCode() === '23000') {
+                // Recherche du libelle du produit qui existe pour l'afficher dans le message d'erreur
+                $stmt = $this->pdo->prepare("SELECT libelle FROM products WHERE ean= :ean");
+                $stmt->execute([':ean' => $ean]);
+                $productAlreadyExist = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                $existProduct = $productAlreadyExist ? $productAlreadyExist['libelle'] : 'inconnu';
+
+                throw new Exception("Référence EAN déjà présente en stock / Produit : " . $existProduct);
+            } 
+
+            // Si c'est une autre erreur PDO, on la remonte telle quelle 
+            throw new Exception("Erreur technique : " . $e->getMessage());
+        }
     }
 
 

@@ -98,6 +98,43 @@ class ProductController
 
 
     /**
+     * Ajouter un nouveau produit
+     * Utilisé par : POST / api/add-product.php
+     */
+    public function addProduct() {
+        try {
+            // On lit les données envoyées en POST comme pour updateStock
+            $libelle = $_POST['libelle'] ?? null;
+            $ean = $_POST['ean'] ?? null;
+            $fournisseur = $_POST['fournisseur'] ?? null;
+            $quantite = $_POST['quantite'] ?? 0;
+
+            // On passe toutes les données au Model dans un tableau
+            $newId = $this->productModel->create([
+                'libelle' => $libelle,
+                'ean' => $ean,
+                'fournisseur' => $fournisseur,
+                'quantite' => $quantite
+            ]);
+
+            //Renvoyer l'ID du nouveau produit 
+            //Vue pourra rediriger vers /product/$newId
+            $this->sendResponse(200, [
+                'error' => false,
+                'message' => 'Produit ajouté avec succès',
+                'id' => $newId
+            ]);
+
+        } catch (Exception $e) {
+            $this->sendResponse(400, [
+                'error' => true,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+
+    /**
      * Mise à jour de la quantite d'un produit 
      * Utilisé par : POST /api/update-stock.php
      */

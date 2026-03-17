@@ -34,6 +34,48 @@ class Product {
 
 
     /**
+     * Ajouter un nouveau produit en BDD
+     * @param array $data ['libelle' => '', 'ean' => '', 'fournisseur' => '', 'quantite' => 0]
+     * @return int L'ID du produit crée
+     * @throws Exception si données invalides
+     */
+    public function create($data) {
+        $libelle     = $data['libelle']     ?? null;
+        $ean         = $data['ean']         ?? null;
+        $fournisseur = $data['fournisseur'] ?? null;
+        $quantite    = $data['quantite']    ?? 0;
+
+        // Validation : Champs obligatoires 
+        if (empty($libelle)) {
+            throw new Exception("Le libellé est obligatoire");
+        }
+
+        if (empty($ean)) {
+            throw new Exception("Le code EAN est obligatoire");
+        }
+
+        // Réutilisation de la validation EAN 
+        $this->validateEan($ean);
+
+        // Requête préparée INSERT 
+        // NOW() remplit automatiuement created_at et updated_at
+
+        $sql = "INSERT INTO products (libelle, ean, fournisseur, quantite, created_at, updated_at) VALUES (:libelle, :ean, :fournisseur, :quantite, NOW(), NOW())";
+
+        $stmt= $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':libelle'     => $libelle,
+            ':ean'         => $ean,
+            ':fournisseur' => $fournisseur,
+            ':quantite'    => (int) $quantite
+        ]);
+
+        // On va retourner l'ID généré par MySQL pour la ligne qu'on vient d'insérer. 
+        return $this->pdo->lastInsertId();
+    }
+
+
+    /**
      * Mise à jour de la quantité d'un produit
      * @param int $id
      * @param int $quantite

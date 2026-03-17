@@ -52,6 +52,28 @@ export async function getProductById(id) {
 
 
 /** 
+ * Ajouter un nouveau produit 
+ * @param {object} data - {libelle, ean, fournisseur, quantite}
+ * @returns {Promise<Object>} L'ID du produit créé
+ * @throws {Error} Si erreur API
+*/
+export async function addProduct(data) {
+    const response = await fetch(`${API_BASE_URL}/add-product.php`, {
+        method: 'POST',
+        body: new URLSearchParams(data)
+    })
+
+    const result = await response.json()
+
+    if (result.error) {
+        throw new Error(result.message)
+    }
+
+    return result
+    
+}
+
+/** 
  * Met à jour la quantite d'un produit 
  * @param {number} id - L'ID du produit 
  * @param {number} quantite - La nouvelle quantité

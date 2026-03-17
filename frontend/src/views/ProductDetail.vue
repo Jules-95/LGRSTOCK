@@ -77,7 +77,7 @@
         <p class="quantite-label">Nombre d'unités ({{ product.quantite }}) </p>
 
         <div class="quantite-controls">
-          <button class="btn-compteur" @click="nouvelleQuantite--">-</button>
+          <button class="btn-compteur" @click=limitDecrement>-</button>
           <span class="quantite-valeur">{{ nouvelleQuantite }}</span>
           <button class="btn-compteur" @click="nouvelleQuantite++">+</button>
         </div>
@@ -96,7 +96,6 @@
 </template>
 
 <script setup>
-import { API_BASE_URL } from "@/config";
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
@@ -160,6 +159,10 @@ async function modifierQuantite() {
   } catch (err) {
     error.value = err.message
   }
+}
+
+function limitDecrement () {
+  if(nouvelleQuantite.value > 0) nouvelleQuantite.value--
 }
 
 // Hook de lifecycle : exécuté au montage du composant

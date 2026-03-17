@@ -88,7 +88,6 @@
 </template>
 
 <script setup>
-import { API_BASE_URL } from "@/config";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 

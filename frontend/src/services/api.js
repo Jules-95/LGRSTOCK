@@ -73,6 +73,30 @@ export async function addProduct(data) {
     
 }
 
+
+/**
+ * Supprimer un produit existant
+ * @param {number} id - L'ID du produit à supprimer
+ * @throws {Error} Si erreur API
+ */
+export async function deleteProduct(id) {
+    const response = await fetch (`${API_BASE_URL}/delete-product.php`, {
+        method: 'POST',
+        body: new URLSearchParams({ id })
+    })
+
+    const result = await response.json()
+
+    if (result.error) {
+        throw new Error(result.message)
+    }
+
+    return result
+    
+}
+
+
+
 /** 
  * Met à jour la quantite d'un produit 
  * @param {number} id - L'ID du produit 

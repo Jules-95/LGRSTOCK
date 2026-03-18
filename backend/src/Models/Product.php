@@ -99,6 +99,30 @@ class Product {
 
 
     /**
+     * Supprimer un produit 
+     * @param int $id
+     * @return bool true si suppression réussi
+     * @throws Exception si ID invalide ou produit introuvable 
+     */
+    public function delete($id) {
+        if (empty($id) || !is_numeric($id)) {
+            throw new Exception("L'ID du produit doit etre valide");
+        }
+
+        $sql = "DELETE FROM products WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':id' => (int) $id]);
+
+        // si aucune ligne supprimée, l'ID n'existait pas 
+        if ($stmt->rowCount() === 0) {
+            throw new Exception("Produit introuvable");
+        }
+
+        return true;
+    }
+
+
+    /**
      * Mise à jour de la quantité d'un produit
      * @param int $id
      * @param int $quantite

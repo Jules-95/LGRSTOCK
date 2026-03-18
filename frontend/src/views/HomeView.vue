@@ -98,11 +98,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
-const route = useRoute()
-const deleteSuccess = computed(() => route.query.deleted === 'true')
+const deleteSuccess = ref(history.state.deleted ===true)
 
 import { searchProducts } from "@/services/api";
 

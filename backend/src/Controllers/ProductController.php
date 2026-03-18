@@ -135,6 +135,32 @@ class ProductController
 
 
     /**
+     * supprime un produit 
+     * Utilisé par : POST /api/delete-product.php
+     */
+    public function deleteProduct() {
+        try {
+            $id = $_POST['id'] ?? null;
+
+            $this->productModel->delete($id);
+
+            $this->sendResponse(200, [
+                'error' => false,
+                'message' => 'Produit supprimé avec succès' 
+            ]);
+        } catch (Exception $e) {
+            $this->sendResponse(400, [
+                'error' => true,
+                'message' => $e->getMessage()
+            ]);
+        }
+    }
+
+
+
+
+
+    /**
      * Mise à jour de la quantite d'un produit 
      * Utilisé par : POST /api/update-stock.php
      */

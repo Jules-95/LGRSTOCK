@@ -1,11 +1,8 @@
 <template>
   <main class="page">
     <div class="container">
-
       <nav class="back-button">
-        <button @click="$router.push('/')" class="btn-back">
-          ← Retour
-        </button>
+        <button @click="$router.push('/')" class="btn-back">← Retour</button>
       </nav>
 
       <article class="card-item">
@@ -16,10 +13,8 @@
         <!-- MessageBox réutilisé pour les états loading/erreur/succès -->
         <MessageBox v-if="loading" type="loading" message="Ajout en cours..." />
         <MessageBox v-if="error" type="error" :message="error" />
-        <MessageBox v-if="succes" type="info" message="Produit ajouté avec succès !" />
 
         <form class="product-form" @submit.prevent="handleSubmit">
-
           <div class="form-group">
             <label for="libelle">Libellé *</label>
             <input
@@ -61,7 +56,6 @@
               v-model="form.quantite"
               type="number"
               min="0"
-              value="0"
               class="form-input"
             />
           </div>
@@ -74,7 +68,6 @@
               Ajouter le produit
             </button>
           </div>
-
         </form>
       </article>
     </div>
@@ -82,43 +75,55 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { addProduct } from '@/services/api'
-import MessageBox from '@/components/MessageBox.vue'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { addProduct } from "@/services/api";
+import MessageBox from "@/components/MessageBox.vue";
 
-const router = useRouter()
+const router = useRouter();
 
 // Les données du formulaire — un objet avec un champ par input
 const form = ref({
-  libelle: '',
-  ean: '',
-  fournisseur: '',
-  quantite: 0
-})
+  libelle: "",
+  ean: "",
+  fournisseur: "",
+  quantite: 0,
+});
 
 // Les états de la page
-const loading = ref(false)
-const error   = ref(null)
-const succes  = ref(false)
+const loading = ref(false);
+const error = ref(null);
 
 async function handleSubmit() {
+  error.value = null;
+
+  // Validation coté client
+  // Vérification avant d'appeler l'API
+  // Eviter les requêtes inutiles au serveur. 
+  if (!form.value.libelle.trim()) {
+    error.value = 'Le libellé est obligatoire'
+    return
+  }
+
+  if (!form.value.ean.trim()) {
+    error.value = 'Le code EAN est obligatoire'
+    return
+  }
+
   loading.value = true
-  error.value   = null
-  succes.value  = false
+
 
   try {
     // On envoie tout l'objet form.value à api.js
-    const result = await addProduct(form.value)
+    const result = await addProduct(form.value);
 
     // PHP nous renvoie l'ID du nouveau produit
     // On redirige directement vers sa fiche
-    router.push(`/product/${result.id}`)
-
+    router.push(`/product/${result.id}`);
   } catch (err) {
-    error.value = err.message
+    error.value = err.message;
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 </script>
@@ -157,7 +162,7 @@ async function handleSubmit() {
   background: white;
   border-radius: 20px;
   padding: 2.5rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); 
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
 }
 
 .form-header {
@@ -171,7 +176,6 @@ async function handleSubmit() {
   color: #1f2937;
   margin: 0;
 }
-
 
 .product-form {
   display: flex;

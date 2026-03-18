@@ -99,7 +99,7 @@
 
 <script setup>
 import { ref } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { useRouter} from "vue-router";
 
 const deleteSuccess = ref(history.state.deleted ===true)
 
@@ -303,6 +303,6 @@ function goToProduct(productId) {
 .product-info .stock {
   color: #667eea;
   font-weight: 600;
-  margin: top 0.5rem;
+  margin-top: 0.5rem;
 }
 </style>

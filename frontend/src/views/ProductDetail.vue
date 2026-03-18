@@ -47,12 +47,12 @@
 
           <div class="detail-row">
             <span class="detail-label">Créé le</span>
-            <span class="detail-value">{{ product.created_at }}</span>
+            <span class="detail-value">{{ formatDate(product.created_at) }}</span>
           </div>
 
           <div class="detail-row">
             <span class="detail-label">Modifié le</span>
-            <span class="detail-value">{{ product.updated_at }}</span>
+            <span class="detail-value">{{ formatDate(product.updated_at) }}</span>
           </div>
         </section>
 
@@ -182,6 +182,16 @@ async function supprimerProduit() {
   } catch (err) {
     error.value = err.message;
   }
+}
+
+/**
+ * Formate une date SQL (ex: "2026-03-18 15:51:10") en français lisible
+ * Résultat : "18/03/2026 à 15:51"
+ */
+function formatDate(dateStr) {
+  if (!dateStr) return '-'
+  const date = new Date(dateStr)
+  return date.toLocaleDateString('fr-FR') + ' à ' + date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
 }
 
 // Hook de lifecycle : exécuté au montage du composant

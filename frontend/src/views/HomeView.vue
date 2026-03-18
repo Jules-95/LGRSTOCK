@@ -9,6 +9,12 @@
         </p>
       </header>
 
+      <MessageBox 
+      v-if="deleteSuccess"
+      type="info"
+      message="Produit supprimé avec succès"
+      />
+
       <section class="card-item">
         <h2>🔍 Recherche de produits</h2>
 
@@ -92,8 +98,11 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed } from "vue";
+import { useRouter, useRoute } from "vue-router";
+
+const route = useRoute()
+const deleteSuccess = computed(() => route.query.deleted === 'true')
 
 import { searchProducts } from "@/services/api";
 

@@ -175,7 +175,10 @@ async function supprimerProduit() {
   try {
     await deleteProduct(product.value.id);
     // produit supprimer -> retour HomePage
-    router.push("/");
+    router.push({
+      path: '/',
+      query: { deleted: 'true'}
+    });
   } catch (err) {
     error.value = err.message;
   }

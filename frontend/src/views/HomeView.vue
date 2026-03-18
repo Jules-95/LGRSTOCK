@@ -203,15 +203,15 @@ function goToProduct(productId) {
 /* Style des cards conteneurs */
 .card-item {
   background: white;
-  border-radius: 20px;
+  border-radius: var(--radius-card);
   padding: 2.5rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-card);
 }
 
 .card-item h2 {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
-  color: #1f2937;
+  color: var(--color-text-dark);
 }
 
 /* Style des champs formulaire */
@@ -222,21 +222,21 @@ function goToProduct(productId) {
 .form-group label {
   display: block;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-medium);
   margin-bottom: 0.5rem;
 }
 
 .form-group input {
   width: 100%;
   padding: 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-input);
   font-size: 1rem;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -244,10 +244,10 @@ function goToProduct(productId) {
 
 .search-btn {
   padding: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-btn);
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
@@ -259,11 +259,11 @@ function goToProduct(productId) {
 .results {
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 2px solid #f3f4f6;
+  border-top: 2px solid var(--color-bg-light);
 }
 
 .results h3 {
-  color: #1f2937;
+  color: var(--color-text-dark);
   margin-bottom: 1.5rem;
 }
 
@@ -274,34 +274,34 @@ function goToProduct(productId) {
 }
 
 .product-item {
-  background: #f9fafb;
+  background: var(--color-bg-soft);
   padding: 1.5rem;
-  border-radius: 12px;
-  border: 2px solid #e5e7eb;
+  border-radius: var(--radius-input);
+  border: 2px solid var(--color-border);
   transition: all 0.2s;
   cursor: pointer;
 }
 
 .product-item:hover {
-  border-color: #667eea;
+  border-color: var(--color-primary);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
   transform: translateY(-2px);
 }
 
 .product-info h4 {
-  color: #1f2937;
+  color: var(--color-text-dark);
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
 }
 
 .product-info p {
-  color: #6b7280;
+  color: var(--color-text-light);
   font-size: 0.9rem;
   margin-bottom: 0.25rem;
 }
 
 .product-info .stock {
-  color: #667eea;
+  color: var(--color-primary);
   font-weight: 600;
   margin-top: 0.5rem;
 }

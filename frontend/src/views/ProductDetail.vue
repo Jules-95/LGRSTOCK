@@ -219,7 +219,7 @@ onMounted(() => {
 .btn-back {
   padding: 0.75rem 1.5rem;
   background: white;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
@@ -227,16 +227,16 @@ onMounted(() => {
 }
 
 .btn-back:hover {
-  border-color: #667eea;
+  border-color: var(--color-primary);
   transform: translateX(-3px);
 }
 
 /* Card principale */
 .card-item {
   background: white;
-  border-radius: 20px;
+  border-radius: var(--radius-card);
   padding: 2.5rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--shadow-card);
 }
 
 /* Header avec titre et badge stock */
@@ -246,12 +246,12 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 2px solid #f3f4f6;
+  border-bottom: 2px solid var(--color-bg-light);
 }
 
 .product-header h1 {
   font-size: 1.75rem;
-  color: #1f2937;
+  color: var(--color-text-dark);
   margin: 0;
 }
 
@@ -286,7 +286,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 1rem 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-bg-light);
 }
 
 .detail-row:last-child {
@@ -295,11 +295,11 @@ onMounted(() => {
 
 .detail-label {
   font-weight: 600;
-  color: #6b7280;
+  color: var(--color-text-light);
 }
 
 .detail-value {
-  color: #1f2937;
+  color: var(--color-text-dark);
   font-weight: 500;
 }
 
@@ -313,8 +313,8 @@ onMounted(() => {
 .btn-action {
   flex: 1;
   padding: 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-btn);
   background: white;
   font-weight: 600;
   cursor: pointer;
@@ -341,7 +341,7 @@ onMounted(() => {
 
 .product-name {
   font-weight: 600;
-  color: #6b7280;
+  color: var(--color-text-light);
   margin: 0;
 }
 
@@ -355,7 +355,7 @@ onMounted(() => {
   align-items: center;
   justify-content: space-between;
   background: #fce4e4;
-  border-radius: 12px;
+  border-radius: var(--radius-input);
   padding: 1.5rem;
 }
 
@@ -368,17 +368,17 @@ onMounted(() => {
   font-size: 1.5rem;
   font-weight: 600;
   cursor: pointer;
-  color: #1f2937;
+  color: var(--color-text-dark);
 }
 
 .btn-compteur:hover {
-  background: #f3f4f6;
+  background: var(--color-bg-light);
 }
 
 .quantite-valeur {
   font-size: 2rem;
   font-weight: 700;
-  color: #667eea;
+  color: var(--color-primary);
 }
 
 .form-actions {
@@ -390,7 +390,7 @@ onMounted(() => {
 .btn-annuler {
   flex: 1;
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid var(--color-border);
   border-radius: 10px;
   background: white;
   font-weight: 600;
@@ -402,13 +402,13 @@ onMounted(() => {
   padding: 0.75rem;
   border: none;
   border-radius: 10px;
-  background: #667eea;
+  background: var(--color-primary);
   color: white;
   font-weight: 600;
   cursor: pointer;
 }
 
 .btn-valider:hover {
-  background: #5a67d8;
+  background: var(--color-primary-dark);
 }
 </style>

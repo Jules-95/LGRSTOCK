@@ -58,10 +58,15 @@
 
         <!-- Prévision btn modifier quantité / btn ajouter à une liste -->
         <section class="product-actions">
+
           <button class="btn-action" @click="ouvrirModal">
             ✏️ Modifier la quantité
           </button>
-          <button class="btn-action" disabled>📋 Ajouter à une liste</button>
+
+          <button class="btn-action btn-delete" @click="supprimerProduit">
+            🗑️ Supprimer le produit
+          </button>
+
         </section>
       </article>
     </div>
@@ -74,22 +79,20 @@
       <div class="form-quantite">
         <p class="product-name">{{ product.libelle }}</p>
 
-        <p class="quantite-label">Nombre d'unités ({{ product.quantite }}) </p>
+        <p class="quantite-label">Nombre d'unités ({{ product.quantite }})</p>
 
         <div class="quantite-controls">
-          <button class="btn-compteur" @click=limitDecrement>-</button>
+          <button class="btn-compteur" @click="limitDecrement">-</button>
           <span class="quantite-valeur">{{ nouvelleQuantite }}</span>
           <button class="btn-compteur" @click="nouvelleQuantite++">+</button>
         </div>
 
-          <div class="form-actions">
-            <button class="btn-annuler" @click="showModal = false">
-              Annuler
-            </button>
-            <button class="btn-valider" @click="modifierQuantite">
-              Valider
-            </button>
-          </div>
+        <div class="form-actions">
+          <button class="btn-annuler" @click="showModal = false">
+            Annuler
+          </button>
+          <button class="btn-valider" @click="modifierQuantite">Valider</button>
+        </div>
       </div>
     </Modal>
   </main>
@@ -99,7 +102,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-import { getProductById, updateStock } from "@/services/api";
+import { getProductById, updateStock, deleteProduct } from "@/services/api";
 
 import MessageBox from "@/components/MessageBox.vue";
 import Modal from "@/components/Modal.vue";
@@ -146,23 +149,36 @@ async function fetchProduct() {
 }
 
 function ouvrirModal() {
-  nouvelleQuantite.value = product.value.quantite
-  showModal.value = true
+  nouvelleQuantite.value = product.value.quantite;
+  showModal.value = true;
 }
 
 async function modifierQuantite() {
   try {
-    await updateStock(product.value.id, nouvelleQuantite.value)
+    await updateStock(product.value.id, nouvelleQuantite.value);
     // Mettre à jour l'affichage sans recharger la page
-    product.value.quantite = nouvelleQuantite.value
+    product.value.quantite = nouvelleQuantite.value;
     showModal.value = false;
   } catch (err) {
-    error.value = err.message
+    error.value = err.message;
   }
 }
 
-function limitDecrement () {
-  if(nouvelleQuantite.value > 0) nouvelleQuantite.value--
+function limitDecrement() {
+  if (nouvelleQuantite.value > 0) nouvelleQuantite.value--;
+}
+
+async function supprimerProduit() {
+  // Confirmation avant suppression - Popup native du navigateur.
+  if (!confirm(`Supprimer définitivement "${product.value.libelle}" ?`)) return;
+
+  try {
+    await deleteProduct(product.value.id);
+    // produit supprimer -> retour HomePage
+    router.push("/");
+  } catch (err) {
+    error.value = err.message;
+  }
 }
 
 // Hook de lifecycle : exécuté au montage du composant
@@ -292,16 +308,15 @@ onMounted(() => {
   transition: all 0.2s;
 }
 
-.btn-action:not(:disabled):hover {
-  border-color: #667eea;
-  background: #f9fafb;
+.btn-delete {
+  border-color: #fee2e2;
+  color: #991b1b;
 }
 
-.btn-action:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.btn-delete:hover {
+  border-color: #ef4444;
+  background: #fee2e2;
 }
-
 
 /* Modale Modif quantite */
 
@@ -347,13 +362,11 @@ onMounted(() => {
   background: #f3f4f6;
 }
 
-
 .quantite-valeur {
   font-size: 2rem;
   font-weight: 700;
   color: #667eea;
 }
-
 
 .form-actions {
   display: flex;
@@ -362,9 +375,9 @@ onMounted(() => {
 }
 
 .btn-annuler {
-  flex : 1;
+  flex: 1;
   padding: 0.75rem;
-  border : 2px solid #e5e7eb;
+  border: 2px solid #e5e7eb;
   border-radius: 10px;
   background: white;
   font-weight: 600;

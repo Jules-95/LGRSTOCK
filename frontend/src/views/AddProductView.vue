@@ -1,77 +1,71 @@
 <template>
-  <main class="page">
-    <div class="container">
-      <div class="back-button">
-        <button @click="router.push('/')" class="btn-back">← Retour à la recherche</button>
-      </div>
+  <PageLayout back-label="← Retour à la recherche">
+    <article class="card-item">
+      <header class="form-header">
+        <h1>Ajouter un produit</h1>
+      </header>
 
-      <article class="card-item">
-        <header class="form-header">
-          <h1>Ajouter un produit</h1>
-        </header>
+      <!-- MessageBox réutilisé pour les états loading/erreur/succès -->
+      <MessageBox v-if="loading" type="loading" message="Ajout en cours..." />
+      <MessageBox v-if="error" type="error" :message="error" />
 
-        <!-- MessageBox réutilisé pour les états loading/erreur/succès -->
-        <MessageBox v-if="loading" type="loading" message="Ajout en cours..." />
-        <MessageBox v-if="error" type="error" :message="error" />
+      <form class="product-form" @submit.prevent="handleSubmit">
+        <div class="form-group">
+          <label for="libelle">Libellé *</label>
+          <input
+            id="libelle"
+            v-model="form.libelle"
+            type="text"
+            placeholder="Nom du produit"
+            class="form-input"
+          />
+        </div>
 
-        <form class="product-form" @submit.prevent="handleSubmit">
-          <div class="form-group">
-            <label for="libelle">Libellé *</label>
-            <input
-              id="libelle"
-              v-model="form.libelle"
-              type="text"
-              placeholder="Nom du produit"
-              class="form-input"
-            />
-          </div>
+        <div class="form-group">
+          <label for="ean">Code EAN *</label>
+          <input
+            id="ean"
+            v-model="form.ean"
+            type="text"
+            placeholder="13 chiffres"
+            maxlength="13"
+            class="form-input"
+          />
+        </div>
 
-          <div class="form-group">
-            <label for="ean">Code EAN *</label>
-            <input
-              id="ean"
-              v-model="form.ean"
-              type="text"
-              placeholder="13 chiffres"
-              maxlength="13"
-              class="form-input"
-            />
-          </div>
+        <div class="form-group">
+          <label for="fournisseur">Fournisseur</label>
+          <input
+            id="fournisseur"
+            v-model="form.fournisseur"
+            type="text"
+            placeholder="Nom du fournisseur (optionnel)"
+            class="form-input"
+          />
+        </div>
 
-          <div class="form-group">
-            <label for="fournisseur">Fournisseur</label>
-            <input
-              id="fournisseur"
-              v-model="form.fournisseur"
-              type="text"
-              placeholder="Nom du fournisseur (optionnel)"
-              class="form-input"
-            />
-          </div>
+        <div class="form-group">
+          <label for="quantite">Quantité initiale</label>
+          <input
+            id="quantite"
+            v-model="form.quantite"
+            type="number"
+            min="0"
+            class="form-input"
+          />
+        </div>
 
-          <div class="form-group">
-            <label for="quantite">Quantité initiale</label>
-            <input
-              id="quantite"
-              v-model="form.quantite"
-              type="number"
-              min="0"
-              class="form-input"
-            />
-          </div>
-
-          <div class="form-actions">
-            <button type="button" class="btn-annuler" @click="$router.back()">
-              Annuler
-            </button>
-            <button type="submit" class="btn-valider" :disabled="loading">
-              Ajouter le produit
-            </button>
-          </div>
-        </form>
-      </article>
-    </div>
-  </main>
+        <div class="form-actions">
+          <button type="button" class="btn-annuler" @click="$router.back()">
+            Annuler
+          </button>
+          <button type="submit" class="btn-valider" :disabled="loading">
+            Ajouter le produit
+          </button>
+        </div>
+      </form>
+    </article>
+  </PageLayout>
 </template>
 
 <script setup>
@@ -79,6 +73,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { addProduct } from "@/services/api";
 import MessageBox from "@/components/MessageBox.vue";
+import PageLayout from "@/components/PageLayout.vue";
 
 const router = useRouter();
 
@@ -99,19 +94,18 @@ async function handleSubmit() {
 
   // Validation coté client
   // Vérification avant d'appeler l'API
-  // Eviter les requêtes inutiles au serveur. 
+  // Eviter les requêtes inutiles au serveur.
   if (!form.value.libelle.trim()) {
-    error.value = 'Le libellé est obligatoire'
-    return
+    error.value = "Le libellé est obligatoire";
+    return;
   }
 
   if (!form.value.ean.trim()) {
-    error.value = 'Le code EAN est obligatoire'
-    return
+    error.value = "Le code EAN est obligatoire";
+    return;
   }
 
-  loading.value = true
-
+  loading.value = true;
 
   try {
     // On envoie tout l'objet form.value à api.js
@@ -129,38 +123,6 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
-.page {
-  min-height: 100vh;
-  padding: 2rem;
-  padding-top: 3rem
-}
-
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.back-button {
-  max-width: 800px;
-  margin: 0 auto;
-  margin-bottom: 1.5rem;
-}
-
-.btn-back {
-  padding: 0.75rem 1.5rem;
-  background: white;
-  border: 2px solid var(--color-border);
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-back:hover {
-  border-color: var(--color-primary);
-  transform: translateX(-3px);
-}
-
 .card-item {
   background: white;
   border-radius: var(--radius-card);

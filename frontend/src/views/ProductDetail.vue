@@ -1,75 +1,64 @@
 <template>
-  <main class="page">
-    <div class="container">
-      <!-- Bouton retour -->
-      <div class="back-button">
-        <button @click="router.push('/')" class="btn-back">
-          ← Retour à la recherche
+  <PageLayout back-label="← Retour à la recherche">
+    <!-- Message de chargement -->
+    <MessageBox
+      v-if="loading"
+      type="loading"
+      message="Chargement du produit..."
+    />
+
+    <!-- Message d'erreur -->
+    <MessageBox v-if="error" type="error" :message="error" />
+
+    <!-- fiche produit -->
+    <article v-if="product" class="card-item">
+      <header class="product-header">
+        <h1>{{ product.libelle }}</h1>
+        <span class="stock-badge" :class="stockClass">
+          {{ product.quantite }} unités
+        </span>
+      </header>
+
+      <section class="product-details">
+        <div class="detail-row">
+          <span class="detail-label">Code EAN</span>
+          <span class="detail-value">{{ product.ean }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Fournisseur</span>
+          <span class="detail-value">{{
+            product.fournisseur || "Non renseigné"
+          }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Quantité en stock</span>
+          <span class="detail-value">{{ product.quantite }} unités</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Créé le</span>
+          <span class="detail-value">{{ formatDate(product.created_at) }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Modifié le</span>
+          <span class="detail-value">{{ formatDate(product.updated_at) }}</span>
+        </div>
+      </section>
+
+      <!-- Prévision btn modifier quantité / btn ajouter à une liste -->
+      <section class="product-actions">
+        <button class="btn-action" @click="ouvrirModal">
+          ✏️ Modifier la quantité
         </button>
-      </div>
 
-      <!-- Message de chargement -->
-      <MessageBox
-        v-if="loading"
-        type="loading"
-        message="Chargement du produit..."
-      />
-
-      <!-- Message d'erreur -->
-      <MessageBox v-if="error" type="error" :message="error" />
-
-      <!-- fiche produit -->
-      <article v-if="product" class="card-item">
-        <header class="product-header">
-          <h1>{{ product.libelle }}</h1>
-          <span class="stock-badge" :class="stockClass">
-            {{ product.quantite }} unités
-          </span>
-        </header>
-
-        <section class="product-details">
-          <div class="detail-row">
-            <span class="detail-label">Code EAN</span>
-            <span class="detail-value">{{ product.ean }}</span>
-          </div>
-
-          <div class="detail-row">
-            <span class="detail-label">Fournisseur</span>
-            <span class="detail-value">{{
-              product.fournisseur || "Non renseigné"
-            }}</span>
-          </div>
-
-          <div class="detail-row">
-            <span class="detail-label">Quantité en stock</span>
-            <span class="detail-value">{{ product.quantite }} unités</span>
-          </div>
-
-          <div class="detail-row">
-            <span class="detail-label">Créé le</span>
-            <span class="detail-value">{{ formatDate(product.created_at) }}</span>
-          </div>
-
-          <div class="detail-row">
-            <span class="detail-label">Modifié le</span>
-            <span class="detail-value">{{ formatDate(product.updated_at) }}</span>
-          </div>
-        </section>
-
-        <!-- Prévision btn modifier quantité / btn ajouter à une liste -->
-        <section class="product-actions">
-
-          <button class="btn-action" @click="ouvrirModal">
-            ✏️ Modifier la quantité
-          </button>
-
-          <button class="btn-action btn-delete" @click="supprimerProduit">
-            🗑️ Supprimer le produit
-          </button>
-
-        </section>
-      </article>
-    </div>
+        <button class="btn-action btn-delete" @click="supprimerProduit">
+          🗑️ Supprimer le produit
+        </button>
+      </section>
+    </article>
 
     <Modal
       v-if="showModal"
@@ -95,7 +84,7 @@
         </div>
       </div>
     </Modal>
-  </main>
+  </PageLayout>
 </template>
 
 <script setup>
@@ -106,6 +95,7 @@ import { getProductById, updateStock, deleteProduct } from "@/services/api";
 
 import MessageBox from "@/components/MessageBox.vue";
 import Modal from "@/components/Modal.vue";
+import PageLayout from "@/components/PageLayout.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -176,8 +166,8 @@ async function supprimerProduit() {
     await deleteProduct(product.value.id);
     // produit supprimer -> retour HomePage
     router.push({
-      path: '/',
-      state: { deleted: true }
+      path: "/",
+      state: { deleted: true },
     });
   } catch (err) {
     error.value = err.message;
@@ -189,9 +179,13 @@ async function supprimerProduit() {
  * Résultat : "18/03/2026 à 15:51"
  */
 function formatDate(dateStr) {
-  if (!dateStr) return '-'
-  const date = new Date(dateStr)
-  return date.toLocaleDateString('fr-FR') + ' à ' + date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+  if (!dateStr) return "-";
+  const date = new Date(dateStr);
+  return (
+    date.toLocaleDateString("fr-FR") +
+    " à " +
+    date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
+  );
 }
 
 // Hook de lifecycle : exécuté au montage du composant
@@ -201,37 +195,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page {
-  min-height: 100vh;
-  padding: 2rem;
-  padding-top: 3rem;
-}
-
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-/* Bouton retour */
-.back-button {
-  margin-bottom: 1.5rem;
-}
-
-.btn-back {
-  padding: 0.75rem 1.5rem;
-  background: white;
-  border: 2px solid var(--color-border);
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-back:hover {
-  border-color: var(--color-primary);
-  transform: translateX(-3px);
-}
-
 /* Card principale */
 .card-item {
   background: white;

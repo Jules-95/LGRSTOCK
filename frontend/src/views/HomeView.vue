@@ -1,114 +1,114 @@
 <template>
-  <main class="home">
-    <div class="container">
-      <header class="header">
-        <h1 class="logo">LGR STOCK</h1>
-        <p class="subtitle">
-          Outil de visualisation et de manipulation de stock de la reserve
-          Colombe
-        </p>
-      </header>
+  <PageLayout>
+    <header class="header">
+      <h1 class="logo">LGR STOCK</h1>
+      <p class="subtitle">
+        Outil de visualisation et de manipulation de stock de la reserve Colombe
+      </p>
+    </header>
 
-      <MessageBox 
+    <MessageBox
       v-if="deleteSuccess"
       type="info"
       message="Produit supprimé avec succès"
+    />
+
+    <section class="card-item">
+      <h2>🔍 Recherche de produits</h2>
+
+      <form @submit.prevent="handleSearch">
+        <div class="form-group">
+          <label>Code EAN</label>
+          <input
+            v-model="searchEAN"
+            type="text"
+            placeholder="3700523456789"
+            maxlength="13"
+            autofocus
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Libellé du produit</label>
+          <input
+            v-model="searchLibelle"
+            type="text"
+            placeholder="Ex: Flip 7, Lego..."
+          />
+        </div>
+
+        <div class="form-group">
+          <label>Fournisseur</label>
+          <input
+            v-model="searchFournisseur"
+            type="text"
+            placeholder="Ex: Mattel, Blackrock..."
+          />
+        </div>
+
+        <button class="primary-btn" type="submit">🔍 Rechercher</button>
+      </form>
+
+      <button
+        class="secondary-btn"
+        type="button"
+        @click="router.push('/ajouter-produit')"
+        style="margin-top: 1rem"
+      >
+        + Ajouter un produit
+      </button>
+
+      <!-- Message de chargement -->
+      <MessageBox
+        v-if="loading"
+        type="loading"
+        message="Recherche en cours..."
       />
 
-      <section class="card-item">
-        <h2>🔍 Recherche de produits</h2>
+      <!-- Meesage d'erreur -->
+      <MessageBox v-if="error" type="error" :message="error" />
 
-        <form @submit.prevent="handleSearch">
-          <div class="form-group">
-            <label>Code EAN</label>
-            <input
-              v-model="searchEAN"
-              type="text"
-              placeholder="3700523456789"
-              maxlength="13"
-              autofocus
-            />
-          </div>
+      <!-- Résultat -->
+      <section v-if="products.length > 0" class="results" ref="resultsSection">
+        <h3>📦 Résultats ({{ products.length }})</h3>
 
-          <div class="form-group">
-            <label>Libellé du produit</label>
-            <input
-              v-model="searchLibelle"
-              type="text"
-              placeholder="Ex: Flip 7, Lego..."
-            />
-          </div>
-
-          <div class="form-group">
-            <label>Fournisseur</label>
-            <input
-              v-model="searchFournisseur"
-              type="text"
-              placeholder="Ex: Mattel, Blackrock..."
-            />
-          </div>
-
-          <button class="primary-btn" type="submit">🔍 Rechercher</button>
-        </form>
-
-        <button class="secondary-btn" type="button" @click="router.push('/ajouter-produit')" style="margin-top: 1rem;">
-          + Ajouter un produit
-        </button>
-
-        <!-- Message de chargement -->
-        <MessageBox
-          v-if="loading"
-          type="loading"
-          message="Recherche en cours..."
-        />
-
-        <!-- Meesage d'erreur -->
-        <MessageBox v-if="error" type="error" :message="error" />
-
-        <!-- Résultat -->
-        <section v-if="products.length > 0" class="results" ref="resultsSection">
-          <h3>📦 Résultats ({{ products.length }})</h3>
-
-          <div class="product-list">
-            <article
-              v-for="product in products"
-              :key="product.id"
-              class="product-item"
-              @click="goToProduct(product.id)"
-            >
-              <div class="product-info">
-                <h4>{{ product.libelle }}</h4>
-                <p>EAN : {{ product.ean }}</p>
-                <p>Fournisseur : {{ product.fournisseur || "Non reseigné" }}</p>
-                <p class="stock">Stock : {{ product.quantite }}</p>
-              </div>
-            </article>
-          </div>
-        </section>
-
-        <!-- Aucun résulat -->
-        <MessageBox
-          v-if="!loading && searched && products.length === 0"
-          type="info"
-          message="Aucun produit trouvé"
-        />
+        <div class="product-list">
+          <article
+            v-for="product in products"
+            :key="product.id"
+            class="product-item"
+            @click="goToProduct(product.id)"
+          >
+            <div class="product-info">
+              <h4>{{ product.libelle }}</h4>
+              <p>EAN : {{ product.ean }}</p>
+              <p>Fournisseur : {{ product.fournisseur || "Non reseigné" }}</p>
+              <p class="stock">Stock : {{ product.quantite }}</p>
+            </div>
+          </article>
+        </div>
       </section>
-    </div>
-  </main>
+
+      <!-- Aucun résulat -->
+      <MessageBox
+        v-if="!loading && searched && products.length === 0"
+        type="info"
+        message="Aucun produit trouvé"
+      />
+    </section>
+  </PageLayout>
 </template>
 
 <script setup>
 import { ref, nextTick } from "vue";
-import { useRouter} from "vue-router";
-
-const deleteSuccess = ref(history.state.deleted ===true)
-
+import { useRouter } from "vue-router";
 import { searchProducts } from "@/services/api";
-
 import MessageBox from "@/components/MessageBox.vue";
+import PageLayout from "@/components/PageLayout.vue";
 
 // Hook Vue Router qui donne accès à l'objet de navigation
 const router = useRouter();
+const deleteSuccess = ref(history.state.deleted === true); // Message de succes de supression avec le retour à cette vue.
 
 // Variables réactives pour stocker ce que l'utilisateur entre dans un champ
 const searchEAN = ref("");
@@ -151,7 +151,10 @@ async function handleSearch() {
       // Sinon affichage de la liste de résultat
       products.value = data.data;
       await nextTick();
-      resultsSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      resultsSection.value?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   } catch (err) {
     // Le service a lancé une erreur (throw new Error)
@@ -172,22 +175,8 @@ function goToProduct(productId) {
 }
 </script>
 
-
-
 <style scoped>
 
-
-/* Mis en page de toutes les vues  */
-.home {
-  min-height: 100vh;
-  padding: 2rem;
-  padding-top: 3rem;
-}
-
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-}
 /* Header commun à toutes les vues */
 .header {
   text-align: center;
@@ -250,7 +239,11 @@ function goToProduct(productId) {
 
 .primary-btn {
   padding: 1rem;
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-secondary) 100%
+  );
   color: white;
   border: none;
   border-radius: var(--radius-btn);
@@ -259,7 +252,6 @@ function goToProduct(productId) {
   cursor: pointer;
   width: 100%;
 }
-
 
 .secondary-btn {
   padding: 1rem;
@@ -272,7 +264,6 @@ function goToProduct(productId) {
   cursor: pointer;
   width: 100%;
   transition: all ease 0.2s;
-  margin-top: 1rem;
 }
 
 .secondary-btn:hover {

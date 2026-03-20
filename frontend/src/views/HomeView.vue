@@ -66,7 +66,7 @@
         <MessageBox v-if="error" type="error" :message="error" />
 
         <!-- Résultat -->
-        <section v-if="products.length > 0" class="results">
+        <section v-if="products.length > 0" class="results" ref="resultsSection">
           <h3>📦 Résultats ({{ products.length }})</h3>
 
           <div class="product-list">
@@ -98,7 +98,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import { useRouter} from "vue-router";
 
 const deleteSuccess = ref(history.state.deleted ===true)
@@ -120,6 +120,7 @@ const products = ref([]); // Liste des produits trouvés
 const loading = ref(false); // Indique si une recherche est en cours
 const error = ref(null); // Message d'erreur éventuel
 const searched = ref(false); // Indique si un erecherche a été lancée
+const resultsSection = ref(null); // Ref qui pointe vers l'élément DOM
 
 // Fonction appelé au clique sur le btn "Rechercher"
 async function handleSearch() {
@@ -149,6 +150,8 @@ async function handleSearch() {
     } else {
       // Sinon affichage de la liste de résultat
       products.value = data.data;
+      await nextTick();
+      resultsSection.value?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   } catch (err) {
     // Le service a lancé une erreur (throw new Error)

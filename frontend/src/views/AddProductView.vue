@@ -1,9 +1,9 @@
 <template>
   <main class="page">
     <div class="container">
-      <nav class="back-button">
-        <button @click="$router.push('/')" class="btn-back">← Retour</button>
-      </nav>
+      <div class="back-button">
+        <button @click="router.push('/')" class="btn-back">← Retour à la recherche</button>
+      </div>
 
       <article class="card-item">
         <header class="form-header">
@@ -132,6 +132,7 @@ async function handleSubmit() {
 .page {
   min-height: 100vh;
   padding: 2rem;
+  padding-top: 3rem
 }
 
 .container {
@@ -140,6 +141,8 @@ async function handleSubmit() {
 }
 
 .back-button {
+  max-width: 800px;
+  margin: 0 auto;
   margin-bottom: 1.5rem;
 }
 
@@ -221,6 +224,7 @@ async function handleSubmit() {
   background: white;
   font-weight: 600;
   cursor: pointer;
+  color: var(--color-text-dark);
 }
 
 .btn-valider {

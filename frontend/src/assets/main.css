@@ -37,6 +37,6 @@ body {
 
   /* Rayon des bordures */
   --radius-card: 20px;
-  --radius-input: 12px;
+  --radius-input: 8px;
   --radius-btn: 12px;
 }

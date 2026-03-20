@@ -2,11 +2,11 @@
   <main class="page">
     <div class="container">
       <!-- Bouton retour -->
-      <nav class="back-button">
-        <button @click="$router.push('/')" class="btn-back">
+      <div class="back-button">
+        <button @click="router.push('/')" class="btn-back">
           ← Retour à la recherche
         </button>
-      </nav>
+      </div>
 
       <!-- Message de chargement -->
       <MessageBox
@@ -204,6 +204,7 @@ onMounted(() => {
 .page {
   min-height: 100vh;
   padding: 2rem;
+  padding-top: 3rem;
 }
 
 .container {

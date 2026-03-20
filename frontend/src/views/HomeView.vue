@@ -48,10 +48,10 @@
             />
           </div>
 
-          <button class="search-btn" type="submit">🔍 Rechercher</button>
+          <button class="primary-btn" type="submit">🔍 Rechercher</button>
         </form>
 
-        <button class="search-btn" type="button" @click="router.push('/ajouter-produit')" style="margin-top: 1rem;">
+        <button class="secondary-btn" type="button" @click="router.push('/ajouter-produit')" style="margin-top: 1rem;">
           + Ajouter un produit
         </button>
 
@@ -169,6 +169,8 @@ function goToProduct(productId) {
 }
 </script>
 
+
+
 <style scoped>
 
 
@@ -176,6 +178,7 @@ function goToProduct(productId) {
 .home {
   min-height: 100vh;
   padding: 2rem;
+  padding-top: 3rem;
 }
 
 .container {
@@ -222,13 +225,13 @@ function goToProduct(productId) {
 .form-group label {
   display: block;
   font-weight: 600;
-  color: var(--color-text-medium);
+  color: var(--color-text-dark);
   margin-bottom: 0.5rem;
 }
 
 .form-group input {
   width: 100%;
-  padding: 1rem;
+  padding: 0.75rem;
   border: 2px solid var(--color-border);
   border-radius: var(--radius-input);
   font-size: 1rem;
@@ -242,7 +245,7 @@ function goToProduct(productId) {
 
 /* --- BOUTON --- */
 
-.search-btn {
+.primary-btn {
   padding: 1rem;
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   color: white;
@@ -252,7 +255,26 @@ function goToProduct(productId) {
   font-weight: 600;
   cursor: pointer;
   width: 100%;
-  transition: all ease 1s;
+}
+
+
+.secondary-btn {
+  padding: 1rem;
+  background: white;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-btn);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: all ease 0.2s;
+  margin-top: 1rem;
+}
+
+.secondary-btn:hover {
+  background: var(--color-primary);
+  color: white;
 }
 
 /* Résultats */

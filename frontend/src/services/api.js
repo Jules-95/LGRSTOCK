@@ -22,6 +22,9 @@ export async function searchProducts(filters) {
 
     // Appel API
     const response = await fetch(`${API_BASE_URL}/search.php?${params.toString()}`)
+
+    if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
+
     const data = await response.json()
 
     // Gestion des erreurs
@@ -41,6 +44,9 @@ export async function searchProducts(filters) {
 
 export async function getProductById(id) {
     const response = await fetch(`${API_BASE_URL}/product.php?id=${id}`)
+
+    if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
+
     const data = await response.json()
 
     if (data.error) {
@@ -62,6 +68,8 @@ export async function addProduct(data) {
         method: 'POST',
         body: new URLSearchParams(data)
     })
+
+    if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
 
     const result = await response.json()
 
@@ -85,6 +93,8 @@ export async function deleteProduct(id) {
         body: new URLSearchParams({ id })
     })
 
+    if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
+
     const result = await response.json()
 
     if (result.error) {
@@ -107,6 +117,8 @@ export async function updateStock(id, quantite) {
         method: 'POST',
         body: new URLSearchParams({ id, quantite})
     })
+
+    if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
 
     const data = await response.json()
 

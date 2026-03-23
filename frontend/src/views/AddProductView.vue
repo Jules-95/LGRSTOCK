@@ -106,6 +106,12 @@ async function handleSubmit() {
     return;
   }
 
+  // Validation EAN coté front
+  if (!/^\d{13}$/.test(form.value.ean.trim())){
+    error.value = 'Le code EAN doit contenir exactement 13 chiffres'
+    return
+  }
+
   loading.value = true;
 
   try {

@@ -60,6 +60,7 @@
       </section>
     </AppCard>
 
+    <!-- Modale de modification de quantite d'un produit -->
     <Modal
       v-if="showModal"
       title="Modifier la quantité"
@@ -81,6 +82,28 @@
             Annuler
           </button>
           <button class="btn-valider" @click="modifierQuantite">Valider</button>
+        </div>
+      </div>
+    </Modal>
+
+    <!-- Modale de confirmation de suppression d'un produit de la BDD -->
+    <Modal
+      v-if="showDeleteModal"
+      title="Supprimer le produit"
+      @close="showDeleteModal = false"
+    >
+      <div class="delete-confirm">
+        <p class="delete-message">
+          Supprimer définitivement <strong>{{ product.libelle }}</strong> ?
+        </p>
+        <p class="delete-warning">Cette action est irréversible.</p>
+        <div class="form-actions">
+          <button class="btn-annuler" @click="showDeleteModal = false">
+            Annuler
+          </button>
+          <button class="btn-supprimer" @click="confirmerSuppression">
+            Supprimer
+          </button>
         </div>
       </div>
     </Modal>
@@ -108,6 +131,7 @@ const error = ref(null);
 
 // Modale et Modification quantite
 const showModal = ref(false);
+const showDeleteModal = ref(false);
 const nouvelleQuantite = ref(product.value?.quantite ?? 0);
 
 // Computed : class CSS selon le stock
@@ -159,19 +183,20 @@ function limitDecrement() {
   if (nouvelleQuantite.value > 0) nouvelleQuantite.value--;
 }
 
-async function supprimerProduit() {
-  // Confirmation avant suppression - Popup native du navigateur.
-  if (!confirm(`Supprimer définitivement "${product.value.libelle}" ?`)) return;
+function supprimerProduit() {
+  showDeleteModal.value = true;
+}
 
+async function confirmerSuppression() {
   try {
     await deleteProduct(product.value.id);
-    // produit supprimer -> retour HomePage
     router.push({
       path: "/",
       state: { deleted: true },
     });
   } catch (err) {
     error.value = err.message;
+    showDeleteModal.value = false;
   }
 }
 
@@ -196,7 +221,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
 /* Header avec titre et badge stock */
 .product-header {
   display: flex;
@@ -289,7 +313,7 @@ onMounted(() => {
   background: #fee2e2;
 }
 
-/* Modale Modif quantite */
+/* Modale Modif quantite / Confirmation supression */
 
 .form-quantite {
   display: flex;
@@ -368,5 +392,36 @@ onMounted(() => {
 
 .btn-valider:hover {
   background: var(--color-primary-dark);
+}
+
+.delete-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.delete-message {
+  color: var(--color-text-dark);
+  font-size: 1rem;
+}
+
+.delete-warning {
+  color: #991b1b;
+  font-size: 0.9rem;
+}
+
+.btn-supprimer {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 10px;
+  background: #ef4444;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-supprimer:hover {
+  background: #dc2626;
 }
 </style>

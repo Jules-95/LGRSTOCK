@@ -42,4 +42,9 @@ const icon = computed(() => {
   background: #fee2e2;
   color: #991b1b;
 }
+
+.message.loading {
+  background: #f3f4f6;
+  color: var(--color-text-medium);
+}
 </style>

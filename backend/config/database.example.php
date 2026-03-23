@@ -1,5 +1,7 @@
 <?php
 // Exemple de configuration de connexion à la base de données
+// ATTENTION : Remplacer ces valeurs par vos propres identifiants 
+// Ne jamais utiliser root/vide en production
 
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'lgr_stock');

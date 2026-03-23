@@ -4,7 +4,7 @@
 
             <!-- Bouton retour affiché uniquement si backLabel est fourni-->
              <div v-if="backLabel" class="back-button">
-                <button class="btn-back" @click="router.back()">
+                <button class="btn-back" @click="router.push('/')">
                     {{ backLabel }}
                 </button>
              </div>

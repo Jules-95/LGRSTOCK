@@ -13,7 +13,7 @@
       message="Produit supprimé avec succès"
     />
 
-    <section class="card-item">
+    <AppCard>
       <h2>🔍 Recherche de produits</h2>
 
       <form @submit.prevent="handleSearch">
@@ -95,7 +95,7 @@
         type="info"
         message="Aucun produit trouvé"
       />
-    </section>
+    </AppCard>
   </PageLayout>
 </template>
 
@@ -105,6 +105,7 @@ import { useRouter } from "vue-router";
 import { searchProducts } from "@/services/api";
 import MessageBox from "@/components/MessageBox.vue";
 import PageLayout from "@/components/PageLayout.vue";
+import AppCard from "@/components/AppCard.vue";
 
 // Hook Vue Router qui donne accès à l'objet de navigation
 const router = useRouter();
@@ -195,15 +196,7 @@ function goToProduct(productId) {
   font-size: 1.1rem;
 }
 
-/* Style des cards conteneurs */
-.card-item {
-  background: white;
-  border-radius: var(--radius-card);
-  padding: 2.5rem;
-  box-shadow: var(--shadow-card);
-}
-
-.card-item h2 {
+h2 {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
   color: var(--color-text-dark);

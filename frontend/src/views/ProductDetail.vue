@@ -11,7 +11,7 @@
     <MessageBox v-if="error" type="error" :message="error" />
 
     <!-- fiche produit -->
-    <article v-if="product" class="card-item">
+    <AppCard v-if="product">
       <header class="product-header">
         <h1>{{ product.libelle }}</h1>
         <span class="stock-badge" :class="stockClass">
@@ -58,7 +58,7 @@
           🗑️ Supprimer le produit
         </button>
       </section>
-    </article>
+    </AppCard>
 
     <Modal
       v-if="showModal"
@@ -96,6 +96,7 @@ import { getProductById, updateStock, deleteProduct } from "@/services/api";
 import MessageBox from "@/components/MessageBox.vue";
 import Modal from "@/components/Modal.vue";
 import PageLayout from "@/components/PageLayout.vue";
+import AppCard from "@/components/AppCard.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -195,13 +196,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* Card principale */
-.card-item {
-  background: white;
-  border-radius: var(--radius-card);
-  padding: 2.5rem;
-  box-shadow: var(--shadow-card);
-}
 
 /* Header avec titre et badge stock */
 .product-header {

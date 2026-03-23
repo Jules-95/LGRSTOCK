@@ -1,6 +1,6 @@
 <template>
   <PageLayout back-label="← Retour à la recherche">
-    <article class="card-item">
+    <AppCard>
       <header class="form-header">
         <h1>Ajouter un produit</h1>
       </header>
@@ -56,7 +56,7 @@
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn-annuler" @click="$router.back()">
+          <button type="button" class="btn-annuler" @click="router.back()">
             Annuler
           </button>
           <button type="submit" class="btn-valider" :disabled="loading">
@@ -64,7 +64,7 @@
           </button>
         </div>
       </form>
-    </article>
+    </AppCard>
   </PageLayout>
 </template>
 
@@ -74,6 +74,7 @@ import { useRouter } from "vue-router";
 import { addProduct } from "@/services/api";
 import MessageBox from "@/components/MessageBox.vue";
 import PageLayout from "@/components/PageLayout.vue";
+import AppCard from "@/components/AppCard.vue";
 
 const router = useRouter();
 
@@ -123,12 +124,6 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
-.card-item {
-  background: white;
-  border-radius: var(--radius-card);
-  padding: 2.5rem;
-  box-shadow: var(--shadow-card);
-}
 
 .form-header {
   margin-bottom: 2rem;

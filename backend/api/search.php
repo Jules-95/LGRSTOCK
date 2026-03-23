@@ -5,11 +5,11 @@
  * Utilisation : GET /api/search.php?ean=...&libelle=...&fournisseur=...
  */
 
+require_once __DIR__ . '/../config/cors.php';
+
 // Cet endpoint n'accepte que les requêtes GET
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405); // 405 = Method Not Allowed
-    header('Content-Type: application/json; charset=utf-8');
-    header('Access-Control-Allow-Origin: *');
     echo json_encode(['error' => true, 'message' => 'Méthode non autorisée']);
     exit;
 }

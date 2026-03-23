@@ -6,8 +6,7 @@
  * Body JSON : { "id": 42, "quantite": 15}
  */
 
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json; charset=utf-8');
+require_once __DIR__ . '/../config/cors.php';
 
 // Cet endpoint n'accepte que les requêtes POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

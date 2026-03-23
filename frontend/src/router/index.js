@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import AddProductView from '@/views/AddProductView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -21,6 +20,12 @@ const router = createRouter({
       path: '/ajouter-produit',
       name: 'add-product',
       component: () => import('../views/AddProductView.vue')
+    },
+    // NOUVELLE ROUTE (Dernière): 404 Not Found
+    {
+      path: '/:pathMatch(.*)*', // Capture toutes les urls qui ne correspondent à aucune route route définie -> Vue Router parcours les routes dans l'ordre et s'arrête à la première qui correspond. 
+      name: 'not-found',
+      component: () => import('../views/NotFoundView.vue')
     }
   ]
 })

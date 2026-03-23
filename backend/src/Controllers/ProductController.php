@@ -199,10 +199,6 @@ class ProductController
         // Definir le code HTTP 
         http_response_code($statusCode);
 
-        // Définir les headers (Métadonnées -> Dit au navigateur :)
-        header('Content-Type: application/json; charset=utf-8'); // "J'envoie du JSON en UTF-8
-        header('Access-Control-Allow-Origin: *'); // "Le front (localhost:5173) a le droit de m'appeler 
-
         // Envoyer le JSON 
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
 

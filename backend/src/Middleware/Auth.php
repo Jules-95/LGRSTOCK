@@ -61,24 +61,6 @@ class Auth {
         }
     }
 
-    /**
-     * Retourne les infos de l'utilisateur connecté ou null. 
-     * Utilisé par check-auth.php pour que VUE sache qui est connecté. 
-     */
-    public static function getUser(): ?array {
-        self::startSession();
-
-        if (!isset($_SESSION['user_id'])) {
-            return null;
-        }
-
-        return [
-            'id'       => $_SESSION['user_id'],
-            'username' => $_SESSION['username'],
-            'role'     => $_SESSION['role'], 
-            'magasin'  => $_SESSION['magasin']
-        ];
-    }
 
     /**
      * Démarre la session si elle n'est pas déjà active.

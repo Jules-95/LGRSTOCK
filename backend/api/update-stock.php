@@ -7,6 +7,9 @@
  */
 
 require_once __DIR__ . '/../config/cors.php';
+require_once __DIR__ . '/../src/Middleware/Auth.php';
+
+Auth::requireAdmin();
 
 // Cet endpoint n'accepte que les requêtes POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

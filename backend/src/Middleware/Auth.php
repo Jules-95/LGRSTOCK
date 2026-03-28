@@ -68,7 +68,7 @@ class Auth {
      * Cette vérification évite l'erreur si un autre fichier 
      * a déja démarré la session.
      */
-    private static function startSession() : void {
+    public static function startSession() : void {
         if (session_status() === PHP_SESSION_NONE) {
             // Durée de vie du cookie : Employé = 8h
             // Durée admin plus courte gérée au login

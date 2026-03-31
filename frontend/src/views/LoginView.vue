@@ -47,7 +47,7 @@ import MessageBox from '@/components/MessageBox.vue';
 import PageLayout from '@/components/PageLayout.vue';
 import { useAuth } from '@/composables/useAuth';
 
-const { login } = useAuth
+const { login } = useAuth()
 
 const username          = ref('')
 const password          = ref('')

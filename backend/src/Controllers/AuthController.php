@@ -76,13 +76,6 @@ class AuthController {
             $_SESSION['role']      = $found['role'];
             $_SESSION['magasin']   = $found['magasin'];
 
-            // Session démare avec une durée de 8h par défaut 
-            // Réduction à 2h pour les admin car action plus sensible.
-            if($found['role'] === 'admin') {
-                ini_set('session.gc_maxlifetime', 7200);
-                session_set_cookie_params(['lifetime' => 7200]);
-            }
-
             http_response_code(200); 
             echo json_encode([
                 'error'    => false, 

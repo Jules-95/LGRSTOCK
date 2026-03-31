@@ -1,103 +1,115 @@
 <template>
-  <main class="home">
-    <div class="container">
-      <header class="header">
-        <h1 class="logo">LGR STOCK</h1>
-        <p class="subtitle">
-          Outil de visualisation et de manipulation de stock de la reserve
-          Colombe
-        </p>
-      </header>
+  <PageLayout>
+    <header class="header">
+      <h1 class="logo">LGR STOCK</h1>
+      <p class="subtitle">
+        Outil de visualisation et de manipulation de stock de la reserve Colombe
+      </p>
+    </header>
 
-      <section class="card-item">
-        <h2>🔍 Recherche de produits</h2>
+    <MessageBox
+      v-if="deleteSuccess"
+      type="info"
+      message="Produit supprimé avec succès"
+    />
 
-        <form @submit.prevent="handleSearch">
-          <div class="form-group">
-            <label>Code EAN</label>
-            <input
-              v-model="searchEAN"
-              type="text"
-              placeholder="3700523456789"
-              maxlength="13"
-              autofocus
-            />
-          </div>
+    <AppCard>
+      <h2>🔍 Recherche de produits</h2>
 
-          <div class="form-group">
-            <label>Libellé du produit</label>
-            <input
-              v-model="searchLibelle"
-              type="text"
-              placeholder="Ex: Flip 7, Lego..."
-            />
-          </div>
+      <form @submit.prevent="handleSearch">
+        <div class="form-group">
+          <label>Code EAN</label>
+          <input
+            v-model="searchEAN"
+            type="text"
+            placeholder="3700523456789"
+            maxlength="13"
+            autofocus
+          />
+        </div>
 
-          <div class="form-group">
-            <label>Fournisseur</label>
-            <input
-              v-model="searchFournisseur"
-              type="text"
-              placeholder="Ex: Mattel, Blackrock..."
-            />
-          </div>
+        <div class="form-group">
+          <label>Libellé du produit</label>
+          <input
+            v-model="searchLibelle"
+            type="text"
+            placeholder="Ex: Flip 7, Lego..."
+          />
+        </div>
 
-          <button class="search-btn" type="submit">🔍 Rechercher</button>
-        </form>
+        <div class="form-group">
+          <label>Fournisseur</label>
+          <input
+            v-model="searchFournisseur"
+            type="text"
+            placeholder="Ex: Mattel, Blackrock..."
+          />
+        </div>
 
-        <!-- Message de chargement -->
-        <MessageBox
-          v-if="loading"
-          type="loading"
-          message="Recherche en cours..."
-        />
+        <button class="primary-btn" type="submit">🔍 Rechercher</button>
+      </form>
 
-        <!-- Meesage d'erreur -->
-        <MessageBox v-if="error" type="error" :message="error" />
+      <button
+        class="secondary-btn"
+        type="button"
+        @click="router.push('/ajouter-produit')"
+        style="margin-top: 1rem"
+      >
+        + Ajouter un produit
+      </button>
 
-        <!-- Résultat -->
-        <section v-if="products.length > 0" class="results">
-          <h3>📦 Résultats ({{ products.length }})</h3>
+      <!-- Message de chargement -->
+      <MessageBox
+        v-if="loading"
+        type="loading"
+        message="Recherche en cours..."
+      />
 
-          <div class="product-list">
-            <article
-              v-for="product in products"
-              :key="product.id"
-              class="product-item"
-              @click="goToProduct(product.id)"
-            >
-              <div class="product-info">
-                <h4>{{ product.libelle }}</h4>
-                <p>EAN : {{ product.ean }}</p>
-                <p>Fournisseur : {{ product.fournisseur || "Non reseigné" }}</p>
-                <p class="stock">Stock : {{ product.quantite }}</p>
-              </div>
-            </article>
-          </div>
-        </section>
+      <!-- Meesage d'erreur -->
+      <MessageBox v-if="error" type="error" :message="error" />
 
-        <!-- Aucun résulat -->
-        <MessageBox
-          v-if="!loading && searched && products.length === 0"
-          type="info"
-          message="Aucun produit trouvé"
-        />
+      <!-- Résultat -->
+      <section v-if="products.length > 0" class="results" ref="resultsSection">
+        <h3>📦 Résultats ({{ products.length }})</h3>
+
+        <div class="product-list">
+          <article
+            v-for="product in products"
+            :key="product.id"
+            class="product-item"
+            @click="goToProduct(product.id)"
+          >
+            <div class="product-info">
+              <h4>{{ product.libelle }}</h4>
+              <p>EAN : {{ product.ean }}</p>
+              <p>Fournisseur : {{ product.fournisseur || "Non reseigné" }}</p>
+              <p class="stock">Stock : {{ product.quantite }}</p>
+            </div>
+          </article>
+        </div>
       </section>
-    </div>
-  </main>
+
+      <!-- Aucun résulat -->
+      <MessageBox
+        v-if="!loading && searched && products.length === 0"
+        type="info"
+        message="Aucun produit trouvé"
+      />
+    </AppCard>
+  </PageLayout>
 </template>
 
 <script setup>
-import { API_BASE_URL } from "@/config";
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import { useRouter } from "vue-router";
-
 import { searchProducts } from "@/services/api";
-
 import MessageBox from "@/components/MessageBox.vue";
+import PageLayout from "@/components/PageLayout.vue";
+import AppCard from "@/components/AppCard.vue";
 
 // Hook Vue Router qui donne accès à l'objet de navigation
 const router = useRouter();
+const deleteSuccess = ref(history.state.deleted === true); // Message de succes de supression avec le retour à cette vue.
 
 // Variables réactives pour stocker ce que l'utilisateur entre dans un champ
 const searchEAN = ref("");
@@ -109,6 +121,7 @@ const products = ref([]); // Liste des produits trouvés
 const loading = ref(false); // Indique si une recherche est en cours
 const error = ref(null); // Message d'erreur éventuel
 const searched = ref(false); // Indique si un erecherche a été lancée
+const resultsSection = ref(null); // Ref qui pointe vers l'élément DOM
 
 // Fonction appelé au clique sur le btn "Rechercher"
 async function handleSearch() {
@@ -138,6 +151,11 @@ async function handleSearch() {
     } else {
       // Sinon affichage de la liste de résultat
       products.value = data.data;
+      await nextTick();
+      resultsSection.value?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
   } catch (err) {
     // Le service a lancé une erreur (throw new Error)
@@ -160,17 +178,6 @@ function goToProduct(productId) {
 
 <style scoped>
 
-
-/* Mis en page de toutes les vues  */
-.home {
-  min-height: 100vh;
-  padding: 2rem;
-}
-
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-}
 /* Header commun à toutes les vues */
 .header {
   text-align: center;
@@ -189,18 +196,10 @@ function goToProduct(productId) {
   font-size: 1.1rem;
 }
 
-/* Style des cards conteneurs */
-.card-item {
-  background: white;
-  border-radius: 20px;
-  padding: 2.5rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
-
-.card-item h2 {
+h2 {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
-  color: #1f2937;
+  color: var(--color-text-dark);
 }
 
 /* Style des champs formulaire */
@@ -211,48 +210,69 @@ function goToProduct(productId) {
 .form-group label {
   display: block;
   font-weight: 600;
-  color: #374151;
+  color: var(--color-text-dark);
   margin-bottom: 0.5rem;
 }
 
 .form-group input {
   width: 100%;
-  padding: 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  padding: 0.75rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-input);
   font-size: 1rem;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
 /* --- BOUTON --- */
 
-.search-btn {
+.primary-btn {
   padding: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary) 0%,
+    var(--color-secondary) 100%
+  );
   color: white;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--radius-btn);
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
   width: 100%;
-  transition: all ease 1s;
+}
+
+.secondary-btn {
+  padding: 1rem;
+  background: white;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
+  border-radius: var(--radius-btn);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: all ease 0.2s;
+}
+
+.secondary-btn:hover {
+  background: var(--color-primary);
+  color: white;
 }
 
 /* Résultats */
 .results {
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 2px solid #f3f4f6;
+  border-top: 2px solid var(--color-bg-light);
 }
 
 .results h3 {
-  color: #1f2937;
+  color: var(--color-text-dark);
   margin-bottom: 1.5rem;
 }
 
@@ -263,36 +283,36 @@ function goToProduct(productId) {
 }
 
 .product-item {
-  background: #f9fafb;
+  background: var(--color-bg-soft);
   padding: 1.5rem;
-  border-radius: 12px;
-  border: 2px solid #e5e7eb;
+  border-radius: var(--radius-input);
+  border: 2px solid var(--color-border);
   transition: all 0.2s;
   cursor: pointer;
 }
 
 .product-item:hover {
-  border-color: #667eea;
+  border-color: var(--color-primary);
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
   transform: translateY(-2px);
 }
 
 .product-info h4 {
-  color: #1f2937;
+  color: var(--color-text-dark);
   font-size: 1.1rem;
   margin-bottom: 0.5rem;
 }
 
 .product-info p {
-  color: #6b7280;
+  color: var(--color-text-light);
   font-size: 0.9rem;
   margin-bottom: 0.25rem;
 }
 
 .product-info .stock {
-  color: #667eea;
+  color: var(--color-primary);
   font-weight: 600;
-  margin: top 0.5rem;
+  margin-top: 0.5rem;
 }
 </style>
 

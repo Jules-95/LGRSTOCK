@@ -1,79 +1,125 @@
 <template>
-  <main class="page">
-    <div class="container">
-      <!-- Bouton retour -->
-      <nav class="back-button">
-        <button @click="$router.back()" class="btn-back">
-          ← Retour à la recherche
+  <PageLayout back-label="← Retour à la recherche">
+    <!-- Message de chargement -->
+    <MessageBox
+      v-if="loading"
+      type="loading"
+      message="Chargement du produit..."
+    />
+
+    <!-- Message d'erreur -->
+    <MessageBox v-if="error" type="error" :message="error" />
+
+    <!-- fiche produit -->
+    <AppCard v-if="product">
+      <header class="product-header">
+        <h1>{{ product.libelle }}</h1>
+        <span class="stock-badge" :class="stockClass">
+          {{ product.quantite }} unités
+        </span>
+      </header>
+
+      <section class="product-details">
+        <div class="detail-row">
+          <span class="detail-label">Code EAN</span>
+          <span class="detail-value">{{ product.ean }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Fournisseur</span>
+          <span class="detail-value">{{
+            product.fournisseur || "Non renseigné"
+          }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Quantité en stock</span>
+          <span class="detail-value">{{ product.quantite }} unités</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Créé le</span>
+          <span class="detail-value">{{ formatDate(product.created_at) }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Modifié le</span>
+          <span class="detail-value">{{ formatDate(product.updated_at) }}</span>
+        </div>
+      </section>
+
+      <!-- Prévision btn modifier quantité / btn ajouter à une liste -->
+      <section class="product-actions">
+        <button class="btn-action" @click="ouvrirModal">
+          ✏️ Modifier la quantité
         </button>
-      </nav>
 
-      <!-- Message de chargement -->
-      <MessageBox
-        v-if="loading"
-        type="loading"
-        message="Chargement du produit..."
-      />
+        <button class="btn-action btn-delete" @click="supprimerProduit">
+          🗑️ Supprimer le produit
+        </button>
+      </section>
+    </AppCard>
 
-      <!-- Message d'erreur -->
-      <MessageBox v-if="error" type="error" :message="error" />
+    <!-- Modale de modification de quantite d'un produit -->
+    <Modal
+      v-if="showModal"
+      title="Modifier la quantité"
+      @close="showModal = false"
+    >
+      <div class="form-quantite">
+        <p class="product-name">{{ product.libelle }}</p>
 
-      <!-- fiche produit -->
-      <article v-if="product" class="card-item">
-        <header class="product-header">
-          <h1>{{ product.libelle }}</h1>
-          <span class="stock-badge" :class="stockClass">
-            {{ product.quantite }} unités
-          </span>
-        </header>
+        <p class="quantite-label">Nombre d'unités ({{ product.quantite }})</p>
 
-        <section class="product-details">
-          <div class="detail-row">
-            <span class="detail-label">Code EAN</span>
-            <span class="detail-value">{{ product.ean }}</span>
-          </div>
+        <div class="quantite-controls">
+          <button class="btn-compteur" @click="limitDecrement">-</button>
+          <span class="quantite-valeur">{{ nouvelleQuantite }}</span>
+          <button class="btn-compteur" @click="nouvelleQuantite++">+</button>
+        </div>
 
-          <div class="detail-row">
-            <span class="detail-label">Fournisseur</span>
-            <span class="detail-value">{{
-              product.fournisseur || "Non renseigné"
-            }}</span>
-          </div>
+        <div class="form-actions">
+          <button class="btn-annuler" @click="showModal = false">
+            Annuler
+          </button>
+          <button class="btn-valider" @click="modifierQuantite">Valider</button>
+        </div>
+      </div>
+    </Modal>
 
-          <div class="detail-row">
-            <span class="detail-label">Quantité en stock</span>
-            <span class="detail-value">{{ product.quantite }} unités</span>
-          </div>
-
-          <div class="detail-row">
-            <span class="detail-label">Créé le</span>
-            <span class="detail-value">{{ product.created_at }}</span>
-          </div>
-
-          <div class="detail-row">
-            <span class="detail-label">Modifié le</span>
-            <span class="detail-value">{{ product.updated_at }}</span>
-          </div>
-        </section>
-
-        <!-- Prévision btn modifier quantité / btn ajouter à une liste -->
-        <section class="product-actions">
-          <button class="btn-action" disabled>✏️ Modifier la quantité</button>
-          <button class="btn-action" disabled>📋 Ajouter à une liste</button>
-        </section>
-      </article>
-    </div>
-  </main>
+    <!-- Modale de confirmation de suppression d'un produit de la BDD -->
+    <Modal
+      v-if="showDeleteModal"
+      title="Supprimer le produit"
+      @close="showDeleteModal = false"
+    >
+      <div class="delete-confirm">
+        <p class="delete-message">
+          Supprimer définitivement <strong>{{ product.libelle }}</strong> ?
+        </p>
+        <p class="delete-warning">Cette action est irréversible.</p>
+        <div class="form-actions">
+          <button class="btn-annuler" @click="showDeleteModal = false">
+            Annuler
+          </button>
+          <button class="btn-supprimer" @click="confirmerSuppression">
+            Supprimer
+          </button>
+        </div>
+      </div>
+    </Modal>
+  </PageLayout>
 </template>
 
 <script setup>
-import { API_BASE_URL } from "@/config";
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-import { getProductById } from '@/services/api'
+import { getProductById, updateStock, deleteProduct } from "@/services/api";
 
 import MessageBox from "@/components/MessageBox.vue";
+import Modal from "@/components/Modal.vue";
+import PageLayout from "@/components/PageLayout.vue";
+import AppCard from "@/components/AppCard.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -82,6 +128,11 @@ const router = useRouter();
 const product = ref(null);
 const loading = ref(false);
 const error = ref(null);
+
+// Modale et Modification quantite
+const showModal = ref(false);
+const showDeleteModal = ref(false);
+const nouvelleQuantite = ref(product.value?.quantite ?? 0);
 
 // Computed : class CSS selon le stock
 const stockClass = computed(() => {
@@ -104,13 +155,63 @@ async function fetchProduct() {
   error.value = null;
 
   try {
-    product.value = await getProductById(productId)
-
+    product.value = await getProductById(productId);
   } catch (err) {
     error.value = err.message;
   } finally {
     loading.value = false;
   }
+}
+
+function ouvrirModal() {
+  nouvelleQuantite.value = product.value.quantite;
+  showModal.value = true;
+}
+
+async function modifierQuantite() {
+  try {
+    await updateStock(product.value.id, nouvelleQuantite.value);
+    // Mettre à jour l'affichage sans recharger la page
+    product.value.quantite = nouvelleQuantite.value;
+    showModal.value = false;
+  } catch (err) {
+    error.value = err.message;
+  }
+}
+
+function limitDecrement() {
+  if (nouvelleQuantite.value > 0) nouvelleQuantite.value--;
+}
+
+function supprimerProduit() {
+  showDeleteModal.value = true;
+}
+
+async function confirmerSuppression() {
+  try {
+    await deleteProduct(product.value.id);
+    router.push({
+      path: "/",
+      state: { deleted: true },
+    });
+  } catch (err) {
+    error.value = err.message;
+    showDeleteModal.value = false;
+  }
+}
+
+/**
+ * Formate une date SQL (ex: "2026-03-18 15:51:10") en français lisible
+ * Résultat : "18/03/2026 à 15:51"
+ */
+function formatDate(dateStr) {
+  if (!dateStr) return "-";
+  const date = new Date(dateStr);
+  return (
+    date.toLocaleDateString("fr-FR") +
+    " à " +
+    date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
+  );
 }
 
 // Hook de lifecycle : exécuté au montage du composant
@@ -120,44 +221,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page {
-  min-height: 100vh;
-  padding: 2rem;
-}
-
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-/* Bouton retour */
-.back-button {
-  margin-bottom: 1.5rem;
-}
-
-.btn-back {
-  padding: 0.75rem 1.5rem;
-  background: white;
-  border: 2px solid #e5e7eb;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-back:hover {
-  border-color: #667eea;
-  transform: translateX(-3px);
-}
-
-/* Card principale */
-.card-item {
-  background: white;
-  border-radius: 20px;
-  padding: 2.5rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
-
 /* Header avec titre et badge stock */
 .product-header {
   display: flex;
@@ -165,12 +228,12 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 2px solid #f3f4f6;
+  border-bottom: 2px solid var(--color-bg-light);
 }
 
 .product-header h1 {
   font-size: 1.75rem;
-  color: #1f2937;
+  color: var(--color-text-dark);
   margin: 0;
 }
 
@@ -205,7 +268,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 1rem 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-bg-light);
 }
 
 .detail-row:last-child {
@@ -214,11 +277,11 @@ onMounted(() => {
 
 .detail-label {
   font-weight: 600;
-  color: #6b7280;
+  color: var(--color-text-light);
 }
 
 .detail-value {
-  color: #1f2937;
+  color: var(--color-text-dark);
   font-weight: 500;
 }
 
@@ -232,21 +295,133 @@ onMounted(() => {
 .btn-action {
   flex: 1;
   padding: 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-btn);
   background: white;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.btn-action:not(:disabled):hover {
-  border-color: #667eea;
-  background: #f9fafb;
+.btn-delete {
+  border-color: #fee2e2;
+  color: #991b1b;
 }
 
-.btn-action:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.btn-delete:hover {
+  border-color: #ef4444;
+  background: #fee2e2;
+}
+
+/* Modale Modif quantite / Confirmation supression */
+
+.form-quantite {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.product-name {
+  font-weight: 600;
+  color: var(--color-text-light);
+  margin: 0;
+}
+
+.quantite-label {
+  text-align: center;
+  font-weight: 700;
+}
+
+.quantite-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fce4e4;
+  border-radius: var(--radius-input);
+  padding: 1.5rem;
+}
+
+.btn-compteur {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  border: none;
+  background: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-text-dark);
+}
+
+.btn-compteur:hover {
+  background: var(--color-bg-light);
+}
+
+.quantite-valeur {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.btn-annuler {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid var(--color-border);
+  border-radius: 10px;
+  background: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-valider {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 10px;
+  background: var(--color-primary);
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-valider:hover {
+  background: var(--color-primary-dark);
+}
+
+.delete-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.delete-message {
+  color: var(--color-text-dark);
+  font-size: 1rem;
+}
+
+.delete-warning {
+  color: #991b1b;
+  font-size: 0.9rem;
+}
+
+.btn-supprimer {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 10px;
+  background: #ef4444;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-supprimer:hover {
+  background: #dc2626;
 }
 </style>

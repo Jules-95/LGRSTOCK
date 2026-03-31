@@ -22,6 +22,9 @@ export async function searchProducts(filters) {
 
     // Appel API
     const response = await fetch(`${API_BASE_URL}/search.php?${params.toString()}`)
+
+    if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
+
     const data = await response.json()
 
     // Gestion des erreurs
@@ -41,6 +44,9 @@ export async function searchProducts(filters) {
 
 export async function getProductById(id) {
     const response = await fetch(`${API_BASE_URL}/product.php?id=${id}`)
+
+    if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
+
     const data = await response.json()
 
     if (data.error) {
@@ -48,4 +54,77 @@ export async function getProductById(id) {
     }
     
     return data.data
+}
+
+
+/** 
+ * Ajouter un nouveau produit 
+ * @param {object} data - {libelle, ean, fournisseur, quantite}
+ * @returns {Promise<Object>} L'ID du produit créé
+ * @throws {Error} Si erreur API
+*/
+export async function addProduct(data) {
+    const response = await fetch(`${API_BASE_URL}/add-product.php`, {
+        method: 'POST',
+        body: new URLSearchParams(data)
+    })
+
+    if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
+
+    const result = await response.json()
+
+    if (result.error) {
+        throw new Error(result.message)
+    }
+
+    return result
+    
+}
+
+
+/**
+ * Supprimer un produit existant
+ * @param {number} id - L'ID du produit à supprimer
+ * @throws {Error} Si erreur API
+ */
+export async function deleteProduct(id) {
+    const response = await fetch (`${API_BASE_URL}/delete-product.php`, {
+        method: 'POST',
+        body: new URLSearchParams({ id })
+    })
+
+    if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
+
+    const result = await response.json()
+
+    if (result.error) {
+        throw new Error(result.message)
+    }
+
+    return result
+    
+}
+
+
+
+/** 
+ * Met à jour la quantite d'un produit 
+ * @param {number} id - L'ID du produit 
+ * @param {number} quantite - La nouvelle quantité
+ */
+export async function updateStock(id, quantite) {
+    const response = await fetch (`${API_BASE_URL}/update-stock.php` , {
+        method: 'POST',
+        body: new URLSearchParams({ id, quantite})
+    })
+
+    if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
+
+    const data = await response.json()
+
+    if (data.error) {
+        throw new Error(data.message)
+    }
+
+    return data
 }

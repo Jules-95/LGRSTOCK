@@ -28,7 +28,11 @@ Il répond à un besoin réel de l'entreprise en proposant un outil adapté à u
   - Code EAN
   - Fournisseur
   - Quantité disponible (indicateur coloré selon le niveau de stock)
-- Gestion des états de l'interface : chargement, erreur, aucun résultat
+  - Gestion des états de l'interface : chargement, erreur, aucun résultat
+  - Modification de la quantite en stock via une modale
+  - Suppression d'un produit avec confirmation
+  
+
 
 ---
 
@@ -145,5 +149,11 @@ L'application est accessible sur `http://localhost:5173` (dev) ou via le serveur
 |---|---|---|
 | GET | `/api/search.php` | Recherche par EAN, libellé ou fournisseur |
 | GET | `/api/product.php?id=` | Récupère un produit par son ID |
-
 Paramètres de recherche : `?ean=`, `?libelle=`, `?fournisseur=` (combinables)
+| POST | `/api/add-product.php` | Ajoute un nouveau produit |
+| POST | `/api/update-stock.php` | Met à jour la quantité d'un produit |
+| POST | `/api/delete-product.php` | Supprime un produit 
+
+## Sécurité
+
+⚠️ Ce projet tourne en réseau local interne. Le système d'authentification est en cours de développement — les endpoints API ne sont pas encore protégés par token.

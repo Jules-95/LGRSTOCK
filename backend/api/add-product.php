@@ -1,14 +1,16 @@
 <?php
 /**
- * API : Recherche de produits
- * 
- * Utilisation : GET /api/search.php?ean=...&libelle=...&fournisseur=...
+ * API : Ajouter un produit
+ * Utilisation : POST api/add-product.php
  */
 
 require_once __DIR__ . '/../config/cors.php';
+require_once __DIR__ . '/../src/Middleware/Auth.php';
 
-// Cet endpoint n'accepte que les requêtes GET
-if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+Auth::requireAdmin();
+
+// Cet endpoint n'accepte que les requêtes POST
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405); // 405 = Method Not Allowed
     echo json_encode(['error' => true, 'message' => 'Méthode non autorisée']);
     exit;
@@ -21,4 +23,4 @@ $pdo = getDBConnection();
 
 $controller = new ProductController($pdo);
 
-$controller->search();
+$controller->addProduct();

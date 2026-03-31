@@ -14,3 +14,29 @@ body {
 #app {
   min-height: 100vh;
 }
+
+/* Variables CSS globales — Single Source of Truth du design */
+:root {
+  /* Couleurs principales */
+  --color-primary: #667eea;
+  --color-primary-dark: #5a67d8;
+  --color-secondary: #764ba2;
+
+  /* Couleurs neutres */
+  --color-text-dark: #1f2937;
+  --color-text-medium: #374151;
+  --color-text-light: #6b7280;
+
+  /* Couleurs de bordures et fonds */
+  --color-border: #e5e7eb;
+  --color-bg-light: #f3f4f6;
+  --color-bg-soft: #f9fafb;
+
+  /* Ombres */
+  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+  /* Rayon des bordures */
+  --radius-card: 20px;
+  --radius-input: 8px;
+  --radius-btn: 12px;
+}

@@ -27,6 +27,7 @@ const icon = computed(() => {
 
 .message {
   padding: 1rem;
+  margin-bottom: 1rem;
   border-radius: 10px;
   margin-top: 1.5rem;
   font-weight: 500;
@@ -40,5 +41,10 @@ const icon = computed(() => {
 .message.error {
   background: #fee2e2;
   color: #991b1b;
+}
+
+.message.loading {
+  background: #f3f4f6;
+  color: var(--color-text-medium);
 }
 </style>

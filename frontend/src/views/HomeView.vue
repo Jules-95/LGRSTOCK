@@ -49,15 +49,6 @@
         <button class="primary-btn" type="submit">🔍 Rechercher</button>
       </form>
 
-      <button
-        class="secondary-btn"
-        type="button"
-        @click="router.push('/ajouter-produit')"
-        style="margin-top: 1rem"
-      >
-        + Ajouter un produit
-      </button>
-
       <!-- Message de chargement -->
       <MessageBox
         v-if="loading"
@@ -244,24 +235,6 @@ h2 {
   font-weight: 600;
   cursor: pointer;
   width: 100%;
-}
-
-.secondary-btn {
-  padding: 1rem;
-  background: white;
-  color: var(--color-primary);
-  border: 2px solid var(--color-primary);
-  border-radius: var(--radius-btn);
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  width: 100%;
-  transition: all ease 0.2s;
-}
-
-.secondary-btn:hover {
-  background: var(--color-primary);
-  color: white;
 }
 
 /* Résultats */

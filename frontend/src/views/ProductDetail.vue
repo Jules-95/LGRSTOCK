@@ -50,63 +50,14 @@
 
       <!-- Prévision btn modifier quantité / btn ajouter à une liste -->
       <section class="product-actions">
-        <button class="btn-action" @click="ouvrirModal">
-          ✏️ Modifier la quantité
-        </button>
-
-        <button class="btn-action btn-delete" @click="supprimerProduit">
-          🗑️ Supprimer le produit
+        <button class="btn-list" disabled>
+          + Ajouter à une liste pour transfert
         </button>
       </section>
     </AppCard>
 
-    <!-- Modale de modification de quantite d'un produit -->
-    <Modal
-      v-if="showModal"
-      title="Modifier la quantité"
-      @close="showModal = false"
-    >
-      <div class="form-quantite">
-        <p class="product-name">{{ product.libelle }}</p>
+    <!-- Modale à venir pour le système de liste -->
 
-        <p class="quantite-label">Nombre d'unités ({{ product.quantite }})</p>
-
-        <div class="quantite-controls">
-          <button class="btn-compteur" @click="limitDecrement">-</button>
-          <span class="quantite-valeur">{{ nouvelleQuantite }}</span>
-          <button class="btn-compteur" @click="nouvelleQuantite++">+</button>
-        </div>
-
-        <div class="form-actions">
-          <button class="btn-annuler" @click="showModal = false">
-            Annuler
-          </button>
-          <button class="btn-valider" @click="modifierQuantite">Valider</button>
-        </div>
-      </div>
-    </Modal>
-
-    <!-- Modale de confirmation de suppression d'un produit de la BDD -->
-    <Modal
-      v-if="showDeleteModal"
-      title="Supprimer le produit"
-      @close="showDeleteModal = false"
-    >
-      <div class="delete-confirm">
-        <p class="delete-message">
-          Supprimer définitivement <strong>{{ product.libelle }}</strong> ?
-        </p>
-        <p class="delete-warning">Cette action est irréversible.</p>
-        <div class="form-actions">
-          <button class="btn-annuler" @click="showDeleteModal = false">
-            Annuler
-          </button>
-          <button class="btn-supprimer" @click="confirmerSuppression">
-            Supprimer
-          </button>
-        </div>
-      </div>
-    </Modal>
   </PageLayout>
 </template>
 
@@ -114,25 +65,21 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-import { getProductById, updateStock, deleteProduct } from "@/services/api";
+import { getProductById } from "@/services/api";
 
 import MessageBox from "@/components/MessageBox.vue";
 import Modal from "@/components/Modal.vue";
 import PageLayout from "@/components/PageLayout.vue";
 import AppCard from "@/components/AppCard.vue";
 
-const route = useRoute();
-const router = useRouter();
+const route = useRoute(); // Donne accès aux infos de la route actuelle -> Où je suis 
+const router = useRouter(); // donne accès au router pour naviguer vers une autre route -> Où je vais
 
 // Etats réactifs
 const product = ref(null);
 const loading = ref(false);
 const error = ref(null);
 
-// Modale et Modification quantite
-const showModal = ref(false);
-const showDeleteModal = ref(false);
-const nouvelleQuantite = ref(product.value?.quantite ?? 0);
 
 // Computed : class CSS selon le stock
 const stockClass = computed(() => {
@@ -163,42 +110,6 @@ async function fetchProduct() {
   }
 }
 
-function ouvrirModal() {
-  nouvelleQuantite.value = product.value.quantite;
-  showModal.value = true;
-}
-
-async function modifierQuantite() {
-  try {
-    await updateStock(product.value.id, nouvelleQuantite.value);
-    // Mettre à jour l'affichage sans recharger la page
-    product.value.quantite = nouvelleQuantite.value;
-    showModal.value = false;
-  } catch (err) {
-    error.value = err.message;
-  }
-}
-
-function limitDecrement() {
-  if (nouvelleQuantite.value > 0) nouvelleQuantite.value--;
-}
-
-function supprimerProduit() {
-  showDeleteModal.value = true;
-}
-
-async function confirmerSuppression() {
-  try {
-    await deleteProduct(product.value.id);
-    router.push({
-      path: "/",
-      state: { deleted: true },
-    });
-  } catch (err) {
-    error.value = err.message;
-    showDeleteModal.value = false;
-  }
-}
 
 /**
  * Formate une date SQL (ex: "2026-03-18 15:51:10") en français lisible
@@ -292,136 +203,16 @@ onMounted(() => {
   margin-top: 2rem;
 }
 
-.btn-action {
-  flex: 1;
+.btn-list {
+  width: 100%;
   padding: 1rem;
-  border: 2px solid var(--color-border);
+  border: 2px dashed var(--color-border);
   border-radius: var(--radius-btn);
-  background: white;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-delete {
-  border-color: #fee2e2;
-  color: #991b1b;
-}
-
-.btn-delete:hover {
-  border-color: #ef4444;
-  background: #fee2e2;
-}
-
-/* Modale Modif quantite / Confirmation supression */
-
-.form-quantite {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.product-name {
-  font-weight: 600;
+  background: var(--color-bg-soft);
   color: var(--color-text-light);
-  margin: 0;
-}
-
-.quantite-label {
-  text-align: center;
-  font-weight: 700;
-}
-
-.quantite-controls {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #fce4e4;
-  border-radius: var(--radius-input);
-  padding: 1.5rem;
-}
-
-.btn-compteur {
-  width: 52px;
-  height: 52px;
-  border-radius: 10px;
-  border: none;
-  background: white;
-  font-size: 1.5rem;
   font-weight: 600;
-  cursor: pointer;
-  color: var(--color-text-dark);
+  cursor: not-allowed;
+  font-size: 0.95rem;
 }
 
-.btn-compteur:hover {
-  background: var(--color-bg-light);
-}
-
-.quantite-valeur {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
-.btn-annuler {
-  flex: 1;
-  padding: 0.75rem;
-  border: 2px solid var(--color-border);
-  border-radius: 10px;
-  background: white;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btn-valider {
-  flex: 1;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 10px;
-  background: var(--color-primary);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btn-valider:hover {
-  background: var(--color-primary-dark);
-}
-
-.delete-confirm {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.delete-message {
-  color: var(--color-text-dark);
-  font-size: 1rem;
-}
-
-.delete-warning {
-  color: #991b1b;
-  font-size: 0.9rem;
-}
-
-.btn-supprimer {
-  flex: 1;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 10px;
-  background: #ef4444;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btn-supprimer:hover {
-  background: #dc2626;
-}
 </style>

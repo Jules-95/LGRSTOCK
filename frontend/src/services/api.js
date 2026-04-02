@@ -21,7 +21,9 @@ export async function searchProducts(filters) {
     if (filters.fournisseur) params.append('fournisseur', filters.fournisseur)
 
     // Appel API
-    const response = await fetch(`${API_BASE_URL}/search.php?${params.toString()}`)
+    const response = await fetch(`${API_BASE_URL}/search.php?${params.toString()}`, {
+        credentials: 'include'
+    })
 
     if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
 
@@ -43,7 +45,9 @@ export async function searchProducts(filters) {
 */
 
 export async function getProductById(id) {
-    const response = await fetch(`${API_BASE_URL}/product.php?id=${id}`)
+    const response = await fetch(`${API_BASE_URL}/product.php?id=${id}`, {
+        credentials: 'include'
+    })
 
     if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
 
@@ -66,6 +70,7 @@ export async function getProductById(id) {
 export async function addProduct(data) {
     const response = await fetch(`${API_BASE_URL}/add-product.php`, {
         method: 'POST',
+        credentials: 'include',
         body: new URLSearchParams(data)
     })
 
@@ -90,6 +95,7 @@ export async function addProduct(data) {
 export async function deleteProduct(id) {
     const response = await fetch (`${API_BASE_URL}/delete-product.php`, {
         method: 'POST',
+        credentials: 'include',
         body: new URLSearchParams({ id })
     })
 
@@ -115,6 +121,7 @@ export async function deleteProduct(id) {
 export async function updateStock(id, quantite) {
     const response = await fetch (`${API_BASE_URL}/update-stock.php` , {
         method: 'POST',
+        credentials: 'include',
         body: new URLSearchParams({ id, quantite})
     })
 

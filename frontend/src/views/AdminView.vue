@@ -9,6 +9,11 @@
       </div>
 
       <nav class="sidebar-nav">
+
+        <button class="nav-item nav-item--disabled" disabled>
+          Vue d'ensemble
+        </button>
+
         <button
           class="nav-item"
           :class="{ active: currentSection === 'produits' }"
@@ -16,12 +21,27 @@
         >
           Produits
         </button>
+
+        <button
+          class="nav-item"
+          :class="{ active: currentSection === 'ajouter'}"
+          @click="currentSection = 'ajouter'"
+          >
+          Ajouter un produit
+        </button>
+
         <button class="nav-item nav-item--disabled" disabled>
           Listes de transfert
         </button>
+
+        <button class="nav-item nav-item--disabled" disabled>
+          Gestion utilisateurs
+        </button>
+
         <button class="nav-item nav-item--disabled" disabled>
           Import CSV
         </button>
+
         <button class="nav-item nav-item--disabled" disabled>
           Export CSV
         </button>
@@ -41,9 +61,6 @@
         <!-- En-tête -->
         <div class="content-header">
           <h1 class="content-title">Produits</h1>
-          <button class="btn-add" @click="router.push('/ajouter-produit')">
-            + Ajouter un produit
-          </button>
         </div>
 
         <!-- Formulaire de recherche -->
@@ -125,17 +142,23 @@
 
       </div>
 
+      <!-- Vue de AjouterProduit -->
+      <div v-if="currentSection === 'ajouter'">
+      <AddProductForm
+        @cancel="currentSection = 'produits'"
+      />
+      </div>
+
     </main>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { searchProducts, deleteProduct } from '@/services/api'
+import AddProductForm from '@/components/AddProductForm.vue'
 
-const router = useRouter()
 const { user, logout } = useAuth()
 
 const currentSection = ref('produits')
@@ -447,5 +470,21 @@ async function confirmDelete(product) {
 .state-message--error {
   color: #991b1b;
   background: #fee2e2;
+}
+
+.btn-back {
+  padding: 0.6rem 1.25rem;
+  border: 1.5px solid var(--color-border);
+  background: white;
+  border-radius: var(--radius-btn);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-text-medium);
+}
+
+.btn-back:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
 }
 </style>

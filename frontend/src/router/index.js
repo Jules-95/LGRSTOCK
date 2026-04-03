@@ -32,13 +32,7 @@ const router = createRouter({
       component: () => import('../views/AdminView.vue'),
       meta: { requiresAuth: true, requiresAdmin: true }
     },
-    // Vue Ajouter un produit - admin only
-    {
-      path: '/ajouter-produit',
-      name: 'add-product',
-      component: () => import('../views/AddProductView.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true }
-    },
+
     // Dernière route : 404 Not Found
     // Vue Router parcourt les routes dans l'ordre et s'arrête à la première qui correspond
     {

@@ -125,22 +125,48 @@ class Product {
     /**
      * Mise à jour de la quantité d'un produit
      * @param int $id
-     * @param int $quantite
+     * @param array $data ['libelle', 'ean', 'fournisseur', 'quantite']
      * @return bool true si la mise à jour a réussi
      * @throws Exception si données invalides
      */
-    public function updateQuantite($id, $quantite) {
+    public function update($id, $data) {
         if (empty($id) || !is_numeric($id)) {
             throw new Exception("L'ID du produit doit être valide");
+        }
+
+        $libelle     = $data['libelle']     ?? null;
+        $ean         = $data['ean']         ?? null;
+        $fournisseur = $data['fournisseur'] ?? null;
+        $quantite    = $data['quantite']    ?? null;
+
+        if (empty($libelle)) {
+            throw new Exception("Le libellé est obligatoire");
+        }
+
+        if (empty($ean)) {
+            throw new Exception("Le code EAN est obligatoire");
+        }
+
+        if (strlen($ean) !== 13 || !ctype_digit($ean)) {
+            throw new Exception("Le code EAN doit contenir exactement 13 chiffres");
         }
 
         if (!is_numeric($quantite) || $quantite < 0) {
             throw new Exception("La quantité doit être un nombre positif ou nul");
         }
 
-        $sql = "UPDATE products SET quantite = :quantite, updated_at = NOW() WHERE id = :id";
+        $sql = "UPDATE products SET 
+            libelle = :libelle,
+            ean = :ean,
+            fournisseur = :fournisseur,
+            quantite = :quantite, 
+            updated_at = NOW() 
+            WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
+            ':libelle' => $libelle,
+            ':ean' => $ean,
+            ':fournisseur' => $fournisseur,
             ':quantite' => (int) $quantite,
             ':id' => (int) $id
         ]);
@@ -148,7 +174,7 @@ class Product {
         //rowCountretourne le nombre de lignes affectées par l'UPDATE
         // Si 0 : l'ID n'existe pas en BDD
         if ($stmt->rowCount() === 0) {
-            throw new Exception("Produit introuvable ou quantité inchangée");
+            throw new Exception("Produit introuvable");
         }
 
         return true;

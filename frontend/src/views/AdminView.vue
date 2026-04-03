@@ -1,6 +1,5 @@
 <template>
   <div class="admin-layout">
-
     <!-- SIDEBAR -->
     <aside class="sidebar">
       <div class="sidebar-header">
@@ -9,7 +8,6 @@
       </div>
 
       <nav class="sidebar-nav">
-
         <button class="nav-item nav-item--disabled" disabled>
           Vue d'ensemble
         </button>
@@ -24,9 +22,9 @@
 
         <button
           class="nav-item"
-          :class="{ active: currentSection === 'ajouter'}"
+          :class="{ active: currentSection === 'ajouter' }"
           @click="currentSection = 'ajouter'"
-          >
+        >
           Ajouter un produit
         </button>
 
@@ -38,26 +36,22 @@
           Gestion utilisateurs
         </button>
 
-        <button class="nav-item nav-item--disabled" disabled>
-          Import CSV
-        </button>
+        <button class="nav-item nav-item--disabled" disabled>Import CSV</button>
 
-        <button class="nav-item nav-item--disabled" disabled>
-          Export CSV
-        </button>
+        <button class="nav-item nav-item--disabled" disabled>Export CSV</button>
       </nav>
 
       <div class="sidebar-footer">
-        <span class="sidebar-user">{{ user?.username }} · {{ user?.magasin }}</span>
+        <span class="sidebar-user"
+          >{{ user?.username }} · {{ user?.magasin }}</span
+        >
         <button class="btn-logout" @click="handleLogout">Déconnexion</button>
       </div>
     </aside>
 
     <!-- CONTENU PRINCIPAL -->
     <main class="admin-content">
-
       <div v-if="currentSection === 'produits'">
-
         <!-- En-tête -->
         <div class="content-header">
           <h1 class="content-title">Produits</h1>
@@ -96,13 +90,17 @@
         </form>
 
         <!-- États -->
-        <div v-if="loading" class="state-message">
-          Chargement...
-        </div>
-        <div v-else-if="errorMessage" class="state-message state-message--error">
+        <div v-if="loading" class="state-message">Chargement...</div>
+        <div
+          v-else-if="errorMessage"
+          class="state-message state-message--error"
+        >
           {{ errorMessage }}
         </div>
-        <div v-else-if="searched && products.length === 0" class="state-message">
+        <div
+          v-else-if="searched && products.length === 0"
+          class="state-message"
+        >
           Aucun produit trouvé.
         </div>
 
@@ -121,7 +119,7 @@
             <tr v-for="product in products" :key="product.id">
               <td>{{ product.libelle }}</td>
               <td class="td-ean">{{ product.ean }}</td>
-              <td>{{ product.fournisseur || '—' }}</td>
+              <td>{{ product.fournisseur || "—" }}</td>
               <td>{{ product.quantite }}</td>
               <td class="td-actions">
                 <button class="btn-edit" @click="editProduct(product)">
@@ -139,81 +137,78 @@
         <div v-else class="state-message">
           Utilisez la barre de recherche pour trouver des produits.
         </div>
-
       </div>
 
       <!-- Vue de AjouterProduit -->
       <div v-if="currentSection === 'ajouter'">
-      <AddProductForm
-        @cancel="currentSection = 'produits'"
-      />
+        <AddProductForm @cancel="currentSection = 'produits'" />
       </div>
-
     </main>
   </div>
 </template>
 
+<!-- SCRIPTS -->
+
 <script setup>
-import { ref } from 'vue'
-import { useAuth } from '@/composables/useAuth'
-import { searchProducts, deleteProduct } from '@/services/api'
-import AddProductForm from '@/components/AddProductForm.vue'
+import { ref } from "vue";
+import { useAuth } from "@/composables/useAuth";
+import { searchProducts, deleteProduct, updateStock } from "@/services/api";
+import AddProductForm from "@/components/AddProductForm.vue";
 
-const { user, logout } = useAuth()
+const { user, logout } = useAuth();
 
-const currentSection = ref('produits')
+const currentSection = ref("produits");
 const filters = ref({
-  ean: '',
-  libelle: '',
-  fournisseur: ''
-})
-const products     = ref([])
-const loading      = ref(false)
-const errorMessage = ref('')
-const searched     = ref(false)
+  ean: "",
+  libelle: "",
+  fournisseur: "",
+});
+const products = ref([]);
+const loading = ref(false);
+const errorMessage = ref("");
+const searched = ref(false);
 
 async function handleLogout() {
-  await logout()
+  await logout();
 }
 
 async function handleSearch() {
-  const { ean, libelle, fournisseur } = filters.value
+  const { ean, libelle, fournisseur } = filters.value;
 
   if (!ean && !libelle && !fournisseur) {
-    errorMessage.value = 'Veuillez remplir au moins un champ de recherche'
-    return
+    errorMessage.value = "Veuillez remplir au moins un champ de recherche";
+    return;
   }
 
-  loading.value = true
-  errorMessage.value = ''
-  searched.value = true
-  products.value = []
+  loading.value = true;
+  errorMessage.value = "";
+  searched.value = true;
+  products.value = [];
 
   try {
-    const result = await searchProducts({ ean, libelle, fournisseur })
-    products.value = result.data ?? []
+    const result = await searchProducts({ ean, libelle, fournisseur });
+    products.value = result.data ?? [];
   } catch (err) {
-    errorMessage.value = err.message
+    errorMessage.value = err.message;
   } finally {
-    loading.value = false
+    loading.value = false;
   }
 }
 
-function editProduct(product) {
-  console.log('Modifier', product)
-}
 
 async function confirmDelete(product) {
-  if (!confirm(`Supprimer "${product.libelle}" ?`)) return
+  if (!confirm(`Supprimer "${product.libelle}" ?`)) return;
 
   try {
-    await deleteProduct(product.id)
-    products.value = products.value.filter(p => p.id !== product.id)
+    await deleteProduct(product.id);
+    products.value = products.value.filter((p) => p.id !== product.id);
   } catch (err) {
-    errorMessage.value = err.message
+    errorMessage.value = err.message;
   }
 }
 </script>
+
+<!-- STYLES -->
 
 <style scoped>
 .admin-layout {
@@ -233,7 +228,7 @@ async function confirmDelete(product) {
 
 .sidebar-header {
   padding: 0 1.25rem 1.5rem;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: 1rem;
 }
 
@@ -248,7 +243,7 @@ async function confirmDelete(product) {
 .sidebar-role {
   display: block;
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.5);
+  color: rgba(255, 255, 255, 0.5);
   margin-top: 0.2rem;
 }
 
@@ -264,7 +259,7 @@ async function confirmDelete(product) {
   background: none;
   border: none;
   border-left: 3px solid transparent;
-  color: rgba(255,255,255,0.55);
+  color: rgba(255, 255, 255, 0.55);
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.15s;
@@ -273,28 +268,28 @@ async function confirmDelete(product) {
 .nav-item.active {
   color: white;
   border-left-color: var(--color-primary);
-  background: rgba(255,255,255,0.06);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .nav-item:hover:not(.active):not(:disabled) {
-  color: rgba(255,255,255,0.8);
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .nav-item--disabled {
-  color: rgba(255,255,255,0.25) !important;
+  color: rgba(255, 255, 255, 0.25) !important;
   cursor: not-allowed;
   font-style: italic;
 }
 
 .sidebar-footer {
   padding: 1rem 1.25rem 0;
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .sidebar-user {
   display: block;
   font-size: 0.75rem;
-  color: rgba(255,255,255,0.35);
+  color: rgba(255, 255, 255, 0.35);
   margin-bottom: 0.75rem;
 }
 
@@ -402,7 +397,7 @@ async function confirmDelete(product) {
   background: white;
   border-radius: var(--radius-card);
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .product-table th {

@@ -1,9 +1,7 @@
 <?php
 /**
- * API : Mise à jour de la quantité d'un produit 
- * 
- * Utilisation : POST /api/update-stock.php
- * Body JSON : { "id": 42, "quantite": 15}
+ * API : Mise à jour complète d'un produit 
+ * Utilisation : POST /api/update-product.php
  */
 
 require_once __DIR__ . '/../config/cors.php';
@@ -25,4 +23,4 @@ $pdo = getDBConnection();
 
 $controller = new ProductController($pdo);
 
-$controller->updateStock();
+$controller->updateProduct();

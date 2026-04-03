@@ -161,21 +161,23 @@ class ProductController
 
 
     /**
-     * Mise à jour de la quantite d'un produit 
-     * Utilisé par : POST /api/update-stock.php
+     * Modification d'un produit 
+     * Utilisé par : POST /api/update-product.php
      */
-    public function updateStock()
-    {
-        try {
-            // On va lire le $_POST au lieu du JSON brut (plus simple + debug)
-            $id       = $_POST['id']        ?? null;
-            $quantite = $_POST['quantite'] ?? null;
+    public function updateProduct() {
+         try {
+            $id = $_POST['id'] ?? null;
 
-            $this->productModel->updateQuantite($id, $quantite);
+            $this->productModel->update($id, [
+                'libelle'     => $_POST['libelle'] ?? null,
+                'ean'         => $_POST['ean'] ?? null,
+                'fournisseur' => $_POST['fournisseur'] ?? null,
+                'quantite'    => $_POST['quantite'] ?? 0,
+            ]);
 
             $this->sendResponse(200, [
                 'error' => false,
-                'message' => 'Quantité mise à jour avec succès'
+                'message' => 'Produit mit à jour avec succès'
             ]);
         } catch (Exception $e) {
             $this->sendResponse(400, [

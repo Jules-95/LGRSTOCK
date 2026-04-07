@@ -112,28 +112,28 @@ export async function deleteProduct(id) {
 }
 
 
-
-/** 
- * Met à jour la quantite d'un produit 
- * @param {number} id - L'ID du produit 
- * @param {number} quantite - La nouvelle quantité
+/**
+ * @param {number} id - L'ID du produit à modifier
+ * @param {object} data - { libelle, ean, fournisseur, quantite }
+ * @returns {Promise<Object>}
+ * @throws {Error} Si erreur API
  */
-export async function updateStock(id, quantite) {
-    const response = await fetch (`${API_BASE_URL}/update-stock.php` , {
+export async function editProduct(id, data) {
+    const response = await fetch(`${API_BASE_URL}/edit-product.php`, {
         method: 'POST',
         credentials: 'include',
-        body: new URLSearchParams({ id, quantite})
+        body: new URLSearchParams({ id, ...data})
     })
 
-    if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
+    if (response.status >= 500) throw new Error (`Erreur serveur : ${response.status}`)
+    
+    const result = await response.json()
 
-    const data = await response.json()
-
-    if (data.error) {
-        throw new Error(data.message)
+    if (result.error) {
+        throw new Error(result.message)
     }
 
-    return data
+    return result
 }
 
 /**

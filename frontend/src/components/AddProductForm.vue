@@ -103,6 +103,7 @@ async function handleSubmit() {
   try {
     const result = await addProduct(form.value)
     success.value = true
+    setTimeout(() => { success.value = false}, 3000)
     form.value = { libelle: '', ean: '', fournisseur: '', quantite: 0}
     emit('success', result.id) // 
   } catch (err) {

@@ -1,11 +1,11 @@
 <?php
 /**
- * API : Mise à jour complète d'un produit 
- * Utilisation : POST /api/edit-product.php
+ * API : Supprimer un produit
+ * Utilisation : POST api/delete-product.php
  */
 
-require_once __DIR__ . '/../config/cors.php';
-require_once __DIR__ . '/../src/Middleware/Auth.php';
+require_once __DIR__ . '/../../config/cors.php';
+require_once __DIR__ . '/../../src/Middleware/Auth.php';
 
 Auth::requireAdmin();
 
@@ -16,11 +16,11 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../src/Controllers/ProductController.php';
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../src/Controllers/ProductController.php';
 
 $pdo = getDBConnection();
 
 $controller = new ProductController($pdo);
 
-$controller->editProduct();
+$controller->deleteProduct();

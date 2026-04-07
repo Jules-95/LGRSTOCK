@@ -17,7 +17,7 @@
           :class="{ active: currentSection === 'produits' }"
           @click="currentSection = 'produits'"
         >
-          Produits
+          Gestion produits
         </button>
 
         <button
@@ -55,7 +55,7 @@
 
         <!-- En-tête -->
         <div class="content-header">
-          <h1 class="content-title">Produits</h1>
+          <h1 class="content-title">Recherche produit</h1>
         </div>
 
         <MessageBox 

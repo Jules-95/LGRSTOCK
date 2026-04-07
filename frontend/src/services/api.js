@@ -21,7 +21,7 @@ export async function searchProducts(filters) {
     if (filters.fournisseur) params.append('fournisseur', filters.fournisseur)
 
     // Appel API
-    const response = await fetch(`${API_BASE_URL}/search.php?${params.toString()}`, {
+    const response = await fetch(`${API_BASE_URL}/Product/search.php?${params.toString()}`, {
         credentials: 'include'
     })
 
@@ -45,7 +45,7 @@ export async function searchProducts(filters) {
 */
 
 export async function getProductById(id) {
-    const response = await fetch(`${API_BASE_URL}/product.php?id=${id}`, {
+    const response = await fetch(`${API_BASE_URL}/Product/product.php?id=${id}`, {
         credentials: 'include'
     })
 
@@ -68,7 +68,7 @@ export async function getProductById(id) {
  * @throws {Error} Si erreur API
 */
 export async function addProduct(data) {
-    const response = await fetch(`${API_BASE_URL}/add-product.php`, {
+    const response = await fetch(`${API_BASE_URL}/Product/add-product.php`, {
         method: 'POST',
         credentials: 'include',
         body: new URLSearchParams(data)
@@ -93,7 +93,7 @@ export async function addProduct(data) {
  * @throws {Error} Si erreur API
  */
 export async function deleteProduct(id) {
-    const response = await fetch (`${API_BASE_URL}/delete-product.php`, {
+    const response = await fetch (`${API_BASE_URL}/Product/delete-product.php`, {
         method: 'POST',
         credentials: 'include',
         body: new URLSearchParams({ id })
@@ -119,7 +119,7 @@ export async function deleteProduct(id) {
  * @throws {Error} Si erreur API
  */
 export async function editProduct(id, data) {
-    const response = await fetch(`${API_BASE_URL}/edit-product.php`, {
+    const response = await fetch(`${API_BASE_URL}/Product/edit-product.php`, {
         method: 'POST',
         credentials: 'include',
         body: new URLSearchParams({ id, ...data})

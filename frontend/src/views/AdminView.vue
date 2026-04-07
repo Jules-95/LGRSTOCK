@@ -52,10 +52,17 @@
     <!-- CONTENU PRINCIPAL -->
     <main class="admin-content">
       <div v-if="currentSection === 'produits'">
+
         <!-- En-tête -->
         <div class="content-header">
           <h1 class="content-title">Produits</h1>
         </div>
+
+        <MessageBox 
+        v-if="successMessage"
+        type="info"
+        :message="successMessage"
+        />
 
         <!-- Formulaire de recherche -->
         <form @submit.prevent="handleSearch">
@@ -122,7 +129,7 @@
               <td>{{ product.fournisseur || "—" }}</td>
               <td>{{ product.quantite }}</td>
               <td class="td-actions">
-                <button class="btn-edit" @click="editProduct(product)">
+                <button class="btn-edit" @click="openEditModal(product)">
                   Modifier
                 </button>
                 <button class="btn-delete" @click="confirmDelete(product)">
@@ -135,7 +142,7 @@
 
         <!-- Message par défaut avant toute recherche -->
         <div v-else class="state-message">
-          Utilisez la barre de recherche pour trouver des produits.
+          Utilisez les barres de recherche pour trouver des produits.
         </div>
       </div>
 
@@ -144,6 +151,19 @@
         <AddProductForm @cancel="currentSection = 'produits'" />
       </div>
     </main>
+
+    <Modal 
+    v-if="showEditModal"
+    title="Modifier le produit"
+    @close="showEditModal = false"
+    >
+      <EditProductForm
+      :product="selectedProduct"
+      @success="handleEditSucess"
+      @cancel="showEditModal = false"
+      />
+  
+  </Modal>
   </div>
 </template>
 
@@ -152,8 +172,11 @@
 <script setup>
 import { ref } from "vue";
 import { useAuth } from "@/composables/useAuth";
-import { searchProducts, deleteProduct, updateStock } from "@/services/api";
+import { searchProducts, deleteProduct } from "@/services/api";
 import AddProductForm from "@/components/AddProductForm.vue";
+import EditProductForm from "@/components/EditProductForm.vue";
+import Modal from "@/components/Modal.vue";
+import MessageBox from "@/components/MessageBox.vue";
 
 const { user, logout } = useAuth();
 
@@ -167,6 +190,11 @@ const products = ref([]);
 const loading = ref(false);
 const errorMessage = ref("");
 const searched = ref(false);
+const successMessage = ref("")
+
+// Etat de la modale d'édition 
+const showEditModal = ref(false)
+const selectedProduct = ref(null)
 
 async function handleLogout() {
   await logout();
@@ -195,6 +223,23 @@ async function handleSearch() {
   }
 }
 
+function openEditModal (product) {
+  selectedProduct.value = product
+  showEditModal.value = true
+}
+
+function handleEditSucess(updatedProduct) {
+  const index = products.value.findIndex(p => p.id === updatedProduct.id)
+  if (index !== -1) {
+    products.value[index] = updatedProduct
+  }
+
+  showEditModal.value = false
+  successMessage.value = 'Produit modifié avec succès'
+
+  setTimeout(() => { successMessage.value = ''}, 3000)
+}
+
 
 async function confirmDelete(product) {
   if (!confirm(`Supprimer "${product.libelle}" ?`)) return;
@@ -202,6 +247,8 @@ async function confirmDelete(product) {
   try {
     await deleteProduct(product.id);
     products.value = products.value.filter((p) => p.id !== product.id);
+    successMessage.value = 'Produit supprimé avec succès'
+    setTimeout(() => { successMessage.value = ''}, 3000)
   } catch (err) {
     errorMessage.value = err.message;
   }

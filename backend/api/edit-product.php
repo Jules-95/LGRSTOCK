@@ -1,7 +1,7 @@
 <?php
 /**
  * API : Mise à jour complète d'un produit 
- * Utilisation : POST /api/update-product.php
+ * Utilisation : POST /api/edit-product.php
  */
 
 require_once __DIR__ . '/../config/cors.php';
@@ -23,4 +23,4 @@ $pdo = getDBConnection();
 
 $controller = new ProductController($pdo);
 
-$controller->updateProduct();
+$controller->editProduct();

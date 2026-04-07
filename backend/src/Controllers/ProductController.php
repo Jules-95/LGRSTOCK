@@ -162,9 +162,9 @@ class ProductController
 
     /**
      * Modification d'un produit 
-     * Utilisé par : POST /api/update-product.php
+     * Utilisé par : POST /api/edit-product.php
      */
-    public function updateProduct() {
+    public function editProduct() {
          try {
             $id = $_POST['id'] ?? null;
 

@@ -40,7 +40,7 @@ class User {
     /**
     * Retourne tous les utilisateurs sans les mdp
     */
-    public function getAll(): array {
+    public function getAllUser(): array {
         $stmt = $this->pdo->prepare('
         SELECT id, username, role, magasin, created_at
         FROM users

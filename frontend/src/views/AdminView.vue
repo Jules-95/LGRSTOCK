@@ -28,16 +28,19 @@
           Ajouter un produit
         </button>
 
+        <button
+          class="nav-item"
+          :class="{ active: currentSection === 'utilisateurs' }"
+          @click="currentSection = 'utilisateurs'"
+        >
+          Gestion utilisateurs
+        </button>
+
         <button class="nav-item nav-item--disabled" disabled>
           Listes de transfert
         </button>
 
-        <button class="nav-item nav-item--disabled" disabled>
-          Gestion utilisateurs
-        </button>
-
         <button class="nav-item nav-item--disabled" disabled>Import CSV</button>
-
         <button class="nav-item nav-item--disabled" disabled>Export CSV</button>
       </nav>
 
@@ -51,20 +54,18 @@
 
     <!-- CONTENU PRINCIPAL -->
     <main class="admin-content">
+      <!-- SECTION PRODUITS -->
       <div v-if="currentSection === 'produits'">
-
-        <!-- En-tête -->
         <div class="content-header">
           <h1 class="content-title">Recherche produit</h1>
         </div>
 
-        <MessageBox 
-        v-if="successMessage"
-        type="info"
-        :message="successMessage"
+        <MessageBox
+          v-if="successMessage"
+          type="info"
+          :message="successMessage"
         />
 
-        <!-- Formulaire de recherche -->
         <form @submit.prevent="handleSearch">
           <div class="search-fields">
             <div class="search-field">
@@ -96,7 +97,6 @@
           </div>
         </form>
 
-        <!-- États -->
         <div v-if="loading" class="state-message">Chargement...</div>
         <div
           v-else-if="errorMessage"
@@ -111,7 +111,6 @@
           Aucun produit trouvé.
         </div>
 
-        <!-- Tableau produits -->
         <table v-else-if="products.length > 0" class="product-table">
           <thead>
             <tr>
@@ -140,66 +139,157 @@
           </tbody>
         </table>
 
-        <!-- Message par défaut avant toute recherche -->
         <div v-else class="state-message">
           Utilisez les barres de recherche pour trouver des produits.
         </div>
       </div>
 
-      <!-- Vue de AjouterProduit -->
+      <!-- SECTION AJOUTER PRODUIT -->
       <div v-if="currentSection === 'ajouter'">
+        <div class="content-header">
+          <h1 class="content-title">Ajouter un produit</h1>
+        </div>
         <AddProductForm @cancel="currentSection = 'produits'" />
+      </div>
+
+      <!-- SECTION UTILISATEURS -->
+      <div v-if="currentSection === 'utilisateurs'">
+        <div class="content-header">
+          <h1 class="content-title">Gestion utilisateurs</h1>
+          <button class="btn-add" @click="showAddUserModal = true">
+            + Ajouter un utilisateur
+          </button>
+        </div>
+
+        <MessageBox
+          v-if="successMessageUsers"
+          type="info"
+          :message="successMessageUsers"
+        />
+        <MessageBox
+          v-if="errorMessageUsers"
+          type="error"
+          :message="errorMessageUsers"
+        />
+
+        <div v-if="loadingUsers" class="state-message">Chargement...</div>
+
+        <table v-else-if="users.length > 0" class="product-table">
+          <thead>
+            <tr>
+              <th>Nom d'utilisateur</th>
+              <th>Rôle</th>
+              <th>Magasin</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="u in users" :key="u.id">
+              <td>{{ u.username }}</td>
+              <td>{{ u.role }}</td>
+              <td>{{ u.magasin }}</td>
+              <td class="td-actions">
+                <button class="btn-edit" @click="openEditUserModal(u)">
+                  Modifier
+                </button>
+                <button class="btn-delete" @click="confirmDeleteUser(u)">
+                  Supprimer
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div v-else class="state-message">Aucun utilisateur trouvé.</div>
       </div>
     </main>
 
-    <Modal 
-    v-if="showEditModal"
-    title="Modifier le produit"
-    @close="showEditModal = false"
+    <!-- MODALE MODIFIER PRODUIT -->
+    <Modal
+      v-if="showEditModal"
+      title="Modifier le produit"
+      @close="showEditModal = false"
     >
       <EditProductForm
-      :product="selectedProduct"
-      @success="handleEditSucess"
-      @cancel="showEditModal = false"
+        :product="selectedProduct"
+        @success="handleEditSuccess"
+        @cancel="showEditModal = false"
       />
-  
-  </Modal>
+    </Modal>
+
+    <!-- MODALE AJOUTER UTILISATEUR -->
+    <Modal
+      v-if="showAddUserModal"
+      title="Ajouter un utilisateur"
+      @close="showAddUserModal = false"
+    >
+      <AddUserForm
+        @success="handleAddUserSuccess"
+        @cancel="showAddUserModal = false"
+      />
+    </Modal>
+
+    <!-- MODALE MODIFIER UTILISATEUR -->
+    <Modal
+      v-if="showEditUserModal"
+      title="Modifier l'utilisateur"
+      @close="showEditUserModal = false"
+    >
+      <EditUserForm
+        :user="selectedUser"
+        @success="handleEditUserSuccess"
+        @cancel="showEditUserModal = false"
+      />
+    </Modal>
   </div>
 </template>
 
-<!-- SCRIPTS -->
-
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useAuth } from "@/composables/useAuth";
-import { searchProducts, deleteProduct } from "@/services/api";
+import {
+  searchProducts,
+  deleteProduct,
+  getUsers,
+  deleteUser,
+} from "@/services/api";
 import AddProductForm from "@/components/AddProductForm.vue";
 import EditProductForm from "@/components/EditProductForm.vue";
+import AddUserForm from "@/components/AddUserForm.vue";
+import EditUserForm from "@/components/EditUserForm.vue";
 import Modal from "@/components/Modal.vue";
 import MessageBox from "@/components/MessageBox.vue";
 
 const { user, logout } = useAuth();
 
+// ── NAVIGATION ───────────────────────────────────────────
 const currentSection = ref("produits");
-const filters = ref({
-  ean: "",
-  libelle: "",
-  fournisseur: "",
-});
+
+// ── PRODUITS ─────────────────────────────────────────────
+const filters = ref({ ean: "", libelle: "", fournisseur: "" });
 const products = ref([]);
 const loading = ref(false);
 const errorMessage = ref("");
 const searched = ref(false);
-const successMessage = ref("")
+const successMessage = ref("");
+const showEditModal = ref(false);
+const selectedProduct = ref(null);
 
-// Etat de la modale d'édition 
-const showEditModal = ref(false)
-const selectedProduct = ref(null)
+// ── UTILISATEURS ─────────────────────────────────────────
+const users = ref([]);
+const loadingUsers = ref(false);
+const errorMessageUsers = ref("");
+const successMessageUsers = ref("");
+const showAddUserModal = ref(false);
+const showEditUserModal = ref(false);
+const selectedUser = ref(null);
 
+// ── FONCTIONS GÉNÉRALES ───────────────────────────────────
 async function handleLogout() {
   await logout();
 }
 
+// ── FONCTIONS PRODUITS ────────────────────────────────────
 async function handleSearch() {
   const { ean, libelle, fournisseur } = filters.value;
 
@@ -223,23 +313,22 @@ async function handleSearch() {
   }
 }
 
-function openEditModal (product) {
-  selectedProduct.value = product
-  showEditModal.value = true
+function openEditModal(product) {
+  selectedProduct.value = product;
+  showEditModal.value = true;
 }
 
-function handleEditSucess(updatedProduct) {
-  const index = products.value.findIndex(p => p.id === updatedProduct.id)
+function handleEditSuccess(updatedProduct) {
+  const index = products.value.findIndex((p) => p.id === updatedProduct.id);
   if (index !== -1) {
-    products.value[index] = updatedProduct
+    products.value[index] = updatedProduct;
   }
-
-  showEditModal.value = false
-  successMessage.value = 'Produit modifié avec succès'
-
-  setTimeout(() => { successMessage.value = ''}, 3000)
+  showEditModal.value = false;
+  successMessage.value = "Produit modifié avec succès";
+  setTimeout(() => {
+    successMessage.value = "";
+  }, 3000);
 }
-
 
 async function confirmDelete(product) {
   if (!confirm(`Supprimer "${product.libelle}" ?`)) return;
@@ -247,10 +336,77 @@ async function confirmDelete(product) {
   try {
     await deleteProduct(product.id);
     products.value = products.value.filter((p) => p.id !== product.id);
-    successMessage.value = 'Produit supprimé avec succès'
-    setTimeout(() => { successMessage.value = ''}, 3000)
+    successMessage.value = "Produit supprimé avec succès";
+    setTimeout(() => {
+      successMessage.value = "";
+    }, 3000);
   } catch (err) {
     errorMessage.value = err.message;
+  }
+}
+
+// ── FONCTIONS UTILISATEURS ────────────────────────────────
+watch(currentSection, (newSection) => {
+  if (newSection === "utilisateurs") {
+    loadUsers();
+  }
+});
+
+async function loadUsers() {
+  loadingUsers.value = true;
+  errorMessageUsers.value = "";
+
+  try {
+    const result = await getUsers();
+    users.value = result.data ?? [];
+  } catch (err) {
+    errorMessageUsers.value = err.message;
+  } finally {
+    loadingUsers.value = false;
+  }
+}
+
+function openEditUserModal(u) {
+  selectedUser.value = u;
+  showEditUserModal.value = true;
+}
+
+function handleAddUserSuccess() {
+  showAddUserModal.value = false;
+  successMessageUsers.value = "Utilisateur ajouté avec succès";
+  setTimeout(() => {
+    successMessageUsers.value = "";
+  }, 3000);
+  loadUsers();
+}
+
+function handleEditUserSuccess(updatedUser) {
+  const index = users.value.findIndex((u) => u.id === updatedUser.id);
+  if (index !== -1) {
+    users.value[index] = updatedUser;
+  }
+  showEditUserModal.value = false;
+  successMessageUsers.value = "Utilisateur modifié avec succès";
+  setTimeout(() => {
+    successMessageUsers.value = "";
+  }, 3000);
+}
+
+async function confirmDeleteUser(u) {
+  if (!confirm(`Supprimer "${u.username}" ?`)) return;
+
+  try {
+    await deleteUser(u.id);
+    users.value = users.value.filter((u2) => u2.id !== u.id);
+    successMessageUsers.value = "Utilisateur supprimé avec succès";
+    setTimeout(() => {
+      successMessageUsers.value = "";
+    }, 3000);
+  } catch (err) {
+    errorMessageUsers.value = err.message;
+    setTimeout(() => {
+      errorMessageUsers.value = "";
+    }, 3000);
   }
 }
 </script>

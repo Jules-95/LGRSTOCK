@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 import { checkAuth } from '@/services/api'
 
 const router = createRouter({
@@ -15,7 +14,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: HomeView,
+      component: () => import('../views/HomeView.vue'),
       meta: { requiresAuth: true, employeOnly: true }
     },
     // Import dynamique - ProductDetail chargé uniquement quand l'utilisateur navigue vers /product/:id

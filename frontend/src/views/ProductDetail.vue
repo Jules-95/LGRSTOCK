@@ -63,17 +63,16 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute } from "vue-router";
 
 import { getProductById } from "@/services/api";
 
 import MessageBox from "@/components/MessageBox.vue";
-import Modal from "@/components/Modal.vue";
 import PageLayout from "@/components/PageLayout.vue";
 import AppCard from "@/components/AppCard.vue";
 
 const route = useRoute(); // Donne accès aux infos de la route actuelle -> Où je suis 
-const router = useRouter(); // donne accès au router pour naviguer vers une autre route -> Où je vais
+
 
 // Etats réactifs
 const product = ref(null);

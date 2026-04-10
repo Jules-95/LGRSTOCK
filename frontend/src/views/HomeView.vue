@@ -5,6 +5,10 @@
       <p class="subtitle">
         Outil de visualisation et de manipulation de stock de la reserve Colombe
       </p>
+      <div class="header-user">
+        <span class="header-username">{{ user?.username }}</span>
+        <button class="btn-logout" @click="handleLogout">Déconnexion</button>
+      </div>
     </header>
 
     <MessageBox
@@ -73,7 +77,7 @@
             <div class="product-info">
               <h4>{{ product.libelle }}</h4>
               <p>EAN : {{ product.ean }}</p>
-              <p>Fournisseur : {{ product.fournisseur || "Non reseigné" }}</p>
+              <p>Fournisseur : {{ product.fournisseur || "Non renseigné" }}</p>
               <p class="stock">Stock : {{ product.quantite }}</p>
             </div>
           </article>
@@ -94,13 +98,15 @@
 import { ref, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { searchProducts } from "@/services/api";
+import { useAuth } from '@/composables/useAuth'
 import MessageBox from "@/components/MessageBox.vue";
 import PageLayout from "@/components/PageLayout.vue";
 import AppCard from "@/components/AppCard.vue";
 
+
 // Hook Vue Router qui donne accès à l'objet de navigation
 const router = useRouter();
-const deleteSuccess = ref(history.state.deleted === true); // Message de succes de supression avec le retour à cette vue.
+const deleteSuccess = ref(history.state?.deleted === true); // Message de succes de supression avec le retour à cette vue.
 
 // Variables réactives pour stocker ce que l'utilisateur entre dans un champ
 const searchEAN = ref("");
@@ -113,6 +119,13 @@ const loading = ref(false); // Indique si une recherche est en cours
 const error = ref(null); // Message d'erreur éventuel
 const searched = ref(false); // Indique si un erecherche a été lancée
 const resultsSection = ref(null); // Ref qui pointe vers l'élément DOM
+
+// Récupération de logout et user
+const { user, logout } = useAuth()
+
+async function handleLogout() {
+  await logout()
+}
 
 // Fonction appelé au clique sur le btn "Rechercher"
 async function handleSearch() {
@@ -168,6 +181,35 @@ function goToProduct(productId) {
 </script>
 
 <style scoped>
+
+/* Affichage de la fonctionnalité de deconnexion */
+.header-user {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.header-username {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.btn-logout {
+  background: none;
+  border: 1.5px solid, rgba(255, 255, 255, 0.4);
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-btn);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-logout:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
 
 /* Header commun à toutes les vues */
 .header {

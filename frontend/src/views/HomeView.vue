@@ -11,12 +11,6 @@
       </div>
     </header>
 
-    <MessageBox
-      v-if="deleteSuccess"
-      type="info"
-      message="Produit supprimé avec succès"
-    />
-
     <AppCard>
       <h2>🔍 Recherche de produits</h2>
 
@@ -106,7 +100,6 @@ import AppCard from "@/components/AppCard.vue";
 
 // Hook Vue Router qui donne accès à l'objet de navigation
 const router = useRouter();
-const deleteSuccess = ref(history.state?.deleted === true); // Message de succes de supression avec le retour à cette vue.
 
 // Variables réactives pour stocker ce que l'utilisateur entre dans un champ
 const searchEAN = ref("");

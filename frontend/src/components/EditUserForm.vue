@@ -1,5 +1,5 @@
 <template>
-  <form class="product-form" @submit.prevent="handleSubmit">
+  <form class="user-form" @submit.prevent="handleSubmit">
 
     <MessageBox v-if="loading" type="loading" message="Modification en cours..." />
     <MessageBox v-if="error" type="error" :message="error" />
@@ -109,7 +109,7 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
-.product-form {
+.user-form {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;

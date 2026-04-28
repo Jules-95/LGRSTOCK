@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { checkAuth } from '@/services/api'
+import { checkAuth } from '@/services/authApi'
 
 const router = createRouter({
   history: createWebHistory(),

@@ -60,7 +60,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { editProduct } from '@/services/api'
+import { editProduct } from '@/services/productApi'
 import MessageBox from '@/components/MessageBox.vue'
 
 const props = defineProps({

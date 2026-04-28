@@ -64,7 +64,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { addProduct } from '@/services/api'
+import { addProduct } from '@/services/productApi'
 import MessageBox from '@/components/MessageBox.vue'
 
 const emit = defineEmits(['success', 'cancel'])

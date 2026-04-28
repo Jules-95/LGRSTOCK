@@ -91,7 +91,7 @@
 <script setup>
 import { ref, nextTick } from "vue";
 import { useRouter } from "vue-router";
-import { searchProducts } from "@/services/api";
+import { searchProducts } from "@/services/productApi";
 import { useAuth } from '@/composables/useAuth'
 import MessageBox from "@/components/MessageBox.vue";
 import PageLayout from "@/components/PageLayout.vue";

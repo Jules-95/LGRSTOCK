@@ -55,7 +55,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { editUser } from '@/services/api'
+import { editUser } from '@/services/userApi'
 import MessageBox from '@/components/MessageBox.vue'
 
 const props = defineProps({

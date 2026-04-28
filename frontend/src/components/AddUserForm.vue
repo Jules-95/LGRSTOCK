@@ -59,7 +59,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { addUser } from '@/services/api'
+import { addUser } from '@/services/userApi'
 import MessageBox from '@/components/MessageBox.vue'
 
 const emit = defineEmits(['success', 'cancel'])

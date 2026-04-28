@@ -247,12 +247,8 @@
 <script setup>
 import { ref, watch } from "vue";
 import { useAuth } from "@/composables/useAuth";
-import {
-  searchProducts,
-  deleteProduct,
-  getUsers,
-  deleteUser,
-} from "@/services/api";
+import { searchProducts, deleteProduct } from "@/services/productApi";
+import { getUsers, deleteUser } from "@/services/userApi";
 import AddProductForm from "@/components/AddProductForm.vue";
 import EditProductForm from "@/components/EditProductForm.vue";
 import AddUserForm from "@/components/AddUserForm.vue";

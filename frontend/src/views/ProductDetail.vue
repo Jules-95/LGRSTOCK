@@ -65,7 +65,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 
-import { getProductById } from "@/services/api";
+import { getProductById } from "@/services/productApi";
 
 import MessageBox from "@/components/MessageBox.vue";
 import PageLayout from "@/components/PageLayout.vue";

@@ -74,7 +74,6 @@ const userSectionRef = ref(null)
 watch(currentSection, async (newSection) => {
   if (newSection === 'utilisateurs') {
     await nextTick()
-    console.log('userSectionRef:', userSectionRef.value)
     userSectionRef.value?.loadUsers()
   }
 })

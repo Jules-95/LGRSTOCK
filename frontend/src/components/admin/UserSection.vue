@@ -70,7 +70,6 @@ const showEditModal = ref(false)
 const selectedUser = ref(null)
 
 async function loadUsers() {
-    console.log('loadUsers appelé')
   loading.value = true
   errorMessage.value = ''
 

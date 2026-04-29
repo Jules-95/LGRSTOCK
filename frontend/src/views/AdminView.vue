@@ -32,13 +32,17 @@
         >
           Gestion utilisateurs
         </button>
-        <button class="nav-item nav-item--disabled" disabled>Listes de transfert</button>
+        <button class="nav-item nav-item--disabled" disabled>
+          Listes de transfert
+        </button>
         <button class="nav-item nav-item--disabled" disabled>Import CSV</button>
         <button class="nav-item nav-item--disabled" disabled>Export CSV</button>
       </nav>
 
       <div class="sidebar-footer">
-        <span class="sidebar-user">{{ user?.username }} · {{ user?.magasin }}</span>
+        <span class="sidebar-user"
+          >{{ user?.username }} · {{ user?.magasin }}</span
+        >
         <button class="btn-logout" @click="handleLogout">Déconnexion</button>
       </div>
     </aside>
@@ -47,39 +51,40 @@
     <main class="admin-content">
       <ProductSection v-if="currentSection === 'produits'" />
 
-      <div v-if="currentSection === 'ajouter'">
-        <div class="content-header">
-          <h1 class="content-title">Ajouter un produit</h1>
-        </div>
-        <AddProductForm @cancel="currentSection = 'produits'" />
-      </div>
+      <AddProductSection
+        v-if="currentSection === 'ajouter'"
+        @cancel="currentSection = 'produits'"
+      />
 
-      <UserSection v-if="currentSection === 'utilisateurs'" ref="userSectionRef" />
+      <UserSection
+        v-if="currentSection === 'utilisateurs'"
+        ref="userSectionRef"
+      />
     </main>
   </div>
 </template>
 
 <script setup>
-import { nextTick, ref, watch } from 'vue'
-import { useAuth } from '@/composables/useAuth'
-import ProductSection from '@/components/admin/ProductSection.vue'
-import UserSection from '@/components/admin/UserSection.vue'
-import AddProductForm from '@/components/admin/AddProductForm.vue'
+import { nextTick, ref, watch } from "vue";
+import { useAuth } from "@/composables/useAuth";
+import ProductSection from "@/components/admin/ProductSection.vue";
+import UserSection from "@/components/admin/UserSection.vue";
+import AddProductSection from "@/components/admin/AddProductSection.vue";
 
-const { user, logout } = useAuth()
+const { user, logout } = useAuth();
 
-const currentSection = ref('produits')
-const userSectionRef = ref(null)
+const currentSection = ref("produits");
+const userSectionRef = ref(null);
 
 watch(currentSection, async (newSection) => {
-  if (newSection === 'utilisateurs') {
-    await nextTick()
-    userSectionRef.value?.loadUsers()
+  if (newSection === "utilisateurs") {
+    await nextTick();
+    userSectionRef.value?.loadUsers();
   }
-})
+});
 
 async function handleLogout() {
-  await logout()
+  await logout();
 }
 </script>
 
@@ -179,18 +184,5 @@ async function handleLogout() {
   background: var(--color-bg-light);
   padding: 2rem;
   overflow-y: auto;
-}
-
-.content-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-}
-
-.content-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-text-dark);
 }
 </style>

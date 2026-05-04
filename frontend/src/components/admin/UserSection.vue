@@ -61,6 +61,8 @@ import EditUserForm from '@/components/admin/EditUserForm.vue'
 import Modal from '@/components/Modal.vue'
 import MessageBox from '@/components/MessageBox.vue'
 
+import '@/assets/admin.css'
+
 const users = ref([])
 const loading = ref(false)
 const errorMessage = ref('')
@@ -123,18 +125,6 @@ defineExpose({ loadUsers })
 </script>
 
 <style scoped>
-.content-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-}
-
-.content-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-text-dark);
-}
 
 .btn-add {
   padding: 0.6rem 1.25rem;
@@ -151,72 +141,4 @@ defineExpose({ loadUsers })
   background: var(--color-primary-dark);
 }
 
-.product-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border-radius: var(--radius-card);
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-}
-
-.product-table th {
-  padding: 0.75rem 1rem;
-  text-align: left;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-text-light);
-  border-bottom: 1.5px solid var(--color-border);
-}
-
-.product-table td {
-  padding: 0.85rem 1rem;
-  font-size: 0.9rem;
-  color: var(--color-text-dark);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.product-table tr:last-child td {
-  border-bottom: none;
-}
-
-.td-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.btn-edit {
-  padding: 0.3rem 0.75rem;
-  border: 1.5px solid var(--color-border);
-  background: var(--color-bg-soft);
-  border-radius: 6px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  color: var(--color-text-medium);
-}
-
-.btn-delete {
-  padding: 0.3rem 0.75rem;
-  border: 1.5px solid #fecaca;
-  background: #fff5f5;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  color: #dc2626;
-}
-
-.state-message {
-  padding: 2rem;
-  text-align: center;
-  color: var(--color-text-light);
-  background: white;
-  border-radius: var(--radius-card);
-}
-
-.state-message--error {
-  color: #991b1b;
-  background: #fee2e2;
-}
 </style>

@@ -94,7 +94,7 @@ import { useRouter } from "vue-router";
 import { searchProducts } from "@/services/productApi";
 import { useAuth } from '@/composables/useAuth'
 import MessageBox from "@/components/MessageBox.vue";
-import PageLayout from "@/components/PageLayout.vue";
+import PageLayout from "@/components/employe/LayoutEmploye.vue";
 import AppCard from "@/components/AppCard.vue";
 
 

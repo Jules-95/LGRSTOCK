@@ -14,7 +14,7 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
-import PageLayout from '@/components/PageLayout.vue'
+import PageLayout from '@/components/employe/LayoutEmploye.vue'
 import AppCard from '@/components/AppCard.vue'
 
 const router = useRouter()

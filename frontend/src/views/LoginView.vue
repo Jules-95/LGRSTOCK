@@ -44,7 +44,7 @@
 import { ref } from'vue'
 import AppCard from '@/components/AppCard.vue';
 import MessageBox from '@/components/MessageBox.vue';
-import PageLayout from '@/components/PageLayout.vue';
+import PageLayout from '@/components/employe/LayoutEmploye.vue';
 import { useAuth } from '@/composables/useAuth';
 
 const { login } = useAuth()

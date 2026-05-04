@@ -68,7 +68,7 @@ import { useRoute } from "vue-router";
 import { getProductById } from "@/services/productApi";
 
 import MessageBox from "@/components/MessageBox.vue";
-import PageLayout from "@/components/PageLayout.vue";
+import PageLayout from "@/components/employe/LayoutEmploye.vue";
 import AppCard from "@/components/AppCard.vue";
 
 const route = useRoute(); // Donne accès aux infos de la route actuelle -> Où je suis 

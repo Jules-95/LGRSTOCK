@@ -135,6 +135,7 @@ defineExpose({ loadUsers })
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .btn-add:hover {

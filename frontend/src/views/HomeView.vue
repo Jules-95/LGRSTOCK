@@ -1,5 +1,5 @@
 <template>
-  <PageLayout>
+  <LayoutEmploye>
 
     <AppCard>
       <h2>Recherche de produits</h2>
@@ -75,7 +75,7 @@
         message="Aucun produit trouvé"
       />
     </AppCard>
-  </PageLayout>
+  </LayoutEmploye>
 </template>
 
 <script setup>
@@ -83,8 +83,8 @@ import { ref, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { searchProducts } from "@/services/productApi";
 import MessageBox from "@/components/MessageBox.vue";
-import PageLayout from "@/components/employe/LayoutEmploye.vue";
 import AppCard from "@/components/AppCard.vue";
+import LayoutEmploye from "@/components/employe/LayoutEmploye.vue";
 
 
 // Hook Vue Router qui donne accès à l'objet de navigation
@@ -180,7 +180,7 @@ h2 {
 .form-group input {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-input);
   font-size: 1rem;
 }
@@ -203,6 +203,7 @@ h2 {
   font-weight: 600;
   cursor: pointer;
   width: 100%;
+  transition: background 0.2s;
 }
 
 .primary-btn:hover {
@@ -232,7 +233,7 @@ h2 {
   padding: 1.5rem;
   border-radius: var(--radius-input);
   border: 2px solid var(--color-border);
-  transition: all 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
   cursor: pointer;
 }
 

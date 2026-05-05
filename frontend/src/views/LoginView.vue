@@ -1,6 +1,6 @@
 <template>
-    <PageLayout>
-        <AppCard title="Connexion">
+    <LayoutEmploye>
+        <AppCard>
             <form class="login-form" @submit.prevent="handleLogin">
                 
                 <div class="field">
@@ -37,15 +37,15 @@
 
             </form>
         </AppCard>
-    </PageLayout>
+    </LayoutEmploye>
 </template>
 
 <script setup>
 import { ref } from'vue'
 import AppCard from '@/components/AppCard.vue';
 import MessageBox from '@/components/MessageBox.vue';
-import PageLayout from '@/components/employe/LayoutEmploye.vue';
 import { useAuth } from '@/composables/useAuth';
+import LayoutEmploye from '@/components/employe/LayoutEmploye.vue';
 
 const { login } = useAuth()
 
@@ -110,10 +110,10 @@ async function handleLogin() {
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
-    transition : opacity 0.2s;
+    transition : background 0.2s;
 }
 
-.btn-login:hover {
+.btn-login:hover:not(:disabled) {
     background: var(--color-primary-dark);
 }
 

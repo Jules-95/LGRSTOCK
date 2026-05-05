@@ -213,6 +213,7 @@ async function confirmDelete(product) {
   font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
+  transition: background 0.2s;
 }
 
 .btn-search:hover {

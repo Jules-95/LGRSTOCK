@@ -1,9 +1,9 @@
 <template>
   <header class="topbar">
     <span class="topbar-logo">LGR Stock</span>
-    <div class="topbar-right">
+    <div v-if="user" class="topbar-right">
       <span class="topbar-user"
-        >{{ user?.username }} · {{ user?.magasin }}</span
+        >{{ user.username }} · {{ user.magasin }}</span
       >
       <button class="topbar-btn" @click="handleLogout">Déconnexion</button>
     </div>
@@ -26,27 +26,27 @@ async function handleLogout() {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.875rem 1.5rem;
+  padding: 1.2rem 1.7rem;
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
 .topbar-logo {
-  font-size: 0.95rem;
+  font-size: 1.6rem;
   font-weight: 700;
   color: white;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
 }
 
 .topbar-right {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 3rem;
 }
 
 .topbar-user {
-  font-size: 0.8rem;
+  font-size: 1rem;
   color: rgba(255, 255, 255, 0.55);
 }
 
@@ -54,8 +54,12 @@ async function handleLogout() {
   background: none;
   border: none;
   color: var(--color-danger);
-  font-size: 0.85rem;
+  font-size: 1rem;
   cursor: pointer;
   padding: 0;
+}
+
+.topbar-btn:hover {
+  opacity: 0.9;
 }
 </style>

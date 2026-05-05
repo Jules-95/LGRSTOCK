@@ -33,15 +33,22 @@ defineProps({
 .layout {
   min-height: 100vh;
   background: var(--color-bg-light);
+  display: flex;
+  flex-direction: column;
 }
 
 .page {
-  padding: 2rem 1.5rem;
+  padding: 3rem 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .container {
   max-width: 600px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .back-button {
@@ -57,7 +64,7 @@ defineProps({
   font-weight: 600;
   cursor: pointer;
   color: var(--color-text-medium);
-  transition: all 0.2s;
+  transition: border-color 0.2s, color 0.2s;
 }
 
 .btn-back:hover {

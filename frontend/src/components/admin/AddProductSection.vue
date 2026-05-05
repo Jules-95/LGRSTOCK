@@ -128,18 +128,7 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
-.content-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1.5rem;
-}
 
-.content-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--color-text-dark);
-}
 
 .product-form {
   display: flex;

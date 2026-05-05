@@ -101,7 +101,7 @@ defineEmits(['close'])
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid var(--color-bg-light);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .modal-header h2 {

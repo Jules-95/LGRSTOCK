@@ -1,20 +1,8 @@
 <template>
-  <PageLayout>
-    <header class="header">
-      <h1 class="logo">LGR STOCK</h1>
-      <p class="subtitle">
-        Outil de visualisation et de manipulation de stock de la reserve Colombe
-      </p>
-    </header>
-
-    <MessageBox
-      v-if="deleteSuccess"
-      type="info"
-      message="Produit supprimé avec succès"
-    />
+  <LayoutEmploye>
 
     <AppCard>
-      <h2>🔍 Recherche de produits</h2>
+      <h2>Recherche de produits</h2>
 
       <form @submit.prevent="handleSearch">
         <div class="form-group">
@@ -46,17 +34,8 @@
           />
         </div>
 
-        <button class="primary-btn" type="submit">🔍 Rechercher</button>
+        <button class="primary-btn" type="submit">Rechercher</button>
       </form>
-
-      <button
-        class="secondary-btn"
-        type="button"
-        @click="router.push('/ajouter-produit')"
-        style="margin-top: 1rem"
-      >
-        + Ajouter un produit
-      </button>
 
       <!-- Message de chargement -->
       <MessageBox
@@ -70,7 +49,7 @@
 
       <!-- Résultat -->
       <section v-if="products.length > 0" class="results" ref="resultsSection">
-        <h3>📦 Résultats ({{ products.length }})</h3>
+        <h3>Résultats ({{ products.length }})</h3>
 
         <div class="product-list">
           <article
@@ -82,7 +61,7 @@
             <div class="product-info">
               <h4>{{ product.libelle }}</h4>
               <p>EAN : {{ product.ean }}</p>
-              <p>Fournisseur : {{ product.fournisseur || "Non reseigné" }}</p>
+              <p>Fournisseur : {{ product.fournisseur || "Non renseigné" }}</p>
               <p class="stock">Stock : {{ product.quantite }}</p>
             </div>
           </article>
@@ -96,20 +75,20 @@
         message="Aucun produit trouvé"
       />
     </AppCard>
-  </PageLayout>
+  </LayoutEmploye>
 </template>
 
 <script setup>
 import { ref, nextTick } from "vue";
 import { useRouter } from "vue-router";
-import { searchProducts } from "@/services/api";
+import { searchProducts } from "@/services/productApi";
 import MessageBox from "@/components/MessageBox.vue";
-import PageLayout from "@/components/PageLayout.vue";
 import AppCard from "@/components/AppCard.vue";
+import LayoutEmploye from "@/components/employe/LayoutEmploye.vue";
+
 
 // Hook Vue Router qui donne accès à l'objet de navigation
 const router = useRouter();
-const deleteSuccess = ref(history.state.deleted === true); // Message de succes de supression avec le retour à cette vue.
 
 // Variables réactives pour stocker ce que l'utilisateur entre dans un champ
 const searchEAN = ref("");
@@ -122,6 +101,7 @@ const loading = ref(false); // Indique si une recherche est en cours
 const error = ref(null); // Message d'erreur éventuel
 const searched = ref(false); // Indique si un erecherche a été lancée
 const resultsSection = ref(null); // Ref qui pointe vers l'élément DOM
+
 
 // Fonction appelé au clique sur le btn "Rechercher"
 async function handleSearch() {
@@ -178,23 +158,6 @@ function goToProduct(productId) {
 
 <style scoped>
 
-/* Header commun à toutes les vues */
-.header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.logo {
-  font-size: 3rem;
-  font-weight: 800;
-  color: white;
-  margin-bottom: 0.5rem;
-}
-
-.subtitle {
-  color: white;
-  font-size: 1.1rem;
-}
 
 h2 {
   font-size: 1.5rem;
@@ -217,7 +180,7 @@ h2 {
 .form-group input {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-input);
   font-size: 1rem;
 }
@@ -231,44 +194,27 @@ h2 {
 /* --- BOUTON --- */
 
 .primary-btn {
-  padding: 1rem;
-  background: linear-gradient(
-    135deg,
-    var(--color-primary) 0%,
-    var(--color-secondary) 100%
-  );
+  padding: 0.8rem;
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: var(--radius-btn);
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   width: 100%;
+  transition: background 0.2s;
 }
 
-.secondary-btn {
-  padding: 1rem;
-  background: white;
-  color: var(--color-primary);
-  border: 2px solid var(--color-primary);
-  border-radius: var(--radius-btn);
-  font-size: 1.1rem;
-  font-weight: 600;
-  cursor: pointer;
-  width: 100%;
-  transition: all ease 0.2s;
-}
-
-.secondary-btn:hover {
-  background: var(--color-primary);
-  color: white;
+.primary-btn:hover {
+  background: var(--color-primary-dark);
 }
 
 /* Résultats */
 .results {
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 2px solid var(--color-bg-light);
+  border-top: 2px solid var(--color-border);
 }
 
 .results h3 {
@@ -287,7 +233,7 @@ h2 {
   padding: 1.5rem;
   border-radius: var(--radius-input);
   border: 2px solid var(--color-border);
-  transition: all 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
   cursor: pointer;
 }
 

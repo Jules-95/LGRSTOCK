@@ -1,9 +1,3 @@
-/** 
- * Service API - Centralise les appels au backend 
- * 
- * Rôle : Comme un Product.php en backend, gère la logique d'appels API 
- */
-
 import { API_BASE_URL } from "@/config";
 
 /**  
@@ -21,7 +15,9 @@ export async function searchProducts(filters) {
     if (filters.fournisseur) params.append('fournisseur', filters.fournisseur)
 
     // Appel API
-    const response = await fetch(`${API_BASE_URL}/search.php?${params.toString()}`)
+    const response = await fetch(`${API_BASE_URL}/Product/search.php?${params.toString()}`, {
+        credentials: 'include'
+    })
 
     if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
 
@@ -43,7 +39,9 @@ export async function searchProducts(filters) {
 */
 
 export async function getProductById(id) {
-    const response = await fetch(`${API_BASE_URL}/product.php?id=${id}`)
+    const response = await fetch(`${API_BASE_URL}/Product/product.php?id=${id}`, {
+        credentials: 'include'
+    })
 
     if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
 
@@ -64,8 +62,9 @@ export async function getProductById(id) {
  * @throws {Error} Si erreur API
 */
 export async function addProduct(data) {
-    const response = await fetch(`${API_BASE_URL}/add-product.php`, {
+    const response = await fetch(`${API_BASE_URL}/Product/add-product.php`, {
         method: 'POST',
+        credentials: 'include',
         body: new URLSearchParams(data)
     })
 
@@ -88,8 +87,9 @@ export async function addProduct(data) {
  * @throws {Error} Si erreur API
  */
 export async function deleteProduct(id) {
-    const response = await fetch (`${API_BASE_URL}/delete-product.php`, {
+    const response = await fetch (`${API_BASE_URL}/Product/delete-product.php`, {
         method: 'POST',
+        credentials: 'include',
         body: new URLSearchParams({ id })
     })
 
@@ -106,25 +106,26 @@ export async function deleteProduct(id) {
 }
 
 
-
-/** 
- * Met à jour la quantite d'un produit 
- * @param {number} id - L'ID du produit 
- * @param {number} quantite - La nouvelle quantité
+/**
+ * @param {number} id - L'ID du produit à modifier
+ * @param {object} data - { libelle, ean, fournisseur, quantite }
+ * @returns {Promise<Object>}
+ * @throws {Error} Si erreur API
  */
-export async function updateStock(id, quantite) {
-    const response = await fetch (`${API_BASE_URL}/update-stock.php` , {
+export async function editProduct(id, data) {
+    const response = await fetch(`${API_BASE_URL}/Product/edit-product.php`, {
         method: 'POST',
-        body: new URLSearchParams({ id, quantite})
+        credentials: 'include',
+        body: new URLSearchParams({ id, ...data})
     })
 
-    if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
+    if (response.status >= 500) throw new Error (`Erreur serveur : ${response.status}`)
+    
+    const result = await response.json()
 
-    const data = await response.json()
-
-    if (data.error) {
-        throw new Error(data.message)
+    if (result.error) {
+        throw new Error(result.message)
     }
 
-    return data
+    return result
 }

@@ -4,8 +4,8 @@
  * Utilisation : POST api/add-product.php
  */
 
-require_once __DIR__ . '/../config/cors.php';
-require_once __DIR__ . '/../src/Middleware/Auth.php';
+require_once __DIR__ . '/../../config/cors.php';
+require_once __DIR__ . '/../../src/Middleware/Auth.php';
 
 Auth::requireAdmin();
 
@@ -16,8 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-require_once __DIR__ . '/../config/database.php';
-require_once __DIR__ . '/../src/Controllers/ProductController.php';
+require_once __DIR__ . '/../../config/database.php';
+require_once __DIR__ . '/../../src/Controllers/ProductController.php';
 
 $pdo = getDBConnection();
 

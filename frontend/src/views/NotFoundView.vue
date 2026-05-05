@@ -47,6 +47,7 @@ const router = useRouter()
   border-radius: var(--radius-btn);
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .btn-retour:hover {

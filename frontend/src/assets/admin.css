@@ -53,7 +53,7 @@
   padding: 0.3rem 0.75rem;
   border: 1.5px solid var(--color-border);
   background: var(--color-bg-soft);
-  border-radius: 6px;
+  border-radius: var(--radius-input);
   font-size: 0.8rem;
   cursor: pointer;
   color: var(--color-text-medium);
@@ -63,7 +63,7 @@
   padding: 0.3rem 0.75rem;
   border: 1.5px solid #fecaca;
   background: #fff5f5;
-  border-radius: 6px;
+  border-radius: var(--radius-input);
   font-size: 0.8rem;
   cursor: pointer;
   color: #dc2626;
@@ -79,6 +79,6 @@
 }
 
 .state-message--error {
-  color: #991b1b;
-  background: #fee2e2;
+  color: var(--color-danger-text);
+  background: var(--color-danger-bg);
 }

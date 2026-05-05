@@ -97,7 +97,7 @@ async function handleLogout() {
 .sidebar {
   width: 220px;
   flex-shrink: 0;
-  background: #2d1f5e;
+  background: var(--color-nav-bg);
   display: flex;
   flex-direction: column;
   padding: 1.5rem 0;
@@ -173,7 +173,7 @@ async function handleLogout() {
 .btn-logout {
   background: none;
   border: none;
-  color: #f87171;
+  color: var(--color-danger);
   font-size: 0.85rem;
   cursor: pointer;
   padding: 0;

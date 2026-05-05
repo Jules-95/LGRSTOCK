@@ -1,26 +1,17 @@
-/* Reset de base */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-}
-
-#app {
-  min-height: 100vh;
-}
-
 /* Variables CSS globales — Single Source of Truth du design */
 :root {
   /* Couleurs principales */
   --color-primary: #667eea;
   --color-primary-dark: #5a67d8;
   --color-secondary: #764ba2;
+
+  /* Navigation (sidebar admin + topbar employé) */
+  --color-nav-bg: #2d1f5e;
+
+  /* Danger (déconnexion, erreurs, suppressions) */
+  --color-danger: #f87171;
+  --color-danger-bg: #fee2e2;
+  --color-danger-text: #991b1b;
 
   /* Couleurs neutres */
   --color-text-dark: #1f2937;
@@ -33,10 +24,27 @@ body {
   --color-bg-soft: #f9fafb;
 
   /* Ombres */
-  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.1);
 
   /* Rayon des bordures */
-  --radius-card: 20px;
+  --radius-card: 12px;
   --radius-input: 8px;
-  --radius-btn: 12px;
+  --radius-btn: 10px;
+}
+
+/* Reset de base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  background: var(--color-bg-light);
+  min-height: 100vh;
+}
+
+#app {
+  min-height: 100vh;
 }

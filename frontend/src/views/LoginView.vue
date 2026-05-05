@@ -103,7 +103,7 @@ async function handleLogin() {
 .btn-login {
     width: 100%;
     padding: 0.875rem;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    background: var(--color-primary);
     color: white;
     border: none;
     border-radius: var(--radius-btn);
@@ -114,7 +114,7 @@ async function handleLogin() {
 }
 
 .btn-login:hover {
-    opacity: 0.9;
+    background: var(--color-primary-dark);
 }
 
 .btn-login:disabled {

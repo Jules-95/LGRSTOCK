@@ -1,5 +1,5 @@
 <template>
-  <PageLayout back-label="← Retour à la recherche">
+  <LayoutEmploye back-label="← Retour à la recherche">
     <!-- Message de chargement -->
     <MessageBox
       v-if="loading"
@@ -58,7 +58,7 @@
 
     <!-- Modale à venir pour le système de liste -->
 
-  </PageLayout>
+  </LayoutEmploye>
 </template>
 
 <script setup>
@@ -68,8 +68,8 @@ import { useRoute } from "vue-router";
 import { getProductById } from "@/services/productApi";
 
 import MessageBox from "@/components/MessageBox.vue";
-import PageLayout from "@/components/employe/LayoutEmploye.vue";
 import AppCard from "@/components/AppCard.vue";
+import LayoutEmploye from "@/components/employe/LayoutEmploye.vue";
 
 const route = useRoute(); // Donne accès aux infos de la route actuelle -> Où je suis 
 
@@ -138,7 +138,7 @@ onMounted(() => {
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
-  border-bottom: 2px solid var(--color-bg-light);
+  border-bottom: 2px solid var(--color-border);
 }
 
 .product-header h1 {
@@ -149,7 +149,7 @@ onMounted(() => {
 
 .stock-badge {
   padding: 0.5rem 1rem;
-  border-radius: 10px;
+  border-radius: var(--radius-btn);
   font-weight: 600;
   font-size: 0.9rem;
 }
@@ -165,8 +165,8 @@ onMounted(() => {
 }
 
 .stock-badge.stock-empty {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
 }
 
 /* Détails du produit */
@@ -178,7 +178,7 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   padding: 1rem 0;
-  border-bottom: 1px solid var(--color-bg-light);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .detail-row:last-child {

@@ -1,18 +1,8 @@
 <template>
   <PageLayout>
-    <header class="header">
-      <h1 class="logo">LGR STOCK</h1>
-      <p class="subtitle">
-        Outil de visualisation et de manipulation de stock de la reserve Colombe
-      </p>
-      <div class="header-user">
-        <span class="header-username">{{ user?.username }}</span>
-        <button class="btn-logout" @click="handleLogout">Déconnexion</button>
-      </div>
-    </header>
 
     <AppCard>
-      <h2>🔍 Recherche de produits</h2>
+      <h2>Recherche de produits</h2>
 
       <form @submit.prevent="handleSearch">
         <div class="form-group">
@@ -44,7 +34,7 @@
           />
         </div>
 
-        <button class="primary-btn" type="submit">🔍 Rechercher</button>
+        <button class="primary-btn" type="submit">Rechercher</button>
       </form>
 
       <!-- Message de chargement -->
@@ -59,7 +49,7 @@
 
       <!-- Résultat -->
       <section v-if="products.length > 0" class="results" ref="resultsSection">
-        <h3>📦 Résultats ({{ products.length }})</h3>
+        <h3>Résultats ({{ products.length }})</h3>
 
         <div class="product-list">
           <article
@@ -92,7 +82,6 @@
 import { ref, nextTick } from "vue";
 import { useRouter } from "vue-router";
 import { searchProducts } from "@/services/productApi";
-import { useAuth } from '@/composables/useAuth'
 import MessageBox from "@/components/MessageBox.vue";
 import PageLayout from "@/components/employe/LayoutEmploye.vue";
 import AppCard from "@/components/AppCard.vue";
@@ -113,12 +102,6 @@ const error = ref(null); // Message d'erreur éventuel
 const searched = ref(false); // Indique si un erecherche a été lancée
 const resultsSection = ref(null); // Ref qui pointe vers l'élément DOM
 
-// Récupération de logout et user
-const { user, logout } = useAuth()
-
-async function handleLogout() {
-  await logout()
-}
 
 // Fonction appelé au clique sur le btn "Rechercher"
 async function handleSearch() {
@@ -175,52 +158,6 @@ function goToProduct(productId) {
 
 <style scoped>
 
-/* Affichage de la fonctionnalité de deconnexion */
-.header-user {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-  justify-content: center;
-  margin-top: 1rem;
-}
-
-.header-username {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 0.9rem;
-}
-
-.btn-logout {
-  background: none;
-  border: 1.5px solid, rgba(255, 255, 255, 0.4);
-  color: white;
-  padding: 0.4rem 1rem;
-  border-radius: var(--radius-btn);
-  font-size: 0.85rem;
-  cursor: pointer;
-}
-
-.btn-logout:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* Header commun à toutes les vues */
-.header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.logo {
-  font-size: 3rem;
-  font-weight: 800;
-  color: white;
-  margin-bottom: 0.5rem;
-}
-
-.subtitle {
-  color: white;
-  font-size: 1.1rem;
-}
 
 h2 {
   font-size: 1.5rem;
@@ -257,26 +194,26 @@ h2 {
 /* --- BOUTON --- */
 
 .primary-btn {
-  padding: 1rem;
-  background: linear-gradient(
-    135deg,
-    var(--color-primary) 0%,
-    var(--color-secondary) 100%
-  );
+  padding: 0.8rem;
+  background: var(--color-primary);
   color: white;
   border: none;
   border-radius: var(--radius-btn);
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   width: 100%;
+}
+
+.primary-btn:hover {
+  background: var(--color-primary-dark);
 }
 
 /* Résultats */
 .results {
   margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 2px solid var(--color-bg-light);
+  border-top: 2px solid var(--color-border);
 }
 
 .results h3 {

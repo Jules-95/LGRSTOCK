@@ -22,7 +22,7 @@ async function handleLogout() {
 
 <style scoped>
 .topbar {
-  background: #2d1f5e;
+  background: var(--color-nav-bg);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -53,7 +53,7 @@ async function handleLogout() {
 .topbar-btn {
   background: none;
   border: none;
-  color: #f87171;
+  color: var(--color-danger);
   font-size: 0.85rem;
   cursor: pointer;
   padding: 0;

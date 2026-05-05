@@ -1,5 +1,5 @@
 <template>
-  <PageLayout>
+  <LayoutEmploye>
     <AppCard>
       <div class="not-found">
         <h1>404</h1>
@@ -9,13 +9,13 @@
         </button>
       </div>
     </AppCard>
-  </PageLayout>
+  </LayoutEmploye>
 </template>
 
 <script setup>
 import { useRouter } from 'vue-router'
-import PageLayout from '@/components/PageLayout.vue'
 import AppCard from '@/components/AppCard.vue'
+import LayoutEmploye from '@/components/employe/LayoutEmploye.vue';
 
 const router = useRouter()
 </script>
@@ -47,6 +47,7 @@ const router = useRouter()
   border-radius: var(--radius-btn);
   font-weight: 600;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .btn-retour:hover {

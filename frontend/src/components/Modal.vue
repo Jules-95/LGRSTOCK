@@ -101,13 +101,13 @@ defineEmits(['close'])
   align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-border);
 }
 
 .modal-header h2 {
   margin: 0;
   font-size: 1.25rem;
-  color: #1f2937;
+  color: var(--color-text-dark);
 }
 
 .modal-close {
@@ -115,13 +115,13 @@ defineEmits(['close'])
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--color-text-light);
   padding: 0.25rem 0.5rem;
-  border-radius: 6px;
+  border-radius: var(--radius-input);
   transition: background 0.2s;
 }
 
 .modal-close:hover {
-  background: #f3f4f6;
+  background: var(--color-bg-light);
 }
 </style>

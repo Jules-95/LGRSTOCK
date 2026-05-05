@@ -28,7 +28,7 @@ const icon = computed(() => {
 .message {
   padding: 1rem;
   margin-bottom: 1rem;
-  border-radius: 10px;
+  border-radius: var(--radius-btn);
   margin-top: 1.5rem;
   font-weight: 500;
 }
@@ -39,12 +39,12 @@ const icon = computed(() => {
 }
 
 .message.error {
-  background: #fee2e2;
-  color: #991b1b;
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
 }
 
 .message.loading {
-  background: #f3f4f6;
+  background: var(--color-bg-light);
   color: var(--color-text-medium);
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <form class="product-form" @submit.prevent="handleSubmit">
+  <form class="form-card" @submit.prevent="handleSubmit">
 
     <MessageBox v-if="loading" type="loading" message="Modification en cours..." />
     <MessageBox v-if="error" type="error" :message="error" />
@@ -55,8 +55,10 @@
 
 <script setup>
 import { ref } from 'vue'
-import { editUser } from '@/services/api'
+import { editUser } from '@/services/userApi'
 import MessageBox from '@/components/MessageBox.vue'
+
+import '@/assets/form.css'
 
 const props = defineProps({
   user: {
@@ -107,76 +109,3 @@ async function handleSubmit() {
   }
 }
 </script>
-
-<style scoped>
-.product-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.form-group label {
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--color-text-light);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-}
-
-.form-input {
-  padding: 0.75rem 1rem;
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-input);
-  font-size: 0.95rem;
-  color: var(--color-text-dark);
-  transition: border-color 0.2s;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
-.btn-annuler {
-  flex: 1;
-  padding: 0.75rem;
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-btn);
-  background: white;
-  font-weight: 600;
-  cursor: pointer;
-  color: var(--color-text-dark);
-}
-
-.btn-valider {
-  flex: 1;
-  padding: 0.75rem;
-  border: none;
-  border-radius: var(--radius-btn);
-  background: var(--color-primary);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.btn-valider:hover:not(:disabled) {
-  background: var(--color-primary-dark);
-}
-
-.btn-valider:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-</style>

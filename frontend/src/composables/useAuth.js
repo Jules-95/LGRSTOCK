@@ -25,7 +25,7 @@
  */
 
 import { ref, computed } from 'vue'
-import { login as apiLogin, logout as apiLogout, checkAuth} from '@/services/api'
+import { login as apiLogin, logout as apiLogout, checkAuth} from '@/services/authApi'
 import { useRouter } from 'vue-router'
 
 // Ces variables sont définies EN DEHORS de la fonction 

@@ -27,7 +27,9 @@ class ExportController {
 
         foreach ($products as $product) {
             fputcsv($output, [
-                $product['ean'],
+                '="' . ($product['ean'] ?? '') . '"',
+                //Formulation différente pour EAN - A l'ouverture d'un CSV par Excel il reconnait un nombre et le converti en entier. On force excel a évaluer ça comme une formule et affiche la valeur telle quelle avec le 0 
+                // Problème connu des formats de code EAN sur Excel. 
                 $product['libelle'],
                 $product['fournisseur'] ?? '',
                 $product['ref_fournisseur'] ?? '',
@@ -35,5 +37,7 @@ class ExportController {
                 $product['quantite'] ?? 0,
             ], ';');
         }
+        fclose($output);
+        // Pas obligatoire ici mais fopen ouvre un "canal" vers php://output et lui alloue des ressources en mémoire - Même si dans ce cas attendre la fin du script pour libérer ces ressoucres c'est mieux de fermer manuellement. 
     }
 }

@@ -108,7 +108,7 @@ async function handleSearch() {
   // Réinitialiser l'état
   error.value = null;
   products.value = [];
-  searched.value = true;
+  searched.value = false;
 
   // Vérifier qu'au moins un champ est rempli
   if (!searchEAN.value && !searchLibelle.value && !searchFournisseur.value) {
@@ -131,6 +131,7 @@ async function handleSearch() {
     } else {
       // Sinon affichage de la liste de résultat
       products.value = data.data;
+      searched.value = true;
       await nextTick();
       resultsSection.value?.scrollIntoView({
         behavior: "smooth",

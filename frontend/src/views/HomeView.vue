@@ -216,6 +216,7 @@ h2 {
   margin-top: 2rem;
   padding-top: 2rem;
   border-top: 2px solid var(--color-border);
+  scroll-margin-top: 8rem;
 }
 
 .results h3 {

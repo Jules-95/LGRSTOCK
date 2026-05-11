@@ -93,6 +93,6 @@ async function handleExport() {
 }
 
 .btn-valider {
-    flex: 0;
+  flex: 0;
 }
 </style>

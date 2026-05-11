@@ -35,15 +35,20 @@
         <button class="nav-item nav-item--disabled" disabled>
           Listes de transfert
         </button>
-        <button class="nav-item nav-item--disabled" disabled>Import CSV</button>
-
-        <button 
-        class="nav-item"
-        :class="{active: currentSection === 'export'}"
-        @click="currentSection = 'export'"
+        <button
+          class="nav-item"
+          :class="{ active: currentSection === 'import' }"
+          @click="currentSection = 'import'"
         >
-        Export CSV
-      </button>
+          Import CSV
+        </button>
+        <button
+          class="nav-item"
+          :class="{ active: currentSection === 'export' }"
+          @click="currentSection = 'export'"
+        >
+          Export CSV
+        </button>
 
       </nav>
 
@@ -71,6 +76,9 @@
 
       <ExportSection 
       v-if="currentSection === 'export'" />
+
+      <ImportSection 
+      v-if="currentSection === 'import'"/>
     </main>
   </div>
 </template>
@@ -82,6 +90,7 @@ import ProductSection from "@/components/admin/ProductSection.vue";
 import UserSection from "@/components/admin/UserSection.vue";
 import AddProductSection from "@/components/admin/AddProductSection.vue";
 import ExportSection from "@/components/admin/ExportSection.vue";
+import ImportSection from "@/components/admin/ImportSection.vue";
 
 const { user, logout } = useAuth();
 

@@ -163,6 +163,8 @@ class Product {
             updated_at = NOW() 
             WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
+
+        try {
         $stmt->execute([
             ':libelle' => $libelle,
             ':ean' => $ean,
@@ -170,6 +172,11 @@ class Product {
             ':quantite' => (int) $quantite,
             ':id' => (int) $id
         ]);
+        } catch (PDOException $e) {
+            if ($e->getCode() === '23000') {
+                throw new Exception("Ce code EAN est déja utilisé pour un autre produit");
+            }
+        }
 
         //rowCountretourne le nombre de lignes affectées par l'UPDATE
         // Si 0 : l'ID n'existe pas en BDD

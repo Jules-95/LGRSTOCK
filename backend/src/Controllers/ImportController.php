@@ -78,11 +78,19 @@ class ImportController
                 continue;
             }
 
+
             // EAN en doublon dans le fichier lui-même
             if (in_array($ean, $eansInFile)) {
                 $errors[] = "Ligne $line : EAN $ean en doublon dans le fichier";
                 continue;
             }
+
+            // EAN doit être exactement de 13 chiffres
+            if (!preg_match('/^\d{13}$/', $ean)) {
+                $errors[] = "Ligne $line : EAN invalide ($ean) - doit contenir exactement 13 chiffres";
+                continue;
+            }
+
             $eansInFile[] = $ean;
 
             // Libellé obligatoire si EAN inconnu en base

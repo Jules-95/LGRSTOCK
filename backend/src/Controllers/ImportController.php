@@ -41,6 +41,25 @@ class ImportController
         // Normaliser les en-têtes (minuscules, sans espaces)
         $headers = array_map(fn($h) => strtolower(trim($h)), $headers);
 
+        // Mapping des noms de colonnes externes -> noms internes
+        $mapping = [
+            'libellé'           => 'libelle' , 
+            'libellé article'   => 'libelle' ,
+            'libelle article'   => 'libelle' ,
+            'description'       => 'libelle' ,
+            'code ean'          => 'ean' ,
+            'code barre'        => 'ean' ,
+            'quantité'          => 'quantite' ,
+            'quantity'          => 'quantite' ,
+            'stock'             => 'quantite' ,
+            'stock local'       => 'quantite' ,
+            'price'             => 'prix' ,
+            'réf. fournisseur'  => 'ref_fournisseur' ,
+            'ref. fournisseur'  => 'ref_fournisseur' ,
+        ];
+
+        $headers = array_map(fn($h) => $mapping[$h] ?? $h, $headers);
+
         // Lire toutes les lignes
         $rows = [];
         while (($row = fgetcsv($handle, 0, ';')) !== false) {
@@ -121,7 +140,7 @@ class ImportController
             if (is_numeric($ean) && strlen($ean) < 13) {
                 $ean = str_pad($ean, 13, '0', STR_PAD_LEFT);
             }
-            
+
             $libelle  = trim($row['libelle'] ?? '');
             $fournisseur     = trim($row['fournisseur'] ?? '') ?: null;
             $ref_fournisseur = trim($row['ref_fournisseur'] ?? '') ?: null;

@@ -72,6 +72,13 @@ class ImportController
 
             $ean = trim($row['ean'] ?? '');
 
+            // Si EAN a moins de 13 chiffres, on complète avec des 0 à gauche
+            if (!empty($ean) && is_numeric($ean) && strlen($ean) < 13 ){
+                $ean = str_pad($ean, 13, '0', STR_PAD_LEFT);
+                $row['ean'] = $ean;
+            }
+            
+
             // EAN obligatoire
             if (empty($ean)) {
                 $errors[] = "Ligne $line : EAN manquant";
@@ -110,6 +117,11 @@ class ImportController
 
         foreach ($rows as $row) {
             $ean      = trim($row['ean']);
+            // Padding automatique comme pour validate
+            if (is_numeric($ean) && strlen($ean) < 13) {
+                $ean = str_pad($ean, 13, '0', STR_PAD_LEFT);
+            }
+            
             $libelle  = trim($row['libelle'] ?? '');
             $fournisseur     = trim($row['fournisseur'] ?? '') ?: null;
             $ref_fournisseur = trim($row['ref_fournisseur'] ?? '') ?: null;

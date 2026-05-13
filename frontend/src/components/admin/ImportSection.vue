@@ -39,6 +39,11 @@
       {{ successMessage }}
     </p>
 
+    <!-- Warnings colonnes ignorées -->
+    <div v-if="warnings.length > 0" class="state-message state-message--warning">
+      ⚠️ {{ warnings[0] }}
+    </div>
+
     <!-- Erreurs de validation -->
     <div v-if="validationErrors.length > 0" class="validation-errors">
       <p class="error-title">{{ errorMessage }}</p>
@@ -63,11 +68,13 @@ const selectedFile = ref(null)
 const successMessage = ref('')
 const errorMessage = ref('')
 const validationErrors = ref([])
+const warnings = ref([])
 
 function handleFileChange(event) {
   selectedFile.value = event.target.files[0]
   successMessage.value = ''
   errorMessage.value = ''
+  warnings.value = []
   validationErrors.value = []
 }
 
@@ -78,10 +85,12 @@ async function handleImport() {
   successMessage.value = ''
   errorMessage.value = ''
   validationErrors.value = []
+  warnings.value = []
 
   try {
     const result = await importProducts(selectedFile.value)
     successMessage.value = result.message
+    warnings.value = result.details ?? []
     selectedFile.value = null
   } catch (error) {
     errorMessage.value = error.message

@@ -39,7 +39,7 @@ class ImportController
         }
 
         // Normaliser les en-têtes (minuscules, sans espaces)
-        $headers = array_map(fn($h) => strtolower(trim($h)), $headers);
+        $headers = array_map(fn($h) => mb_strtolower(trim($h), 'UTF-8'), $headers);
 
         // Mapping des noms de colonnes externes -> noms internes
         $mapping = [
@@ -60,6 +60,16 @@ class ImportController
 
         $headers = array_map(fn($h) => $mapping[$h] ?? $h, $headers);
 
+        // Colonnes internes attendues
+        $knownColumns = ['ean', 'libelle', 'fournisseur', 'ref_fournisseur', 'prix', 'quantite'];
+
+        // Colonnes présentes dans l'import mais non reconnues
+        $unknownColumns = array_diff($headers, $knownColumns);
+        $warnings = [];
+        if (!empty($unknownColumns)) {
+            $warnings[] = 'Colonnes ignorées : ' . implode(', ', $unknownColumns);
+        }
+
         // Lire toutes les lignes
         $rows = [];
         while (($row = fgetcsv($handle, 0, ';')) !== false) {
@@ -78,7 +88,7 @@ class ImportController
         // PASSE 2 — Insertion
         $imported = $this->insertOrUpdate($rows);
 
-        $this->sendResponse(200, false, "$imported produit(s) importé(s) avec succès");
+        $this->sendResponse(200, false, "$imported produit(s) importé(s) avec succès", $warnings);
     }
 
     private function validate(array $rows): array

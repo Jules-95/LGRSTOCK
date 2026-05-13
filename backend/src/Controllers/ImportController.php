@@ -39,7 +39,36 @@ class ImportController
         }
 
         // Normaliser les en-têtes (minuscules, sans espaces)
-        $headers = array_map(fn($h) => strtolower(trim($h)), $headers);
+        $headers = array_map(fn($h) => mb_strtolower(trim($h), 'UTF-8'), $headers);
+
+        // Mapping des noms de colonnes externes -> noms internes
+        $mapping = [
+            'libellé'           => 'libelle' , 
+            'libellé article'   => 'libelle' ,
+            'libelle article'   => 'libelle' ,
+            'description'       => 'libelle' ,
+            'code ean'          => 'ean' ,
+            'code barre'        => 'ean' ,
+            'quantité'          => 'quantite' ,
+            'quantity'          => 'quantite' ,
+            'stock'             => 'quantite' ,
+            'stock local'       => 'quantite' ,
+            'price'             => 'prix' ,
+            'réf. fournisseur'  => 'ref_fournisseur' ,
+            'ref. fournisseur'  => 'ref_fournisseur' ,
+        ];
+
+        $headers = array_map(fn($h) => $mapping[$h] ?? $h, $headers);
+
+        // Colonnes internes attendues
+        $knownColumns = ['ean', 'libelle', 'fournisseur', 'ref_fournisseur', 'prix', 'quantite'];
+
+        // Colonnes présentes dans l'import mais non reconnues
+        $unknownColumns = array_diff($headers, $knownColumns);
+        $warnings = [];
+        if (!empty($unknownColumns)) {
+            $warnings[] = 'Colonnes ignorées : ' . implode(', ', $unknownColumns);
+        }
 
         // Lire toutes les lignes
         $rows = [];
@@ -59,7 +88,7 @@ class ImportController
         // PASSE 2 — Insertion
         $imported = $this->insertOrUpdate($rows);
 
-        $this->sendResponse(200, false, "$imported produit(s) importé(s) avec succès");
+        $this->sendResponse(200, false, "$imported produit(s) importé(s) avec succès", $warnings);
     }
 
     private function validate(array $rows): array
@@ -71,6 +100,13 @@ class ImportController
             $line = $index + 2; // +2 car ligne 1 = en-têtes
 
             $ean = trim($row['ean'] ?? '');
+
+            // Si EAN a moins de 13 chiffres, on complète avec des 0 à gauche
+            if (!empty($ean) && is_numeric($ean) && strlen($ean) < 13 ){
+                $ean = str_pad($ean, 13, '0', STR_PAD_LEFT);
+                $row['ean'] = $ean;
+            }
+            
 
             // EAN obligatoire
             if (empty($ean)) {
@@ -110,6 +146,11 @@ class ImportController
 
         foreach ($rows as $row) {
             $ean      = trim($row['ean']);
+            // Padding automatique comme pour validate
+            if (is_numeric($ean) && strlen($ean) < 13) {
+                $ean = str_pad($ean, 13, '0', STR_PAD_LEFT);
+            }
+
             $libelle  = trim($row['libelle'] ?? '');
             $fournisseur     = trim($row['fournisseur'] ?? '') ?: null;
             $ref_fournisseur = trim($row['ref_fournisseur'] ?? '') ?: null;

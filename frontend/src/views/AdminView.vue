@@ -8,9 +8,14 @@
       </div>
 
       <nav class="sidebar-nav">
-        <button class="nav-item nav-item--disabled" disabled>
+
+        <button
+          class="nav-item"
+          :class="{ active: currentSection === 'overview'}"
+          @click="currentSection = 'overview'"
+          >
           Vue d'ensemble
-        </button>
+          </button>
         <button
           class="nav-item"
           :class="{ active: currentSection === 'produits' }"
@@ -79,6 +84,9 @@
 
       <ImportSection 
       v-if="currentSection === 'import'"/>
+
+      <OverviewSection
+      v-if="currentSection === 'overview'"/>
     </main>
   </div>
 </template>
@@ -91,6 +99,7 @@ import UserSection from "@/components/admin/UserSection.vue";
 import AddProductSection from "@/components/admin/AddProductSection.vue";
 import ExportSection from "@/components/admin/ExportSection.vue";
 import ImportSection from "@/components/admin/ImportSection.vue";
+import OverviewSection from "@/components/admin/OverviewSection.vue";
 
 const { user, logout } = useAuth();
 

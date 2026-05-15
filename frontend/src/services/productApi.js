@@ -7,12 +7,13 @@ import { API_BASE_URL } from "@/config";
  * @throws {Error} Si erreur API
  */
 
-export async function searchProducts(filters) {
+export async function searchProducts(filters, page = 1) {
   // Construire les paramètres URL (enlever les valeurs vides)
   const params = new URLSearchParams();
   if (filters.ean) params.append("ean", filters.ean);
   if (filters.libelle) params.append("libelle", filters.libelle);
   if (filters.fournisseur) params.append("fournisseur", filters.fournisseur);
+  params.append("page", page);
 
   // Appel API
   const response = await fetch(
@@ -190,3 +191,26 @@ export async function importProducts(file) {
 
   return result
 }
+
+/**
+ * Récupère les statistiques globales pour le dashboard admin
+ * @returns {Promise<Object>} { total_produits, produits_rupture, total_utilisateurs }
+ * @throws {Error} Si erreur API
+ */
+export async function getStats() {
+  const response = await fetch(`${API_BASE_URL}/stats.php`, {
+    credentials: "include",
+  });
+
+  if (response.status >= 500)
+    throw new Error(`Erreur serveur : ${response.status}`);
+
+  const data = await response.json();
+
+  if (data.error) {
+    throw new Error(data.message);
+  }
+
+  return data.data;
+}
+

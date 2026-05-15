@@ -77,6 +77,12 @@
       Utilisez les barres de recherche pour trouver des produits.
     </div>
 
+    <AppPagination
+      :current-page="currentPage"
+      :total-pages="totalPages"
+      @change="fetchPage"
+    />
+
     <Modal
       v-if="showEditModal"
       title="Modifier le produit"
@@ -97,6 +103,7 @@ import { searchProducts, deleteProduct } from "@/services/productApi";
 import EditProductForm from "@/components/admin/EditProductForm.vue";
 import Modal from "@/components/Modal.vue";
 import MessageBox from "@/components/MessageBox.vue";
+import AppPagination from "@/components/AppPagination.vue";
 
 import '@/assets/admin.css'
 
@@ -108,6 +115,8 @@ const searched = ref(false);
 const successMessage = ref("");
 const showEditModal = ref(false);
 const selectedProduct = ref(null);
+const currentPage = ref(1);
+const totalPages = ref(0);
 
 async function handleSearch() {
   const { ean, libelle, fournisseur } = filters.value;
@@ -117,14 +126,21 @@ async function handleSearch() {
     return;
   }
 
+  currentPage.value = 1;
+  await fetchPage(1);
+}
+
+async function fetchPage(page) {
   loading.value = true;
   errorMessage.value = "";
   searched.value = true;
   products.value = [];
 
   try {
-    const result = await searchProducts({ ean, libelle, fournisseur });
+    const result = await searchProducts(filters.value, page);
     products.value = result.data ?? [];
+    currentPage.value = result.page;
+    totalPages.value = Math.ceil(result.total / result.limit);
   } catch (err) {
     errorMessage.value = err.message;
   } finally {

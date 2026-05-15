@@ -7,12 +7,13 @@ import { API_BASE_URL } from "@/config";
  * @throws {Error} Si erreur API
  */
 
-export async function searchProducts(filters) {
+export async function searchProducts(filters, page = 1) {
   // Construire les paramètres URL (enlever les valeurs vides)
   const params = new URLSearchParams();
   if (filters.ean) params.append("ean", filters.ean);
   if (filters.libelle) params.append("libelle", filters.libelle);
   if (filters.fournisseur) params.append("fournisseur", filters.fournisseur);
+  params.append("page", page);
 
   // Appel API
   const response = await fetch(

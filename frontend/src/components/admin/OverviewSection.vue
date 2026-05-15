@@ -21,6 +21,11 @@
           <span class="stat-value">{{ stats.total_utilisateurs }}</span>
           <span class="stat-label">Utilisateurs</span>
         </div>
+
+        <div class="stat-card">
+            <span class="stat-value stat-value--date">{{ formatDate(stats.derniere_maj) }}</span>
+            <span class="stat-label">Dernière mise à jour</span>
+        </div>
       </div>
     </div>
   </div>
@@ -45,6 +50,17 @@ onMounted(async () => {
     loading.value = false;
   }
 });
+
+function formatDate(dateStr) {
+  if (!dateStr) return "—";
+  return new Date(dateStr).toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
 </script>
 
 <style scoped>
@@ -78,5 +94,9 @@ onMounted(async () => {
 .stat-label {
   font-size: 0.9rem;
   color: var(--color-text-light);
+}
+
+.stat-value--date {
+  font-size: 1.1rem;
 }
 </style>

@@ -18,6 +18,7 @@ class StatsController {
             $totalProduits = (int) $this->pdo->query("SELECT COUNT(*) FROM products")->fetchColumn();
             $produitsRupture = (int) $this->pdo->query("SELECT COUNT(*) FROM products WHERE quantite = 0")->fetchColumn();
             $totalUtilisateurs = (int) $this->pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+            $derniereMaj = $this->pdo->query("SELECT MAX(updated_at) FROM products")->fetchColumn();
 
             http_response_code(200);
             echo json_encode([
@@ -25,7 +26,8 @@ class StatsController {
                 'data' => [
                     'total_produits' => $totalProduits,
                     'produits_rupture' => $produitsRupture,
-                    'total_utilisateurs' => $totalUtilisateurs
+                    'total_utilisateurs' => $totalUtilisateurs,
+                    'derniere_maj' => $derniereMaj
                 ]
             ], JSON_UNESCAPED_UNICODE);
         } catch (Exception $e) {

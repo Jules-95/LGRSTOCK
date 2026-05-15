@@ -1,6 +1,5 @@
 <template>
   <LayoutEmploye>
-
     <AppCard>
       <h2>Recherche de produits</h2>
 
@@ -66,6 +65,12 @@
             </div>
           </article>
         </div>
+
+        <AppPagination
+          :current-page="currentPage"
+          :total-pages="totalPages"
+          @change="fetchPage"
+        />
       </section>
 
       <!-- Aucun résulat -->
@@ -85,81 +90,83 @@ import { searchProducts } from "@/services/productApi";
 import MessageBox from "@/components/MessageBox.vue";
 import AppCard from "@/components/AppCard.vue";
 import LayoutEmploye from "@/components/employe/LayoutEmploye.vue";
+import AppPagination from "@/components/AppPagination.vue";
 
-
-// Hook Vue Router qui donne accès à l'objet de navigation
 const router = useRouter();
 
-// Variables réactives pour stocker ce que l'utilisateur entre dans un champ
+// Champs du formulaire
 const searchEAN = ref("");
 const searchLibelle = ref("");
 const searchFournisseur = ref("");
 
-// Nouvelle variables pour gérer l'état de la recherche (connexion API)
-const products = ref([]); // Liste des produits trouvés
-const loading = ref(false); // Indique si une recherche est en cours
-const error = ref(null); // Message d'erreur éventuel
-const searched = ref(false); // Indique si un erecherche a été lancée
-const resultsSection = ref(null); // Ref qui pointe vers l'élément DOM
+// État de la recherche
+const products = ref([]);
+const loading = ref(false);
+const error = ref(null);
+const searched = ref(false);
+const resultsSection = ref(null);
 
+// Pagination — les 3 nouvelles refs
+const currentPage = ref(1);
+const totalPages = ref(0);
+const activeFilters = ref({});
 
-// Fonction appelé au clique sur le btn "Rechercher"
+// Appelée au clic sur "Rechercher"
 async function handleSearch() {
-  // Réinitialiser l'état
   error.value = null;
   products.value = [];
   searched.value = false;
+  currentPage.value = 1;
 
-  // Vérifier qu'au moins un champ est rempli
   if (!searchEAN.value && !searchLibelle.value && !searchFournisseur.value) {
     error.value = "Veuillez remplir au moins un champ de recherche";
     return;
   }
 
+  // On sauvegarde les filtres pour pouvoir les réutiliser quand on change de page
+  activeFilters.value = {
+    ean: searchEAN.value,
+    libelle: searchLibelle.value,
+    fournisseur: searchFournisseur.value,
+  };
+
+  await fetchPage(1);
+}
+
+// Appelée à chaque changement de page
+async function fetchPage(page) {
   loading.value = true;
-
   try {
-    const data = await searchProducts({
-      ean: searchEAN.value,
-      libelle: searchLibelle.value,
-      fournisseur: searchFournisseur.value,
-    });
+    const data = await searchProducts(activeFilters.value, page);
 
-    //Redirection automatique : Cas où un seul résultat
-    if (data.count === 1) {
+    if (data.count === 1 && page === 1) {
       router.push(`/product/${data.data[0].id}`);
-    } else {
-      // Sinon affichage de la liste de résultat
-      products.value = data.data;
-      searched.value = true;
-      await nextTick();
-      resultsSection.value?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
+      return;
     }
+
+    products.value = data.data;
+    currentPage.value = data.page;
+    totalPages.value = Math.ceil(data.total / data.limit);
+    searched.value = true;
+
+    await nextTick();
+    resultsSection.value?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
   } catch (err) {
-    // Le service a lancé une erreur (throw new Error)
     error.value = err.message;
   } finally {
     loading.value = false;
   }
 }
 
-/**
- * Navigation vers la page de détails d'un produit
- * @param {numbner} productId - L''ID du produit à afficher'
- */
-
 function goToProduct(productId) {
   router.push(`/product/${productId}`);
-  // Si productId = 5 -> résultat : "/product/5"
 }
 </script>
 
 <style scoped>
-
-
 h2 {
   font-size: 1.5rem;
   margin-bottom: 1.5rem;
@@ -235,7 +242,10 @@ h2 {
   padding: 1.5rem;
   border-radius: var(--radius-input);
   border: 2px solid var(--color-border);
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
   cursor: pointer;
 }
 
@@ -262,4 +272,5 @@ h2 {
   font-weight: 600;
   margin-top: 0.5rem;
 }
+
 </style>

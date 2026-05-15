@@ -78,14 +78,22 @@ class ProductController
                 'fournisseur' => $_GET['fournisseur'] ?? null
             ];
 
-            //b. Appeler le Model (Qui fait la validation) 
-            $products = $this->productModel->search($filters);
+            // Récupérer la page demandée (Défaut : 1)
+            $page = isset($_GET['page']) && is_numeric($_GET['page'])
+            ? (int) $_GET['page']
+            : 1;
 
-            //c. Renvoyer les résultats 
+            $result = $this->productModel->search($filters, $page);
+
+
+            //Renvoyer les résultats 
             $this->sendResponse(200, [
                 'error' => false,
-                'count' => count($products),
-                'data' => $products
+                'count' => count($result['data']),
+                'data' => $result['data'],
+                'total' => $result['total'],
+                'page' => $result['page'],
+                'limit' => $result['limit']
             ]);
         } catch (Exception $e) {
             $this->sendResponse(400, [

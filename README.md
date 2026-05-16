@@ -1,4 +1,4 @@
-# LGR Stock
+# LGRSTOCK
 
 Outil interne de gestion et de visualisation des stocks, destiné aux équipes de La Grande Récré (Tours Centre et Tours Nord).
 
@@ -6,8 +6,8 @@ Outil interne de gestion et de visualisation des stocks, destiné aux équipes d
 
 ## Description
 
-**LGR Stock** est une application web interne permettant de consulter et localiser rapidement les produits en réserve.
-L'objectif est de réduire le temps de recherche en magasin en centralisant les informations de stock dans une interface simple et accessible depuis n'importe quel appareil.
+**LGRSTOCK** est une application web interne permettant de consulter, localiser et gérer les produits en réserve externe.
+L'objectif est de réduire le temps de recherche en magasin en centralisant les informations de stock dans une interface simple et accessible depuis n'importe quel appareil (PC, tablette).
 
 ---
 
@@ -18,21 +18,20 @@ Il répond à un besoin réel de l'entreprise en proposant un outil adapté à u
 
 ---
 
-## Fonctionnalités actuelles
+## Fonctionnalités
 
-- Recherche de produits par code EAN (scan ou saisie manuelle), par libellé ou par fournisseur
-- Affichage d'une liste de résultats (mini fiches produit) en cas de résultats multiples
+### Espace employé
+- Recherche de produits par code EAN (scan ou saisie manuelle), libellé ou fournisseur
 - Redirection automatique vers la fiche produit si un seul résultat est trouvé
-- Fiche produit avec :
-  - Libellé
-  - Code EAN
-  - Fournisseur
-  - Quantité disponible (indicateur coloré selon le niveau de stock)
-  - Gestion des états de l'interface : chargement, erreur, aucun résultat
-  - Modification de la quantite en stock via une modale
-  - Suppression d'un produit avec confirmation
-  
+- Affichage d'une liste paginée en cas de résultats multiples
+- Fiche produit avec libellé, EAN, fournisseur et indicateur coloré de niveau de stock
 
+### Espace admin (dashboard)
+- Vue d'ensemble : statistiques globales (produits, ruptures, utilisateurs, dernière mise à jour)
+- Gestion produits : recherche paginée, ajout, modification, suppression
+- Gestion utilisateurs : ajout, modification, suppression (protection anti-auto-suppression)
+- Export CSV (Excel-safe, BOM UTF-8, EAN protégé contre la troncature)
+- Import CSV (validation en 2 passes, mapping intelligent des colonnes, upsert par EAN)
 
 ---
 
@@ -42,94 +41,129 @@ Il répond à un besoin réel de l'entreprise en proposant un outil adapté à u
 
 | Technologie | Rôle |
 |---|---|
-| [Vue.js 3](https://vuejs.org/) (Composition API) | Framework JavaScript réactif |
-| [Vue Router](https://router.vuejs.org/) | Navigation entre les vues |
-| [Vite](https://vitejs.dev/) | Bundler et serveur de développement |
+| Vue.js 3 (Composition API, `<script setup>`) | Framework JavaScript réactif |
+| Vue Router | Navigation et guards de routes |
+| Vite | Bundler et serveur de développement |
 
 ### Backend
 
 | Technologie | Rôle |
 |---|---|
-| PHP (natif) | Serveur HTTP et logique métier |
+| PHP 8 natif (architecture MVC maison) | Serveur HTTP et logique métier |
 | PDO | Accès sécurisé à la base de données |
+| Sessions PHP | Authentification (HttpOnly, SameSite=Lax, durée 8h) |
 
 ### Base de données
 
 | Technologie | Rôle |
 |---|---|
-| MySQL 8.0 | Stockage des données produits |
+| MySQL 8.0 | Stockage des données produits et utilisateurs |
 
 ### Outils de développement
 
 | Outil | Usage |
 |---|---|
-| XAMPP / Laragon | Environnement de développement local |
+| XAMPP | Environnement de développement local |
 | Postman | Tests des endpoints API |
 | Looping | Modélisation de la base de données (MCD/MLD) |
-| npm / pnpm | Gestion des dépendances JavaScript |
+| npm | Gestion des dépendances JavaScript |
 | Git / GitHub | Versioning |
 
 ---
 
 ## Architecture
 
-```
-┌──────────────┐                    ┌──────────────┐
-│   Vue.js 3   │  ←── HTTP/JSON ──→ │     PHP      │
-│  (Frontend)  │                    │  (Backend)   │
-└──────────────┘                    └──────┬───────┘
-  Interface web                            │
-  Recherche produits                       │
-  Affichage du stock                       ▼
-                                    ┌──────────────┐
-                                    │    MySQL     │
-                                    │  (Database)  │
-                                    └──────────────┘
-```
+L'application suit une architecture trois tiers :
+
+- **Frontend** (Vue.js 3) — interface utilisateur, communique avec le backend via des requêtes HTTP/JSON
+- **Backend** (PHP natif) — API REST, traite les requêtes, applique la logique métier
+- **Base de données** (MySQL 8.0) — stockage des produits et utilisateurs, interrogée via PDO
 
 Le frontend Vue.js communique avec le backend PHP via une API REST.
 Le backend expose des endpoints qui interrogent la base de données MySQL via PDO.
+Toutes les requêtes `fetch()` utilisent `credentials: 'include'` pour transmettre le cookie de session.
 
-```
-LGRSTOCK/
-├── backend/
-│   ├── api/            # Endpoints REST (search, product, import)
-│   ├── config/         # Configuration base de données
-│   ├── database/       # Schéma SQL et données de test
-│   └── src/
-│       ├── Controllers/ # Traitement des requêtes HTTP
-│       ├── Models/      # Requêtes base de données
-│       └── Services/    # Services métier (import CSV)
-└── frontend/
-    └── src/
-        ├── components/  # Composants réutilisables
-        ├── views/       # Pages de l'application
-        ├── router/      # Configuration des routes
-        └── services/    # Appels API centralisés
-```
+### Arborescence
+
+**Backend**
+- `api/Auth/` — login.php, logout.php, check-auth.php
+- `api/Product/` — search.php, product.php, add-product.php, edit-product.php, delete-product.php
+- `api/User/` — users.php, add-user.php, edit-user.php, delete-user.php
+- `api/` — export.php, import.php, stats.php
+- `config/` — cors.php, database.example.php, database.php ⚠️ ne pas committer
+- `database/` — schema.sql, seed_products.sql, seed_users.sql
+- `src/Controllers/` — AuthController, ProductController, UserController, ExportController, ImportController, StatsController
+- `src/Middleware/` — Auth.php (requireAuth, requireAdmin)
+- `src/Models/` — Product.php, User.php
+
+**Frontend**
+- `assets/` — CSS global (main.css, admin.css, form.css)
+- `components/admin/` — sections du dashboard admin
+- `components/employe/` — layout et topbar espace employé
+- `composables/` — useAuth.js
+- `router/` — index.js
+- `services/` — productApi.js, authApi.js, userApi.js
+- `views/` — HomeView, AdminView, LoginView, ProductDetail, NotFoundView
+---
+
+## Authentification et rôles
+
+Deux rôles utilisateur :
+- **employé** : accès en lecture seule (recherche + fiche produit)
+- **admin** : accès complet (CRUD produits, gestion utilisateurs, import/export, stats)
+
+Les sessions PHP durent 8 heures. Le cookie `PHPSESSID` est `HttpOnly` et `SameSite=Lax`.
+Les routes Vue sont protégées par des guards qui vérifient la session et le rôle avant chaque navigation.
 
 ---
 
-## Installation (temporaire)
+## Base de données
+
+### Table `products`
+| Colonne | Type | Description |
+|---|---|---|
+| id | INT AUTO_INCREMENT | Identifiant unique |
+| ean | VARCHAR(13) UNIQUE | Code EAN produit |
+| libelle | VARCHAR(255) | Nom du produit |
+| fournisseur | VARCHAR(255) | Nom du fournisseur |
+| ref_fournisseur | VARCHAR(255) | Référence fournisseur |
+| prix | DECIMAL | Prix du produit |
+| quantite | INT | Quantité en stock |
+| created_at | DATETIME | Date de création |
+| updated_at | DATETIME | Date de dernière modification |
+
+### Table `users`
+| Colonne | Type | Description |
+|---|---|---|
+| id | INT AUTO_INCREMENT | Identifiant unique |
+| username | VARCHAR(255) UNIQUE | Nom d'utilisateur |
+| password_hash | VARCHAR(255) | Mot de passe hashé (bcrypt) |
+| role | ENUM('employe','admin') | Rôle de l'utilisateur |
+| magasin | ENUM('tours_nord','tours_centre') | Magasin de rattachement |
+| created_at | DATETIME | Date de création |
+
+---
+
+## Installation (développement local)
 
 ### Prérequis
 
-- PHP 7.4+
+- PHP 8+
 - MySQL 8.0
-- Node.js + npm ou pnpm
-- XAMPP / Laragon (ou tout autre serveur local)
+- Node.js + npm
+- XAMPP
 
 ### Backend
 
-1. Cloner le dépôt dans le répertoire `htdocs` (XAMPP) ou `www` (Laragon)
+1. Cloner le dépôt dans le répertoire `htdocs`
 2. Créer la base de données et importer le schéma :
-   ```sql
+```sql
    SOURCE backend/database/schema.sql;
-   ```
+```
 3. Copier le fichier de configuration et renseigner les identifiants :
-   ```bash
+```bash
    cp backend/config/database.example.php backend/config/database.php
-   ```
+```
 
 ### Frontend
 
@@ -139,21 +173,63 @@ npm install
 npm run dev
 ```
 
-L'application est accessible sur `http://localhost:5173` (dev) ou via le serveur local après build.
+L'application est accessible sur `http://localhost:5173` en développement.
 
 ---
 
 ## API
 
-| Méthode | Endpoint | Description |
-|---|---|---|
-| GET | `/api/search.php` | Recherche par EAN, libellé ou fournisseur |
-| GET | `/api/product.php?id=` | Récupère un produit par son ID |
-Paramètres de recherche : `?ean=`, `?libelle=`, `?fournisseur=` (combinables)
-| POST | `/api/add-product.php` | Ajoute un nouveau produit |
-| POST | `/api/update-stock.php` | Met à jour la quantité d'un produit |
-| POST | `/api/delete-product.php` | Supprime un produit 
+### Authentification
+| Méthode | Endpoint | Auth | Description |
+|---|---|---|---|
+| POST | `/api/Auth/login.php` | Non | Connexion |
+| POST | `/api/Auth/logout.php` | Oui | Déconnexion |
+| GET | `/api/Auth/check-auth.php` | Non | Vérification session |
+
+### Produits
+| Méthode | Endpoint | Auth | Description |
+|---|---|---|---|
+| GET | `/api/Product/search.php` | Employé | Recherche paginée par EAN, libellé ou fournisseur |
+| GET | `/api/Product/product.php?id=` | Employé | Récupère un produit par ID |
+| POST | `/api/Product/add-product.php` | Admin | Ajoute un produit |
+| POST | `/api/Product/edit-product.php` | Admin | Modifie un produit |
+| POST | `/api/Product/delete-product.php` | Admin | Supprime un produit |
+
+### Utilisateurs
+| Méthode | Endpoint | Auth | Description |
+|---|---|---|---|
+| GET | `/api/User/users.php` | Admin | Liste tous les utilisateurs |
+| POST | `/api/User/add-user.php` | Admin | Ajoute un utilisateur |
+| POST | `/api/User/edit-user.php` | Admin | Modifie un utilisateur |
+| POST | `/api/User/delete-user.php` | Admin | Supprime un utilisateur |
+
+### Autres
+| Méthode | Endpoint | Auth | Description |
+|---|---|---|---|
+| GET | `/api/stats.php` | Admin | Statistiques globales |
+| GET | `/api/export.php` | Admin | Export CSV de tous les produits |
+| POST | `/api/import.php` | Admin | Import CSV de produits |
+
+---
 
 ## Sécurité
 
-⚠️ Ce projet tourne en réseau local interne. Le système d'authentification est en cours de développement — les endpoints API ne sont pas encore protégés par token.
+- Authentification par sessions PHP (HttpOnly, SameSite=Lax)
+- Middleware `requireAuth()` et `requireAdmin()` sur tous les endpoints protégés
+- Requêtes SQL préparées via PDO (protection injection SQL)
+- Mots de passe hashés avec bcrypt
+- Guards Vue Router côté frontend
+
+**Limitations connues (usage interne uniquement) :**
+- Pas de protection CSRF (SameSite=Lax uniquement)
+- Pas de rate limiting
+- Les sessions actives ne sont pas invalidées à la suppression d'un utilisateur
+
+---
+
+## Évolutions prévues (v2)
+
+- Système de listes de transfert entre le stock déporté et les magasins (Tours Nord / Tours Centre)
+- Export CSV filtré par fournisseur
+- Amélioration de la gestion des utilisateurs
+- Historique des transferts par magasin

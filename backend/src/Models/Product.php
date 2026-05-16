@@ -76,7 +76,7 @@ class Product {
             ':quantite'    => (int) $quantite
         ]);
 
-        // On va retourner l'ID généré par MySQL pour la ligne qu'on vient d'insérer. (Pour afficher la nouvelle fiche détaillée en cas de produit ajouté)
+        // Inutilisé pour l'instant : Sert à récupérer la dernière ligne insérée (pour afficher la nouvelle fiche détaillée en cas d'ajout de produit) -> Conservé au cas où pour plus tard
         return $this->pdo->lastInsertId();
 
         } catch (PDOException $e) {
@@ -228,6 +228,9 @@ class Product {
             $sql .= " AND fournisseur LIKE :fournisseur";
             $params[':fournisseur'] = '%' . $escaped . '%';
         }
+
+        // Tri des résulats de la recherche
+        $sql .= " ORDER BY libelle ASC"; 
 
         // Compter le total avant LIMIT/OFFSET
         $sqlCount = str_replace("SELECT *", "SELECT COUNT(*)", $sql);

@@ -1,5 +1,6 @@
 # Variables d'environnement (contient les credentials)
 backend/.env
+frontend/.env
 
 # Dépendances
 node_modules/

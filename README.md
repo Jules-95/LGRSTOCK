@@ -73,17 +73,11 @@ Il répond à un besoin réel de l'entreprise en proposant un outil adapté à u
 
 ## Architecture
 
-┌──────────────┐                    ┌──────────────┐
-│   Vue.js 3   │  ←── HTTP/JSON ──→ │     PHP      │
-│  (Frontend)  │                    │  (Backend)   │
-└──────────────┘                    └──────┬───────┘
-Interface web                            │
-Recherche produits                       │
-Gestion du stock                         ▼
-┌──────────────┐
-│    MySQL     │
-│  (Database)  │
-└──────────────┘
+L'application suit une architecture trois tiers :
+
+- **Frontend** (Vue.js 3) — interface utilisateur, communique avec le backend via des requêtes HTTP/JSON
+- **Backend** (PHP natif) — API REST, traite les requêtes, applique la logique métier
+- **Base de données** (MySQL 8.0) — stockage des produits et utilisateurs, interrogée via PDO
 
 Le frontend Vue.js communique avec le backend PHP via une API REST.
 Le backend expose des endpoints qui interrogent la base de données MySQL via PDO.
@@ -91,38 +85,25 @@ Toutes les requêtes `fetch()` utilisent `credentials: 'include'` pour transmett
 
 ### Arborescence
 
-LGRSTOCK/
-├── backend/
-│   ├── api/
-│   │   ├── Auth/         # login.php, logout.php, check-auth.php
-│   │   ├── Product/      # search.php, product.php, add-product.php, edit-product.php, delete-product.php
-│   │   ├── User/         # users.php, add-user.php, edit-user.php, delete-user.php
-│   │   ├── export.php    # Export CSV
-│   │   ├── import.php    # Import CSV
-│   │   └── stats.php     # Statistiques dashboard
-│   ├── config/
-│   │   ├── cors.php
-│   │   ├── database.example.php
-│   │   └── database.php  # ⚠️ Ne pas committer (contient les credentials)
-│   ├── database/
-│   │   ├── schema.sql
-│   │   ├── seed_products.sql
-│   │   └── seed_users.sql
-│   └── src/
-│       ├── Controllers/  # AuthController, ProductController, UserController, ExportController, ImportController, StatsController
-│       ├── Middleware/   # Auth.php — garde-barrière (requireAuth, requireAdmin)
-│       └── Models/       # Product.php, User.php
-└── frontend/
-└── src/
-├── assets/       # CSS global (main.css, admin.css, form.css)
-├── components/
-│   ├── admin/    # Sections du dashboard admin
-│   └── employe/  # Layout et topbar espace employé
-├── composables/  # useAuth.js — état d'authentification partagé entre composants
-├── router/       # index.js (guards de routes)
-├── services/     # productApi.js, authApi.js, userApi.js
-└── views/        # HomeView, AdminView, LoginView, ProductDetail, NotFoundView
+**Backend**
+- `api/Auth/` — login.php, logout.php, check-auth.php
+- `api/Product/` — search.php, product.php, add-product.php, edit-product.php, delete-product.php
+- `api/User/` — users.php, add-user.php, edit-user.php, delete-user.php
+- `api/` — export.php, import.php, stats.php
+- `config/` — cors.php, database.example.php, database.php ⚠️ ne pas committer
+- `database/` — schema.sql, seed_products.sql, seed_users.sql
+- `src/Controllers/` — AuthController, ProductController, UserController, ExportController, ImportController, StatsController
+- `src/Middleware/` — Auth.php (requireAuth, requireAdmin)
+- `src/Models/` — Product.php, User.php
 
+**Frontend**
+- `assets/` — CSS global (main.css, admin.css, form.css)
+- `components/admin/` — sections du dashboard admin
+- `components/employe/` — layout et topbar espace employé
+- `composables/` — useAuth.js
+- `router/` — index.js
+- `services/` — productApi.js, authApi.js, userApi.js
+- `views/` — HomeView, AdminView, LoginView, ProductDetail, NotFoundView
 ---
 
 ## Authentification et rôles

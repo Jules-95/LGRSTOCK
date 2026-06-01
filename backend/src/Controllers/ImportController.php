@@ -16,6 +16,32 @@ class ImportController
             return;
         }
 
+        // Vérification du type MIME réel du fichier coté serveur 
+        // $_FILES['type'] vient du navigateur et peut être falsifié
+        // finfo lit le contenu réel du fichier indépendament de son extension
+        $finfo = new finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->file($_FILES['csv']['tmp_name']);
+        $allowedMimes = ['text/plain', 'text/csv', 'application/csv'];
+
+        if (!in_array($mimeType, $allowedMimes)) {
+            $this->sendResponse(400, true, 'Format invalide - seuls les fichiers CSV sont acceptés');
+            return;
+        }
+
+        // Vérification de l'extension - text/plain et text/csv ont le même MIME
+        // Il faut donc bloquer les .txt et donc l'extension
+        $extension = strtolower(pathinfo($_FILES['csv']['name'], PATHINFO_EXTENSION)); 
+        if ($extension !== 'csv') {
+            $this->sendResponse(400, true, 'Format invalide - Seuls les fichiers CSV sont acceptés');
+            return;
+        }
+
+        // Vérification taille max 2Mo 
+        if ($_FILES['csv']['size'] > 2 * 1024 * 1024) {
+            $this->sendResponse(400, true, 'Fichier trop volumineux - Maximum 2Mo');
+            return;
+        }
+
         $filepath = $_FILES['csv']['tmp_name'];
 
         $handle = fopen($filepath, 'r');

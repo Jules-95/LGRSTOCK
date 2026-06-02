@@ -41,6 +41,11 @@ header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type');
 header('Content-Type: application/json; charset=utf-8');
 
+// Headers de sécurité
+header('X-Content-Type-Options: nosniff');  // Empêche le navigateur de deviner le type de fichier
+header('X-Frame-Options: DENY');             // Empêche l'app d'être chargée dans une iframe (clickjacking)
+header('Referrer-Policy: strict-origin-when-cross-origin'); // Limite les infos envoyées dans le header Referer
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(204);
     exit;

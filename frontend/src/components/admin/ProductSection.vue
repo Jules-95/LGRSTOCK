@@ -62,22 +62,43 @@
           <td class="td-libelle">{{ product.libelle }}</td>
           <td class="td-ean">{{ product.ean }}</td>
           <td class="td-fournisseur">{{ product.fournisseur || "—" }}</td>
-          <td class="td-secondary td-ref">{{ product.ref_fournisseur || "—" }}</td>
+          <td class="td-secondary td-ref">
+            {{ product.ref_fournisseur || "—" }}
+          </td>
           <td class="td-secondary td-prix">
             {{ product.prix ? product.prix + " €" : "—" }}
           </td>
           <td class="td-qte">{{ product.quantite }}</td>
 
-
           <td class="td-actions">
-            <button class="btn-edit" @click="openEditModal(product)">
-              Modifier
-            </button>
-            <button class="btn-delete" @click="confirmDelete(product)">
-              Supprimer
-            </button>
+            <div
+              class="dropdown"
+              :class="{ open: openDropdown === product.id }"
+            >
+              <button class="btn-dots" @click.stop="toggleDropdown(product.id)">
+                ···
+              </button>
+              <div class="dropdown-menu">
+                <button
+                  @click="
+                    openEditModal(product);
+                    openDropdown = null;
+                  "
+                >
+                  Modifier
+                </button>
+                <button
+                  class="danger"
+                  @click="
+                    confirmDelete(product);
+                    openDropdown = null;
+                  "
+                >
+                  Supprimer
+                </button>
+              </div>
+            </div>
           </td>
-          
         </tr>
       </tbody>
     </table>
@@ -107,7 +128,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { searchProducts, deleteProduct } from "@/services/productApi";
 import EditProductForm from "@/components/admin/EditProductForm.vue";
 import Modal from "@/components/Modal.vue";
@@ -126,6 +147,18 @@ const showEditModal = ref(false);
 const selectedProduct = ref(null);
 const currentPage = ref(1);
 const totalPages = ref(0);
+
+const openDropdown = ref(null);
+
+onMounted(() => {
+  document.addEventListener("click", () => {
+    openDropdown.value = null;
+  });
+});
+
+function toggleDropdown(id) {
+  openDropdown.value = openDropdown.value === id ? null : id;
+}
 
 async function handleSearch() {
   const { ean, libelle, fournisseur } = filters.value;
@@ -191,6 +224,7 @@ async function confirmDelete(product) {
 </script>
 
 <style scoped>
+/* ── Formulaire de recherche ── */
 .search-fields {
   display: flex;
   gap: 1rem;
@@ -243,14 +277,12 @@ async function confirmDelete(product) {
   background: var(--color-primary-dark);
 }
 
-.td-ean {
-  font-family: monospace;
-  font-size: 0.8rem;
-  color: var(--color-text-light);
+/* ── Colonnes du tableau produits ── */
+th {
+  white-space: nowrap;
+  text-align: center;
 }
 
-/* Correctifs de l'organisation du tableau */
-/* Largeurs fixes par colonne */
 .th-libelle,
 .td-libelle {
   width: 25%;
@@ -274,27 +306,27 @@ async function confirmDelete(product) {
   width: 13%;
 }
 
-/* Empêche les retours à la ligne dans les headers */
-th {
+/* ── Styles spécifiques aux cellules ── */
+.td-libelle {
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.td-ean {
+  font-family: monospace;
+  font-size: 0.8rem;
+  color: var(--color-text-light);
   text-align: center;
 }
 
-
-/* Infos secondaires moins visibles */
 .td-secondary {
   color: var(--color-text-light);
   font-size: 0.85rem;
 }
 
-.td-ean {
-  text-align: center;
-}
-
-.td-fournisseur {
-  text-align: center;
-}
-
+.td-fournisseur,
 .td-ref {
   text-align: center;
 }
@@ -308,13 +340,4 @@ th {
   text-align: center;
   font-weight: 600;
 }
-
-
-.td-libelle {
-  max-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 </style>

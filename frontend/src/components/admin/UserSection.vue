@@ -26,9 +26,32 @@
           <td>{{ u.username }}</td>
           <td>{{ u.role }}</td>
           <td>{{ u.magasin }}</td>
+
           <td class="td-actions">
-            <button class="btn-edit" @click="openEditModal(u)">Modifier</button>
-            <button class="btn-delete" @click="confirmDelete(u)">Supprimer</button>
+            <div class="dropdown" :class="{ open: openDropdown === u.id }">
+              <button class="btn-dots" @click.stop="toggleDropdown(u.id)">
+                ···
+              </button>
+              <div class="dropdown-menu">
+                <button
+                  @click="
+                    openEditModal(u);
+                    openDropdown = null;
+                  "
+                >
+                  Modifier
+                </button>
+                <button
+                  class="danger"
+                  @click="
+                    confirmDelete(u);
+                    openDropdown = null;
+                  "
+                >
+                  Supprimer
+                </button>
+              </div>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -36,14 +59,22 @@
 
     <div v-else class="state-message">Aucun utilisateur trouvé.</div>
 
-    <Modal v-if="showAddUserModal" title="Ajouter un utilisateur" @close="showAddUserModal = false">
+    <Modal
+      v-if="showAddUserModal"
+      title="Ajouter un utilisateur"
+      @close="showAddUserModal = false"
+    >
       <AddUserForm
         @success="handleAddSuccess"
         @cancel="showAddUserModal = false"
       />
     </Modal>
 
-    <Modal v-if="showEditModal" title="Modifier l'utilisateur" @close="showEditModal = false">
+    <Modal
+      v-if="showEditModal"
+      title="Modifier l'utilisateur"
+      @close="showEditModal = false"
+    >
       <EditUserForm
         :user="selectedUser"
         @success="handleEditSuccess"
@@ -54,78 +85,97 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { getUsers, deleteUser } from '@/services/userApi'
-import AddUserForm from '@/components/admin/AddUserForm.vue'
-import EditUserForm from '@/components/admin/EditUserForm.vue'
-import Modal from '@/components/Modal.vue'
-import MessageBox from '@/components/MessageBox.vue'
+import { onMounted, ref } from "vue";
+import { getUsers, deleteUser } from "@/services/userApi";
+import AddUserForm from "@/components/admin/AddUserForm.vue";
+import EditUserForm from "@/components/admin/EditUserForm.vue";
+import Modal from "@/components/Modal.vue";
+import MessageBox from "@/components/MessageBox.vue";
 
-import '@/assets/admin.css'
+import "@/assets/admin.css";
 
-const users = ref([])
-const loading = ref(false)
-const errorMessage = ref('')
-const successMessage = ref('')
-const showAddUserModal = ref(false)
-const showEditModal = ref(false)
-const selectedUser = ref(null)
+const users = ref([]);
+const loading = ref(false);
+const errorMessage = ref("");
+const successMessage = ref("");
+const showAddUserModal = ref(false);
+const showEditModal = ref(false);
+const selectedUser = ref(null);
+
+const openDropdown = ref(null);
 
 async function loadUsers() {
-  loading.value = true
-  errorMessage.value = ''
+  loading.value = true;
+  errorMessage.value = "";
 
   try {
-    const result = await getUsers()
-    users.value = result.data ?? []
+    const result = await getUsers();
+    users.value = result.data ?? [];
   } catch (err) {
-    errorMessage.value = err.message
+    errorMessage.value = err.message;
   } finally {
-    loading.value = false
+    loading.value = false;
   }
+}
+
+onMounted(() => {
+  document.addEventListener("click", () => {
+    openDropdown.value = null;
+  });
+});
+
+function toggleDropdown(id) {
+  openDropdown.value = openDropdown.value === id ? null : id;
 }
 
 function openEditModal(u) {
-  selectedUser.value = u
-  showEditModal.value = true
+  selectedUser.value = u;
+  showEditModal.value = true;
 }
 
 function handleAddSuccess() {
-  showAddUserModal.value = false
-  successMessage.value = 'Utilisateur ajouté avec succès'
-  setTimeout(() => { successMessage.value = '' }, 3000)
-  loadUsers()
+  showAddUserModal.value = false;
+  successMessage.value = "Utilisateur ajouté avec succès";
+  setTimeout(() => {
+    successMessage.value = "";
+  }, 3000);
+  loadUsers();
 }
 
 function handleEditSuccess(updatedUser) {
-  const index = users.value.findIndex(u => u.id === updatedUser.id)
+  const index = users.value.findIndex((u) => u.id === updatedUser.id);
   if (index !== -1) {
-    users.value[index] = updatedUser
+    users.value[index] = updatedUser;
   }
-  showEditModal.value = false
-  successMessage.value = 'Utilisateur modifié avec succès'
-  setTimeout(() => { successMessage.value = '' }, 3000)
+  showEditModal.value = false;
+  successMessage.value = "Utilisateur modifié avec succès";
+  setTimeout(() => {
+    successMessage.value = "";
+  }, 3000);
 }
 
 async function confirmDelete(u) {
-  if (!confirm(`Supprimer "${u.username}" ?`)) return
+  if (!confirm(`Supprimer "${u.username}" ?`)) return;
 
   try {
-    await deleteUser(u.id)
-    users.value = users.value.filter(u2 => u2.id !== u.id)
-    successMessage.value = 'Utilisateur supprimé avec succès'
-    setTimeout(() => { successMessage.value = '' }, 3000)
+    await deleteUser(u.id);
+    users.value = users.value.filter((u2) => u2.id !== u.id);
+    successMessage.value = "Utilisateur supprimé avec succès";
+    setTimeout(() => {
+      successMessage.value = "";
+    }, 3000);
   } catch (err) {
-    errorMessage.value = err.message
-    setTimeout(() => { errorMessage.value = '' }, 3000)
+    errorMessage.value = err.message;
+    setTimeout(() => {
+      errorMessage.value = "";
+    }, 3000);
   }
 }
 
-defineExpose({ loadUsers })
+defineExpose({ loadUsers });
 </script>
 
 <style scoped>
-
 .btn-add {
   padding: 0.6rem 1.25rem;
   background: var(--color-primary);
@@ -142,4 +192,7 @@ defineExpose({ loadUsers })
   background: var(--color-primary-dark);
 }
 
+th:last-child {
+  text-align: center;
+}
 </style>

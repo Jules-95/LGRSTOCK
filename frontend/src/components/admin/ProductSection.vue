@@ -48,19 +48,27 @@
     <table v-else-if="products.length > 0" class="product-table">
       <thead>
         <tr>
-          <th>Libellé</th>
-          <th>EAN</th>
-          <th>Fournisseur</th>
-          <th>Quantité</th>
-          <th>Actions</th>
+          <th class="th-libelle">Libellé</th>
+          <th class="th-ean">EAN</th>
+          <th class="th-fournisseur">Fournisseur</th>
+          <th class="th-ref">Réf. fourn</th>
+          <th class="th-prix">Prix</th>
+          <th class="th-qte">Qté</th>
+          <th class="th-actions">Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="product in products" :key="product.id">
-          <td>{{ product.libelle }}</td>
+          <td class="td-libelle">{{ product.libelle }}</td>
           <td class="td-ean">{{ product.ean }}</td>
-          <td>{{ product.fournisseur || "—" }}</td>
-          <td>{{ product.quantite }}</td>
+          <td class="td-fournisseur">{{ product.fournisseur || "—" }}</td>
+          <td class="td-secondary td-ref">{{ product.ref_fournisseur || "—" }}</td>
+          <td class="td-secondary td-prix">
+            {{ product.prix ? product.prix + " €" : "—" }}
+          </td>
+          <td class="td-qte">{{ product.quantite }}</td>
+
+
           <td class="td-actions">
             <button class="btn-edit" @click="openEditModal(product)">
               Modifier
@@ -69,6 +77,7 @@
               Supprimer
             </button>
           </td>
+          
         </tr>
       </tbody>
     </table>
@@ -105,7 +114,7 @@ import Modal from "@/components/Modal.vue";
 import MessageBox from "@/components/MessageBox.vue";
 import AppPagination from "@/components/AppPagination.vue";
 
-import '@/assets/admin.css'
+import "@/assets/admin.css";
 
 const filters = ref({ ean: "", libelle: "", fournisseur: "" });
 const products = ref([]);
@@ -182,8 +191,6 @@ async function confirmDelete(product) {
 </script>
 
 <style scoped>
-
-
 .search-fields {
   display: flex;
   gap: 1rem;
@@ -240,6 +247,74 @@ async function confirmDelete(product) {
   font-family: monospace;
   font-size: 0.8rem;
   color: var(--color-text-light);
+}
+
+/* Correctifs de l'organisation du tableau */
+/* Largeurs fixes par colonne */
+.th-libelle,
+.td-libelle {
+  width: 25%;
+}
+.th-ean {
+  width: 13%;
+}
+.th-fournisseur {
+  width: 15%;
+}
+.th-ref {
+  width: 10%;
+}
+.th-prix {
+  width: 8%;
+}
+.th-qte {
+  width: 6%;
+}
+.th-actions {
+  width: 13%;
+}
+
+/* Empêche les retours à la ligne dans les headers */
+th {
+  white-space: nowrap;
+  text-align: center;
+}
+
+
+/* Infos secondaires moins visibles */
+.td-secondary {
+  color: var(--color-text-light);
+  font-size: 0.85rem;
+}
+
+.td-ean {
+  text-align: center;
+}
+
+.td-fournisseur {
+  text-align: center;
+}
+
+.td-ref {
+  text-align: center;
+}
+
+.td-prix {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.td-qte {
+  text-align: center;
+  font-weight: 600;
+}
+
+
+.td-libelle {
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 </style>

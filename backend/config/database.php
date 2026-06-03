@@ -16,6 +16,10 @@ foreach ($lines as $line) {
     $_ENV[trim($key)] = trim($value);
 }
 
+// Affichage des erreurs PHP uniquement en développement
+ini_set('display_errors', $_ENV['APP_ENV'] === 'production' ? 0 : 1);
+error_reporting(E_ALL);
+
 define('DB_HOST',    $_ENV['DB_HOST']    ?? 'localhost');
 define('DB_NAME',    $_ENV['DB_NAME']    ?? '');
 define('DB_USER',    $_ENV['DB_USER']    ?? '');

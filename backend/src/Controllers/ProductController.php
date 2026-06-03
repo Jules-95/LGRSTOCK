@@ -13,6 +13,7 @@ require_once __DIR__ . '/../Models/Product.php';
 class ProductController
 {
     private $productModel;
+    
 
 
     /**
@@ -56,7 +57,7 @@ class ProductController
             $this->sendResponse(400, [
                 'error' => true,
                 'message' => 'Erreur lors de la récupération du produit',
-                'details' => $e->getMessage()
+                'details' => 'Une erreur est survenue'
             ]);
         }
     }
@@ -186,7 +187,7 @@ class ProductController
                 'fournisseur'     => $_POST['fournisseur'] ?? null,
                 'quantite'        => $_POST['quantite'] ?? 0,
                 'prix'            => $_POST['prix'] ?? null,
-                'ref-fournisseur' => $_POST['ref_fournisseur'] ?? null,
+                'ref_fournisseur' => $_POST['ref_fournisseur'] ?? null,
             ]);
 
             $this->sendResponse(200, [

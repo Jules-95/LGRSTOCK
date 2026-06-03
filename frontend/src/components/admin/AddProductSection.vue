@@ -48,6 +48,31 @@
       </div>
 
       <div class="form-group">
+        <label for="fournisseur">Référence Fournisseur</label>
+        <input
+          id="ref_fournisseur"
+          v-model="form.ref_fournisseur"
+          type="text"
+          placeholder="Ex: REF-001 (optionnel)"
+          class="form-input"
+        />
+      </div>
+
+
+      <div class="form-group">
+        <label for="fournisseur">Prix (€)</label>
+        <input
+          id="prix"
+          v-model="form.prix"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="Ex: 29.99 (optionnel)"
+          class="form-input"
+        />
+      </div>   
+
+      <div class="form-group">
         <label for="quantite">Quantité initiale</label>
         <input
           id="quantite"
@@ -84,6 +109,8 @@ const form = ref({
   libelle: "",
   ean: "",
   fournisseur: "",
+  ref_fournisseur: "",
+  prix: "",
   quantite: 0,
 });
 
@@ -117,7 +144,7 @@ async function handleSubmit() {
     setTimeout(() => {
       success.value = false;
     }, 3000);
-    form.value = { libelle: "", ean: "", fournisseur: "", quantite: 0 };
+    form.value = { libelle: "", ean: "", fournisseur: "", prix: "", ref_fournisseur: "", quantite: 0 };
     emit("success", result.id); //
   } catch (err) {
     error.value = err.message;

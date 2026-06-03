@@ -40,10 +40,12 @@ class Product {
      * @throws Exception si données invalides
      */
     public function create($data) {
-        $libelle     = $data['libelle']     ?? null;
-        $ean         = $data['ean']         ?? null;
-        $fournisseur = $data['fournisseur'] ?? null;
-        $quantite    = $data['quantite']    ?? 0;
+        $libelle         = $data['libelle']                    ?? null;
+        $ean             = $data['ean']                        ?? null;
+        $fournisseur     = $data['fournisseur']                ?? null;
+        $quantite        = $data['quantite']                   ?? 0;
+        $prix            = $prix['prix']                       ?? null;
+        $ref_fournisseur = $ref_fournisseur['ref_fournisseur'] ?? null;
 
         // Validation : Champs obligatoires 
         if (empty($libelle)) {
@@ -66,14 +68,16 @@ class Product {
         // Requête préparée INSERT 
         // NOW() remplit automatiuement created_at et updated_at
 
-        $sql = "INSERT INTO products (libelle, ean, fournisseur, quantite, created_at, updated_at) VALUES (:libelle, :ean, :fournisseur, :quantite, NOW(), NOW())";
+        $sql = "INSERT INTO products (libelle, ean, fournisseur, quantite,ref_fournisseur, prix, created_at, updated_at) VALUES (:libelle, :ean, :fournisseur, :quantite, :ref_fournisseur, :prix, NOW(), NOW())";
 
         $stmt= $this->pdo->prepare($sql);
         $stmt->execute([
             ':libelle'     => $libelle,
             ':ean'         => $ean,
             ':fournisseur' => $fournisseur,
-            ':quantite'    => (int) $quantite
+            ':quantite'    => (int) $quantite,
+            ':ref_fournisseur' => $data['ref_fournisseur'] ?? null,
+            ':prix' => isset($data['prix']) && $data['prix'] !== '' ? (float) $data['prix'] : null,
         ]);
 
         // Inutilisé pour l'instant : Sert à récupérer la dernière ligne insérée (pour afficher la nouvelle fiche détaillée en cas d'ajout de produit) -> Conservé au cas où pour plus tard
@@ -134,10 +138,12 @@ class Product {
             throw new Exception("L'ID du produit doit être valide");
         }
 
-        $libelle     = $data['libelle']     ?? null;
-        $ean         = $data['ean']         ?? null;
-        $fournisseur = $data['fournisseur'] ?? null;
-        $quantite    = $data['quantite']    ?? null;
+        $libelle         = $data['libelle']                    ?? null;
+        $ean             = $data['ean']                        ?? null;
+        $fournisseur     = $data['fournisseur']                ?? null;
+        $quantite        = $data['quantite']                   ?? null;
+        $ref_fournisseur = $ref_fournisseur['ref_fournisseur'] ?? null;
+        $prix            = $prix['prix']                       ?? null;
 
         if (empty($libelle)) {
             throw new Exception("Le libellé est obligatoire");
@@ -160,6 +166,8 @@ class Product {
             ean = :ean,
             fournisseur = :fournisseur,
             quantite = :quantite, 
+            ref_fournisseur = :ref_fournisseur,
+            prix = :prix,
             updated_at = NOW() 
             WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
@@ -170,6 +178,8 @@ class Product {
             ':ean' => $ean,
             ':fournisseur' => $fournisseur,
             ':quantite' => (int) $quantite,
+            ':ref_fournisseur' => $data['ref_fournisseur'] ?? null,
+            ':prix' => isset($data['prix']) && $data['prix'] !== '' ? (float) $data['prix'] : null,
             ':id' => (int) $id
         ]);
         } catch (PDOException $e) {

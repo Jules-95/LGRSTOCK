@@ -76,7 +76,8 @@ class Auth {
             session_set_cookie_params([
                 'lifetime' => 28800,
                 'httponly' => true, // Inaccessible au Javascript
-                'samesite' => 'Lax' // Protection CSRF basique
+                'samesite' => 'Strict',
+                'secure'   => isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'production' 
             ]);
             session_start();
         }

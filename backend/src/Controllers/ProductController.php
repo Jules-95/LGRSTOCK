@@ -13,6 +13,7 @@ require_once __DIR__ . '/../Models/Product.php';
 class ProductController
 {
     private $productModel;
+    
 
 
     /**
@@ -56,7 +57,7 @@ class ProductController
             $this->sendResponse(400, [
                 'error' => true,
                 'message' => 'Erreur lors de la récupération du produit',
-                'details' => $e->getMessage()
+                'details' => 'Une erreur est survenue'
             ]);
         }
     }
@@ -116,13 +117,17 @@ class ProductController
             $ean = $_POST['ean'] ?? null;
             $fournisseur = $_POST['fournisseur'] ?? null;
             $quantite = $_POST['quantite'] ?? 0;
+            $prix = $_POST['prix'] ?? null;
+            $ref_fournisseur = $_POST['ref_fournisseur'] ?? null;
 
             // On passe toutes les données au Model dans un tableau
             $newId = $this->productModel->create([
                 'libelle' => $libelle,
                 'ean' => $ean,
                 'fournisseur' => $fournisseur,
-                'quantite' => $quantite
+                'quantite' => $quantite,
+                'prix' => $prix,
+                'ref_fournisseur' => $ref_fournisseur
             ]);
 
             //Renvoyer l'ID du nouveau produit 
@@ -177,10 +182,12 @@ class ProductController
             $id = $_POST['id'] ?? null;
 
             $this->productModel->update($id, [
-                'libelle'     => $_POST['libelle'] ?? null,
-                'ean'         => $_POST['ean'] ?? null,
-                'fournisseur' => $_POST['fournisseur'] ?? null,
-                'quantite'    => $_POST['quantite'] ?? 0,
+                'libelle'         => $_POST['libelle'] ?? null,
+                'ean'             => $_POST['ean'] ?? null,
+                'fournisseur'     => $_POST['fournisseur'] ?? null,
+                'quantite'        => $_POST['quantite'] ?? 0,
+                'prix'            => $_POST['prix'] ?? null,
+                'ref_fournisseur' => $_POST['ref_fournisseur'] ?? null,
             ]);
 
             $this->sendResponse(200, [

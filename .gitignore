@@ -1,13 +1,10 @@
-# Fichiers de configuration avec mots de passe
-backend/config/database.php
+# Variables d'environnement (contient les credentials)
+backend/.env
+frontend/.env
 
 # Dépendances
 node_modules/
 vendor/
-
-# Fichiers uploadés (CSV temporaires)
-backend/uploads/*
-!backend/uploads/.gitkeep
 
 # Fichiers système
 .DS_Store

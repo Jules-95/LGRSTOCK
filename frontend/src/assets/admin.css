@@ -1,4 +1,4 @@
-/* En-tête de section */
+/* ── En-tête de section ── */
 .content-header {
   display: flex;
   align-items: center;
@@ -12,13 +12,13 @@
   color: var(--color-text-dark);
 }
 
-/* Tableau */
+/* ── Tableau ── */
 .product-table {
   width: 100%;
   border-collapse: collapse;
   background: white;
   border-radius: var(--radius-card);
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
@@ -45,31 +45,11 @@
 }
 
 .td-actions {
-  display: flex;
-  gap: 0.5rem;
+  text-align: center;
+  vertical-align: middle;
 }
 
-.btn-edit {
-  padding: 0.3rem 0.75rem;
-  border: 1.5px solid var(--color-border);
-  background: var(--color-bg-soft);
-  border-radius: var(--radius-input);
-  font-size: 0.8rem;
-  cursor: pointer;
-  color: var(--color-text-medium);
-}
-
-.btn-delete {
-  padding: 0.3rem 0.75rem;
-  border: 1.5px solid #fecaca;
-  background: #fff5f5;
-  border-radius: var(--radius-input);
-  font-size: 0.8rem;
-  cursor: pointer;
-  color: #dc2626;
-}
-
-/* États */
+/* ── États ── */
 .state-message {
   padding: 2rem;
   text-align: center;
@@ -80,5 +60,72 @@
 
 .state-message--error {
   color: var(--color-danger-text);
+  background: var(--color-danger-bg);
+}
+
+/* ── Dropdown d'actions ── */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.btn-dots {
+  background: none;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-btn);
+  padding: 0.25rem 0.65rem;
+  font-size: 1rem;
+  line-height: 1;
+  letter-spacing: 2px;
+  color: var(--color-text-dark);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-dots:hover {
+  background: var(--color-bg-soft);
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-input);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 9999;
+  min-width: 130px;
+  overflow: hidden;
+}
+
+.dropdown.open .dropdown-menu {
+  display: block;
+}
+
+.dropdown-menu button {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: var(--color-text-dark);
+  transition: background 0.15s;
+}
+
+.dropdown-menu button:hover {
+  background: var(--color-bg-soft);
+}
+
+.dropdown-menu button.danger {
+  color: var(--color-danger);
+}
+
+.dropdown-menu button.danger:hover {
   background: var(--color-danger-bg);
 }

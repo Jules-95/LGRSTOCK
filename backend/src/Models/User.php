@@ -65,8 +65,8 @@ class User {
             throw new Exception("Le nom d'utilisateur est obligatoire");
         }
 
-        if (strlen($password) < 5) {
-            throw new Exception ("Le mot de passe doit contenir au moins 5 caractères");
+        if (strlen($password) < 8) {
+            throw new Exception ("Le mot de passe doit contenir au moins 8 caractères");
         }
 
         if (!in_array($role, ['admin', 'employe'])) {
@@ -124,8 +124,8 @@ class User {
 
         // si un nouveau mdp est fourni, on l'inclut dans la requête
         if (!empty($password)) {
-            if (strlen($password) < 5) {
-                throw new Exception("Le mot de passe doit contenir au moins 5 caractères");
+            if (strlen($password) < 8) {
+                throw new Exception("Le mot de passe doit contenir au moins 8 caractères");
             }
 
             $stmt = $this->pdo->prepare('

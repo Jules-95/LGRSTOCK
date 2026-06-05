@@ -33,6 +33,20 @@
         </div>
 
         <div class="detail-row">
+          <span class="detail-label">Référence fournisseur</span>
+          <span class="detail-value">{{
+            product.ref_fournisseur || "Non renseigné"
+          }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Prix</span>
+          <span class="detail-value">{{
+            product.prix ? product.prix + " €" : "Non renseigné"
+          }}</span>
+        </div>
+
+        <div class="detail-row">
           <span class="detail-label">Quantité en stock</span>
           <span class="detail-value">{{ product.quantite }} unités</span>
         </div>
@@ -57,7 +71,6 @@
     </AppCard>
 
     <!-- Modale à venir pour le système de liste -->
-
   </LayoutEmploye>
 </template>
 
@@ -71,14 +84,12 @@ import MessageBox from "@/components/MessageBox.vue";
 import AppCard from "@/components/AppCard.vue";
 import LayoutEmploye from "@/components/employe/LayoutEmploye.vue";
 
-const route = useRoute(); // Donne accès aux infos de la route actuelle -> Où je suis 
-
+const route = useRoute(); // Donne accès aux infos de la route actuelle -> Où je suis
 
 // Etats réactifs
 const product = ref(null);
 const loading = ref(false);
 const error = ref(null);
-
 
 // Computed : class CSS selon le stock
 const stockClass = computed(() => {
@@ -108,7 +119,6 @@ async function fetchProduct() {
     loading.value = false;
   }
 }
-
 
 /**
  * Formate une date SQL (ex: "2026-03-18 15:51:10") en français lisible
@@ -213,5 +223,4 @@ onMounted(() => {
   cursor: not-allowed;
   font-size: 0.95rem;
 }
-
 </style>

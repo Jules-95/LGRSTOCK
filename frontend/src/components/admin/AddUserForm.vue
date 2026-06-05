@@ -12,6 +12,7 @@
         v-model="form.username"
         type="text"
         placeholder="Ex: employe_nord"
+        autocomplete="username"
         class="form-input"
       />
     </div>
@@ -22,7 +23,8 @@
         id="password"
         v-model="form.password"
         type="password"
-        placeholder="Minimum 5 caractères"
+        placeholder="Minimum 8 caractères"
+        autocomplete="new-password"
         class="form-input"
       />
     </div>
@@ -85,8 +87,8 @@ async function handleSubmit() {
     return
   }
 
-  if (form.value.password.length < 5) {
-    error.value = 'Le mot de passe doit contenir au moins 5 caractères'
+  if (form.value.password.length < 8) {
+    error.value = 'Le mot de passe doit contenir au moins 8 caractères'
     return
   }
 

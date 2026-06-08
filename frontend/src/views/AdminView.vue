@@ -269,6 +269,12 @@ async function handleLogout() {
 @media (max-width: 1000px) {
   .burger-btn {
     display: flex;
+    position: static; 
+    margin: 1rem 0 0 1rem;
+  }
+
+  .admin-layout {
+    flex-direction: column; 
   }
 
   .sidebar {
@@ -285,8 +291,7 @@ async function handleLogout() {
   }
 
   .admin-content {
-    padding: 1rem;
-    padding-top: 4rem;
+    padding: 1rem; 
   }
 }
 </style>

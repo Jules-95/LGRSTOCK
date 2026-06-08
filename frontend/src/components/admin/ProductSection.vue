@@ -352,7 +352,6 @@ th {
 
   .search-fields {
     flex-direction: column;
-    max-width: 320px;
     max-width: 100%;
     margin-top: 1.5rem;
     align-items: stretch;
@@ -417,14 +416,7 @@ th {
 
   .td-libelle {
     width: 100%;
-    max-width: none;
-    overflow: visible;
-    white-space: normal;
     align-items: flex-start;
-  }
-
-  .th-libelle {
-    width: 100%;
   }
 
   .td-libelle::before {

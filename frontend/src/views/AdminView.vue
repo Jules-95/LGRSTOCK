@@ -284,6 +284,7 @@ async function handleLogout() {
     height: 100vh;
     z-index: 100;
     transition: left 0.25s ease;
+    overflow-y:auto;
   }
 
   .sidebar.open {

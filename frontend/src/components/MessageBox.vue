@@ -47,4 +47,12 @@ const icon = computed(() => {
   background: var(--color-bg-light);
   color: var(--color-text-medium);
 }
+
+@media (max-width: 1000px) {
+  .message {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.85rem;
+    margin-top: 1rem;
+  }
+}
 </style>

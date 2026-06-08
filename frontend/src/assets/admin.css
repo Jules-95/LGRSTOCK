@@ -129,3 +129,21 @@
 .dropdown-menu button.danger:hover {
   background: var(--color-danger-bg);
 }
+
+@media (max-width: 1000px) {
+  .content-header {
+    justify-content: center;
+  }
+
+  .content-title {
+    font-size: 1.2rem;
+    text-align: center;
+  }
+
+  .dropdown-menu {
+    left: auto;
+    right: 0;
+    transform: none;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  }
+}

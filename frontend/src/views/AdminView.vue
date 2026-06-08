@@ -1,21 +1,38 @@
 <template>
   <div class="admin-layout">
+    <!-- BURGER (Mobile) -->
+    <button
+      class="burger-btn"
+      v-show="!sidebarOpen"
+      @click="sidebarOpen = !sidebarOpen"
+    >
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <!-- OVERLAY -->
+    <div
+      class="sidebar-overlay"
+      :class="{ active: sidebarOpen }"
+      @click="sidebarOpen = false"
+    />
+
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" :class="{ open: sidebarOpen }">
       <div class="sidebar-header">
         <span class="sidebar-logo">LGR STOCK</span>
         <span class="sidebar-role">Dashboard admin</span>
       </div>
 
       <nav class="sidebar-nav">
-
         <button
           class="nav-item"
-          :class="{ active: currentSection === 'overview'}"
+          :class="{ active: currentSection === 'overview' }"
           @click="currentSection = 'overview'"
-          >
+        >
           Vue d'ensemble
-          </button>
+        </button>
         <button
           class="nav-item"
           :class="{ active: currentSection === 'produits' }"
@@ -54,7 +71,6 @@
         >
           Export CSV
         </button>
-
       </nav>
 
       <div class="sidebar-footer">
@@ -79,14 +95,11 @@
         ref="userSectionRef"
       />
 
-      <ExportSection 
-      v-if="currentSection === 'export'" />
+      <ExportSection v-if="currentSection === 'export'" />
 
-      <ImportSection 
-      v-if="currentSection === 'import'"/>
+      <ImportSection v-if="currentSection === 'import'" />
 
-      <OverviewSection
-      v-if="currentSection === 'overview'"/>
+      <OverviewSection v-if="currentSection === 'overview'" />
     </main>
   </div>
 </template>
@@ -105,6 +118,7 @@ const { user, logout } = useAuth();
 
 const currentSection = ref("produits");
 const userSectionRef = ref(null);
+const sidebarOpen = ref(false);
 
 watch(currentSection, async (newSection) => {
   if (newSection === "utilisateurs") {
@@ -214,5 +228,70 @@ async function handleLogout() {
   background: var(--color-bg-light);
   padding: 2rem;
   overflow-y: auto;
+}
+
+.burger-btn {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 200;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem;
+  cursor: pointer;
+}
+
+.burger-btn span {
+  display: block;
+  width: 22px;
+  height: 3px;
+  background: var(--color-nav-bg);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+}
+
+.sidebar-overlay.active {
+  display: block;
+}
+
+@media (max-width: 1000px) {
+  .burger-btn {
+    display: flex;
+    position: static; 
+    margin: 1rem 0 0 1rem;
+  }
+
+  .admin-layout {
+    flex-direction: column; 
+  }
+
+  .sidebar {
+    position: fixed;
+    left: -220px;
+    top: 0;
+    height: 100vh;
+    z-index: 100;
+    transition: left 0.25s ease;
+  }
+
+  .sidebar.open {
+    left: 0;
+  }
+
+  .admin-content {
+    padding: 1rem; 
+  }
 }
 </style>

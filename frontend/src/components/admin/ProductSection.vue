@@ -59,18 +59,20 @@
       </thead>
       <tbody>
         <tr v-for="product in products" :key="product.id">
-          <td class="td-libelle">{{ product.libelle }}</td>
-          <td class="td-ean">{{ product.ean }}</td>
-          <td class="td-fournisseur">{{ product.fournisseur || "—" }}</td>
-          <td class="td-secondary td-ref">
+          <td class="td-libelle" data-label="Libellé">{{ product.libelle }}</td>
+          <td class="td-ean" data-label="EAN">{{ product.ean }}</td>
+          <td class="td-fournisseur" data-label="Fournisseur">
+            {{ product.fournisseur || "—" }}
+          </td>
+          <td class="td-secondary td-ref" data-label="Réf. fourn">
             {{ product.ref_fournisseur || "—" }}
           </td>
-          <td class="td-secondary td-prix">
+          <td class="td-secondary td-prix" data-label="Prix">
             {{ product.prix ? product.prix + " €" : "—" }}
           </td>
-          <td class="td-qte">{{ product.quantite }}</td>
+          <td class="td-qte" data-label="Qté">{{ product.quantite }}</td>
 
-          <td class="td-actions">
+          <td class="td-actions" data-label="">
             <div
               class="dropdown"
               :class="{ open: openDropdown === product.id }"
@@ -201,6 +203,7 @@ function handleEditSuccess(updatedProduct) {
     products.value[index] = updatedProduct;
   }
   showEditModal.value = false;
+  window.scrollTo({ top: 0, behavior: "smooth" });
   successMessage.value = "Produit modifié avec succès";
   setTimeout(() => {
     successMessage.value = "";
@@ -214,6 +217,7 @@ async function confirmDelete(product) {
     await deleteProduct(product.id);
     products.value = products.value.filter((p) => p.id !== product.id);
     successMessage.value = "Produit supprimé avec succès";
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setTimeout(() => {
       successMessage.value = "";
     }, 3000);
@@ -308,10 +312,9 @@ th {
 
 /* ── Styles spécifiques aux cellules ── */
 .td-libelle {
-  max-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  max-width: none;
+  overflow: visible;
+  white-space: normal;
 }
 
 .td-ean {
@@ -339,5 +342,85 @@ th {
 .td-qte {
   text-align: center;
   font-weight: 600;
+}
+
+@media (max-width: 1000px) {
+  form {
+    display: flex;
+    justify-content: center;
+  }
+
+  .search-fields {
+    flex-direction: column;
+    max-width: 100%;
+    margin-top: 1.5rem;
+    align-items: stretch;
+  }
+
+  .btn-search {
+    width: 100%;
+  }
+
+  .product-table {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  .product-table thead {
+    display: none;
+  }
+
+  .product-table tr {
+    display: block;
+    background: white;
+    border-radius: var(--radius-card);
+    margin-bottom: 0.75rem;
+    padding: 0.75rem 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12);
+    border-bottom: none;
+  }
+
+  .product-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--color-border);
+    font-size: 0.85rem;
+    text-align: right;
+  }
+
+  .product-table td:last-child {
+    border-bottom: none;
+  }
+
+  .product-table td::before {
+    content: attr(data-label);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-light);
+    flex: 0 0 110px;
+    text-align: left;
+  }
+
+  .td-actions .dropdown {
+    margin-left: auto;
+  }
+
+  .td-actions::before {
+    display: none;
+  }
+
+  .td-libelle {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .td-libelle::before {
+    padding-top: 0.1rem;
+  }
 }
 </style>

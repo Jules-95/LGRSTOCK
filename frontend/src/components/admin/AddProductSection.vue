@@ -58,7 +58,6 @@
         />
       </div>
 
-
       <div class="form-group">
         <label for="fournisseur">Prix (€)</label>
         <input
@@ -70,7 +69,7 @@
           placeholder="Ex: 29.99 (optionnel)"
           class="form-input"
         />
-      </div>   
+      </div>
 
       <div class="form-group">
         <label for="quantite">Quantité initiale</label>
@@ -100,8 +99,8 @@ import { ref } from "vue";
 import { addProduct } from "@/services/productApi";
 import MessageBox from "@/components/MessageBox.vue";
 
-import '@/assets/admin.css'
-import '@/assets/form.css'
+import "@/assets/admin.css";
+import "@/assets/form.css";
 
 const emit = defineEmits(["success", "cancel"]);
 
@@ -141,13 +140,22 @@ async function handleSubmit() {
   try {
     const result = await addProduct(form.value);
     success.value = true;
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setTimeout(() => {
       success.value = false;
     }, 3000);
-    form.value = { libelle: "", ean: "", fournisseur: "", prix: "", ref_fournisseur: "", quantite: 0 };
+    form.value = {
+      libelle: "",
+      ean: "",
+      fournisseur: "",
+      prix: "",
+      ref_fournisseur: "",
+      quantite: 0,
+    };
     emit("success", result.id); //
   } catch (err) {
     error.value = err.message;
+    window.scrollTo({ top: 0, behavior: "smooth" });
   } finally {
     loading.value = false;
   }
@@ -155,8 +163,6 @@ async function handleSubmit() {
 </script>
 
 <style scoped>
-
-
 .product-form {
   display: flex;
   flex-direction: column;
@@ -166,5 +172,4 @@ async function handleSubmit() {
   border-radius: var(--radius-card);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
-
 </style>

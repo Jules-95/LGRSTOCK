@@ -203,6 +203,7 @@ function handleEditSuccess(updatedProduct) {
     products.value[index] = updatedProduct;
   }
   showEditModal.value = false;
+  window.scrollTo({ top: 0, behavior: "smooth" });
   successMessage.value = "Produit modifié avec succès";
   setTimeout(() => {
     successMessage.value = "";
@@ -216,6 +217,7 @@ async function confirmDelete(product) {
     await deleteProduct(product.id);
     products.value = products.value.filter((p) => p.id !== product.id);
     successMessage.value = "Produit supprimé avec succès";
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setTimeout(() => {
       successMessage.value = "";
     }, 3000);
@@ -343,7 +345,6 @@ th {
 }
 
 @media (max-width: 1000px) {
-
   form {
     display: flex;
     justify-content: center;
@@ -406,8 +407,8 @@ th {
     text-align: left;
   }
 
-  .td-actions {
-    justify-content: flex-end;
+  .td-actions .dropdown {
+    margin-left: auto;
   }
 
   .td-actions::before {

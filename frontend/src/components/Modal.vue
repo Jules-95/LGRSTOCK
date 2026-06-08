@@ -10,7 +10,6 @@
     Avec Teleport, elle flotte au-dessus de tout.
   -->
   <Teleport to="body">
-
     <!--
       @click.self : le .self signifie "seulement si on clique
       SUR cet élément précis, pas sur ses enfants".
@@ -20,9 +19,7 @@
       Avec .self : seul un clic sur le fond sombre ferme la modale.
     -->
     <div class="modal-overlay" @click.self="$emit('close')">
-
       <div class="modal-container">
-
         <div class="modal-header">
           <!--
             "title" est une prop : une valeur que le parent
@@ -50,10 +47,8 @@
         <div class="modal-body">
           <slot />
         </div>
-
       </div>
     </div>
-
   </Teleport>
 </template>
 
@@ -61,13 +56,13 @@
 defineProps({
   title: {
     type: String,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
 // On déclare qu'on peut envoyer l'événement "close" au parent.
 // Le parent écoute avec @close="maFonction"
-defineEmits(['close'])
+defineEmits(["close"]);
 </script>
 
 <style scoped>
@@ -123,5 +118,19 @@ defineEmits(['close'])
 
 .modal-close:hover {
   background: var(--color-bg-light);
+}
+
+@media (max-width: 1000px) {
+  .modal-container {
+    width: 95%;
+    padding: 1.25rem;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .modal-body {
+    overflow-y: auto;
+  }
 }
 </style>

@@ -127,6 +127,10 @@ watch(currentSection, async (newSection) => {
   }
 });
 
+watch(sidebarOpen, (isOpen) => {
+  document.body.style.overflow = isOpen ? 'hidden' : ''
+})
+
 async function handleLogout() {
   await logout();
 }
@@ -285,6 +289,7 @@ async function handleLogout() {
     z-index: 100;
     transition: left 0.25s ease;
     overflow-y:auto;
+    overscroll-behavior: contain;
   }
 
   .sidebar.open {

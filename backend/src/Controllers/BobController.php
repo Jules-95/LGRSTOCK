@@ -34,6 +34,12 @@ class BobController
                 'page'  => $result['page'],
                 'limit' => $result['limit'],
             ]);
+        } catch (PDOException $e) {
+            error_log('BobController::search - ' . $e->getMessage());
+            $this->sendResponse(500, [
+                'error'   => true,
+                'message' => 'Erreur interne du serveur',
+            ]);
         } catch (Exception $e) {
             $this->sendResponse(400, [
                 'error'   => true,

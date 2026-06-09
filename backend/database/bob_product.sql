@@ -1,5 +1,3 @@
-DROP TABLE bob_products;
-
 CREATE TABLE bob_products (
   id INT AUTO_INCREMENT PRIMARY KEY,
   libelle VARCHAR(255),

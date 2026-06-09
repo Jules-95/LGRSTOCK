@@ -11,6 +11,9 @@ class BobImportController
 
     public function import(): void
     {
+        set_time_limit(300); //5min 
+        ini_set('memory_limit', '256M');
+        
         if (!isset($_FILES['csv']) || $_FILES['csv']['error'] !== UPLOAD_ERR_OK) {
             $this->sendResponse(400, true, 'Aucun fichier reçu ou erreur d\'upload');
             return;
@@ -31,8 +34,8 @@ class BobImportController
             return;
         }
 
-        if ($_FILES['csv']['size'] > 15 * 1024 * 1024) {
-            $this->sendResponse(400, true, 'Fichier trop volumineux - Maximum 15Mo');
+        if ($_FILES['csv']['size'] > 30 * 1024 * 1024) {
+            $this->sendResponse(400, true, 'Fichier trop volumineux - Maximum 30Mo');
             return;
         }
 

@@ -71,6 +71,14 @@
         >
           Export CSV
         </button>
+        <button
+          class="nav-item"
+          :class="{ active: currentSection === 'bob' }"
+          @click="
+            currentSection = 'bob';"
+        >
+          Historique Bob
+        </button>
       </nav>
 
       <div class="sidebar-footer">
@@ -100,6 +108,8 @@
       <ImportSection v-if="currentSection === 'import'" />
 
       <OverviewSection v-if="currentSection === 'overview'" />
+
+      <BobSection v-if="currentSection === 'bob'" />
     </main>
   </div>
 </template>
@@ -113,6 +123,7 @@ import AddProductSection from "@/components/admin/AddProductSection.vue";
 import ExportSection from "@/components/admin/ExportSection.vue";
 import ImportSection from "@/components/admin/ImportSection.vue";
 import OverviewSection from "@/components/admin/OverviewSection.vue";
+import BobSection from "@/components/admin/BobSection.vue";
 
 const { user, logout } = useAuth();
 
@@ -269,12 +280,12 @@ async function handleLogout() {
 @media (max-width: 1000px) {
   .burger-btn {
     display: flex;
-    position: static; 
+    position: static;
     margin: 1rem 0 0 1rem;
   }
 
   .admin-layout {
-    flex-direction: column; 
+    flex-direction: column;
   }
 
   .sidebar {
@@ -291,7 +302,7 @@ async function handleLogout() {
   }
 
   .admin-content {
-    padding: 1rem; 
+    padding: 1rem;
   }
 }
 </style>

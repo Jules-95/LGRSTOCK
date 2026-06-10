@@ -29,28 +29,28 @@
         <button
           class="nav-item"
           :class="{ active: currentSection === 'overview' }"
-          @click="currentSection = 'overview'"
+          @click="currentSection = 'overview'; sidebarOpen = false"
         >
           Vue d'ensemble
         </button>
         <button
           class="nav-item"
           :class="{ active: currentSection === 'produits' }"
-          @click="currentSection = 'produits'"
+          @click="currentSection = 'produits'; sidebarOpen = false"
         >
           Gestion produits
         </button>
         <button
           class="nav-item"
           :class="{ active: currentSection === 'ajouter' }"
-          @click="currentSection = 'ajouter'"
+          @click="currentSection = 'ajouter'; sidebarOpen = false"
         >
           Ajouter un produit
         </button>
         <button
           class="nav-item"
           :class="{ active: currentSection === 'utilisateurs' }"
-          @click="currentSection = 'utilisateurs'"
+          @click="currentSection = 'utilisateurs'; sidebarOpen = false"
         >
           Gestion utilisateurs
         </button>
@@ -60,14 +60,14 @@
         <button
           class="nav-item"
           :class="{ active: currentSection === 'import' }"
-          @click="currentSection = 'import'"
+          @click="currentSection = 'import'; sidebarOpen = false"
         >
           Import CSV
         </button>
         <button
           class="nav-item"
           :class="{ active: currentSection === 'export' }"
-          @click="currentSection = 'export'"
+          @click="currentSection = 'export'; sidebarOpen = false"
         >
           Export CSV
         </button>
@@ -75,7 +75,7 @@
           class="nav-item"
           :class="{ active: currentSection === 'bob' }"
           @click="
-            currentSection = 'bob';"
+            currentSection = 'bob'; sidebarOpen = false"
         >
           Historique Bob
         </button>
@@ -292,7 +292,8 @@ async function handleLogout() {
     position: fixed;
     left: -220px;
     top: 0;
-    height: 100vh;
+    /* dvh pour régler le problème sur safari */
+    height: 100dvh;
     z-index: 100;
     transition: left 0.25s ease;
     overflow-y: auto;
@@ -306,7 +307,5 @@ async function handleLogout() {
   .admin-content {
     padding: 1rem;
   }
-
-
 }
 </style>

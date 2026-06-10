@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mer. 25 mars 2026 à 12:49
+-- Généré le : mer. 10 juin 2026 à 13:50
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -24,6 +24,31 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `bob_products`
+--
+
+CREATE TABLE `bob_products` (
+  `id` int(11) NOT NULL,
+  `libelle` varchar(255) DEFAULT NULL,
+  `ean` varchar(20) DEFAULT NULL,
+  `fournisseur` varchar(100) DEFAULT NULL,
+  `ref_fournisseur` varchar(100) DEFAULT NULL,
+  `stock_local` int(11) DEFAULT NULL,
+  `prix` varchar(20) DEFAULT NULL,
+  `code_article` varchar(50) DEFAULT NULL,
+  `millesime` varchar(50) DEFAULT NULL,
+  `activite` varchar(100) DEFAULT NULL,
+  `rayon` varchar(100) DEFAULT NULL,
+  `famille` varchar(100) DEFAULT NULL,
+  `sous_famille` varchar(100) DEFAULT NULL,
+  `code_recreaclub` varchar(50) DEFAULT NULL,
+  `code_fournisseur` varchar(50) DEFAULT NULL,
+  `imported_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `products`
 --
 
@@ -38,7 +63,6 @@ CREATE TABLE `products` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 
 -- --------------------------------------------------------
 
@@ -60,6 +84,12 @@ CREATE TABLE `users` (
 --
 
 --
+-- Index pour la table `bob_products`
+--
+ALTER TABLE `bob_products`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Index pour la table `products`
 --
 ALTER TABLE `products`
@@ -79,6 +109,12 @@ ALTER TABLE `users`
 --
 -- AUTO_INCREMENT pour les tables déchargées
 --
+
+--
+-- AUTO_INCREMENT pour la table `bob_products`
+--
+ALTER TABLE `bob_products`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT pour la table `products`

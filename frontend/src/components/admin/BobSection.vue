@@ -44,44 +44,44 @@
       Aucun produit trouvé.
     </div>
 
-    <table v-else-if="products.length > 0" class="product-table">
-      <thead>
-        <tr>
-          <th>Libellé</th>
-          <th>EAN</th>
-          <th>Fournisseur</th>
-          <th>Réf. fourn</th>
-          <th>Prix</th>
-          <th>Stock</th>
-          <th>Activité</th>
-          <th>Rayon</th>
-          <th>Famille</th>
-          <th>Sous-famille</th>
-          <th>Code article</th>
-          <th>Millésime</th>
-          <th>Code Récréaclub</th>
-          <th>Code fournisseur</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="product in products" :key="product.id">
-          <td>{{ product.libelle }}</td>
-          <td>{{ product.ean || "—" }}</td>
-          <td>{{ product.fournisseur || "—" }}</td>
-          <td>{{ product.ref_fournisseur || "—" }}</td>
-          <td>{{ product.prix || "—" }}</td>
-          <td>{{ product.stock_local ?? "—" }}</td>
-          <td>{{ product.activite || "—" }}</td>
-          <td>{{ product.rayon || "—" }}</td>
-          <td>{{ product.famille || "—" }}</td>
-          <td>{{ product.sous_famille || "—" }}</td>
-          <td>{{ product.code_article || "_" }}</td>
-          <td>{{ product.millesime || "_" }}</td>
-          <td>{{ product.code_recreaclub || "_" }}</td>
-          <td>{{ product.code_fournisseur || "_" }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-else-if="products.length > 0" class="table-wrapper">
+      <table class="product-table">
+        <thead>
+          <tr>
+            <th>Libellé</th>
+            <th>EAN</th>
+            <th>Fournisseur</th>
+            <th>Réf. fourn</th>
+            <th>Prix</th>
+            <th>Stock</th>
+            <th>Activité</th>
+            <th>Rayon</th>
+            <th>Famille</th>
+            <th>Code article</th>
+            <th>Millésime</th>
+            <th>Code Récréaclub</th>
+            <th>Code fournisseur</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="product in products" :key="product.id">
+            <td>{{ product.libelle }}</td>
+            <td>{{ product.ean || "—" }}</td>
+            <td>{{ product.fournisseur || "—" }}</td>
+            <td>{{ product.ref_fournisseur || "—" }}</td>
+            <td>{{ product.prix || "—" }}</td>
+            <td>{{ product.stock_local ?? "—" }}</td>
+            <td>{{ product.activite || "—" }}</td>
+            <td>{{ product.rayon || "—" }}</td>
+            <td>{{ product.famille || "—" }}</td>
+            <td>{{ product.code_article || "—" }}</td>
+            <td>{{ product.millesime || "—" }}</td>
+            <td>{{ product.code_recreaclub || "—" }}</td>
+            <td>{{ product.code_fournisseur || "—" }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <div v-else class="state-message">
       Utilisez les barres de recherche pour trouver des produits.
@@ -158,7 +158,6 @@ async function fetchPage(page) {
     loading.value = false;
   }
 }
-
 </script>
 
 <style scoped>
@@ -213,6 +212,20 @@ async function fetchPage(page) {
   background: var(--color-primary-dark);
 }
 
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.product-table tbody tr:nth-child(even) {
+  background: var(--color-bg-soft);
+}
+
+/* Pour les prix */
+.product-table td:nth-child(5) {
+  white-space: nowrap;
+}
+
 .bob-import {
   margin-top: 3rem;
   padding-top: 1.5rem;
@@ -251,5 +264,29 @@ async function fetchPage(page) {
 .btn-import:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+@media (max-width: 1000px) {
+  form {
+    display: flex;
+    justify-content: center;
+  }
+
+  .search-fields {
+    flex-direction: column;
+    max-width: 100%;
+    margin-top: 1.5rem;
+    align-items: stretch;
+  }
+
+  .btn-search {
+    width: 100%;
+  }
+
+  .product-table th,
+  .product-table td {
+    font-size: 0.7rem;
+    padding: 0.5rem 0.4rem;
+  }
 }
 </style>

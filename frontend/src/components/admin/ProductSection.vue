@@ -345,6 +345,10 @@ th {
   font-weight: 600;
 }
 
+.product-table tbody tr:nth-child(even) {
+  background: var(--color-bg-soft);
+}
+
 @media (max-width: 1000px) {
   form {
     display: flex;

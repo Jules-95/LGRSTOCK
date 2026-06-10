@@ -94,22 +94,11 @@
     />
 
     <div class="bob-import">
-      <p class="bob-import-label">Import des données Bob (usage unique)</p>
-      <label class="btn-import" :class="{ 'btn-disabled': importing }">
-        {{ importing ? "Import en cours..." : "Importer un CSV" }}
-        <input
-          type="file"
-          accept=".csv"
-          :disabled="importing"
-          @change="handleImport"
-        />
-      </label>
-      <p
-        v-if="importMessage"
-        class="import-message"
-        :class="importError ? 'state-message--error' : 'state-message--success'"
-      >
-        {{ importMessage }}
+      <p class="bob-import-label">Import des données Bob</p>
+      <button class="btn-import" disabled>Importer un CSV</button>
+      <p class="bob-import-hint">
+        Import effectué le 09/06/2026 — Contactez le support pour effectuer un
+        nouvel import
       </p>
     </div>
   </div>
@@ -127,9 +116,6 @@ const errorMessage = ref("");
 const searched = ref(false);
 const currentPage = ref(1);
 const totalPages = ref(0);
-const importing = ref(false);
-const importMessage = ref("");
-const importError = ref(false);
 
 async function handleSearch() {
   const { ean, libelle, fournisseur } = filters.value;
@@ -173,34 +159,6 @@ async function fetchPage(page) {
   }
 }
 
-async function handleImport(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  importing.value = true;
-  importMessage.value = "";
-  importError.value = false;
-
-  try {
-    const formData = new FormData();
-    formData.append("csv", file);
-
-    const response = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/bob_import.php`,
-      { method: "POST", credentials: "include", body: formData },
-    );
-    const data = await response.json();
-
-    importMessage.value = data.message;
-    importError.value = data.error;
-  } catch (err) {
-    importMessage.value = "Erreur lors de l'import";
-    importError.value = true;
-  } finally {
-    importing.value = false;
-    event.target.value = "";
-  }
-}
 </script>
 
 <style scoped>
@@ -284,17 +242,14 @@ async function handleImport(event) {
   display: none;
 }
 
-.btn-disabled {
-  opacity: 0.6;
+.bob-import-hint {
+  font-size: 0.8rem;
+  color: var(--color-text-light);
+  font-style: italic;
+}
+
+.btn-import:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
-  pointer-events: none;
-}
-
-.import-message {
-  font-size: 0.85rem;
-}
-
-.state-message--success {
-  color: green;
 }
 </style>

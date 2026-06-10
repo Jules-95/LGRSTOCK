@@ -13,6 +13,7 @@
             type="text"
             placeholder="3700523456789"
             maxlength="13"
+            @focus="$event.target.select()"
           />
         </div>
         <div class="search-field">
@@ -43,44 +44,44 @@
       Aucun produit trouvé.
     </div>
 
-    <table v-else-if="products.length > 0" class="product-table">
-      <thead>
-        <tr>
-          <th>Libellé</th>
-          <th>EAN</th>
-          <th>Fournisseur</th>
-          <th>Réf. fourn</th>
-          <th>Prix</th>
-          <th>Stock</th>
-          <th>Activité</th>
-          <th>Rayon</th>
-          <th>Famille</th>
-          <th>Sous-famille</th>
-          <th>Code article</th>
-          <th>Millésime</th>
-          <th>Code Récréaclub</th>
-          <th>Code fournisseur</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="product in products" :key="product.id">
-          <td>{{ product.libelle }}</td>
-          <td>{{ product.ean || "—" }}</td>
-          <td>{{ product.fournisseur || "—" }}</td>
-          <td>{{ product.ref_fournisseur || "—" }}</td>
-          <td>{{ product.prix || "—" }}</td>
-          <td>{{ product.stock_local ?? "—" }}</td>
-          <td>{{ product.activite || "—" }}</td>
-          <td>{{ product.rayon || "—" }}</td>
-          <td>{{ product.famille || "—" }}</td>
-          <td>{{ product.sous_famille || "—" }}</td>
-          <td>{{ product.code_article || "_" }}</td>
-          <td>{{ product.millesime || "_" }}</td>
-          <td>{{ product.code_recreaclub || "_" }}</td>
-          <td>{{ product.code_fournisseur || "_" }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <div v-else-if="products.length > 0" class="table-wrapper">
+      <table class="product-table">
+        <thead>
+          <tr>
+            <th>Libellé</th>
+            <th>EAN</th>
+            <th>Fournisseur</th>
+            <th>Réf. fourn</th>
+            <th>Prix</th>
+            <th>Stock</th>
+            <th>Activité</th>
+            <th>Rayon</th>
+            <th>Famille</th>
+            <th>Code article</th>
+            <th>Millésime</th>
+            <th>Code Récréaclub</th>
+            <th>Code fournisseur</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="product in products" :key="product.id">
+            <td>{{ product.libelle }}</td>
+            <td>{{ product.ean || "—" }}</td>
+            <td>{{ product.fournisseur || "—" }}</td>
+            <td>{{ product.ref_fournisseur || "—" }}</td>
+            <td>{{ product.prix || "—" }}</td>
+            <td>{{ product.stock_local ?? "—" }}</td>
+            <td>{{ product.activite || "—" }}</td>
+            <td>{{ product.rayon || "—" }}</td>
+            <td>{{ product.famille || "—" }}</td>
+            <td>{{ product.code_article || "—" }}</td>
+            <td>{{ product.millesime || "—" }}</td>
+            <td>{{ product.code_recreaclub || "—" }}</td>
+            <td>{{ product.code_fournisseur || "—" }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <div v-else class="state-message">
       Utilisez les barres de recherche pour trouver des produits.
@@ -93,22 +94,11 @@
     />
 
     <div class="bob-import">
-      <p class="bob-import-label">Import des données Bob (usage unique)</p>
-      <label class="btn-import" :class="{ 'btn-disabled': importing }">
-        {{ importing ? "Import en cours..." : "Importer un CSV" }}
-        <input
-          type="file"
-          accept=".csv"
-          :disabled="importing"
-          @change="handleImport"
-        />
-      </label>
-      <p
-        v-if="importMessage"
-        class="import-message"
-        :class="importError ? 'state-message--error' : 'state-message--success'"
-      >
-        {{ importMessage }}
+      <p class="bob-import-label">Import des données Bob</p>
+      <button class="btn-import" disabled>Importer un CSV</button>
+      <p class="bob-import-hint">
+        Import effectué le 09/06/2026 — Contactez le support pour effectuer un
+        nouvel import
       </p>
     </div>
   </div>
@@ -126,9 +116,6 @@ const errorMessage = ref("");
 const searched = ref(false);
 const currentPage = ref(1);
 const totalPages = ref(0);
-const importing = ref(false);
-const importMessage = ref("");
-const importError = ref(false);
 
 async function handleSearch() {
   const { ean, libelle, fournisseur } = filters.value;
@@ -169,35 +156,6 @@ async function fetchPage(page) {
     errorMessage.value = err.message;
   } finally {
     loading.value = false;
-  }
-}
-
-async function handleImport(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-
-  importing.value = true;
-  importMessage.value = "";
-  importError.value = false;
-
-  try {
-    const formData = new FormData();
-    formData.append("csv", file);
-
-    const response = await fetch(
-      `${import.meta.env.VITE_API_BASE_URL}/bob_import.php`,
-      { method: "POST", credentials: "include", body: formData },
-    );
-    const data = await response.json();
-
-    importMessage.value = data.message;
-    importError.value = data.error;
-  } catch (err) {
-    importMessage.value = "Erreur lors de l'import";
-    importError.value = true;
-  } finally {
-    importing.value = false;
-    event.target.value = "";
   }
 }
 </script>
@@ -254,6 +212,20 @@ async function handleImport(event) {
   background: var(--color-primary-dark);
 }
 
+.table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.product-table tbody tr:nth-child(even) {
+  background: var(--color-bg-soft);
+}
+
+/* Pour les prix */
+.product-table td:nth-child(5) {
+  white-space: nowrap;
+}
+
 .bob-import {
   margin-top: 3rem;
   padding-top: 1.5rem;
@@ -283,17 +255,38 @@ async function handleImport(event) {
   display: none;
 }
 
-.btn-disabled {
-  opacity: 0.6;
+.bob-import-hint {
+  font-size: 0.8rem;
+  color: var(--color-text-light);
+  font-style: italic;
+}
+
+.btn-import:disabled {
+  opacity: 0.4;
   cursor: not-allowed;
-  pointer-events: none;
 }
 
-.import-message {
-  font-size: 0.85rem;
-}
+@media (max-width: 1000px) {
+  form {
+    display: flex;
+    justify-content: center;
+  }
 
-.state-message--success {
-  color: green;
+  .search-fields {
+    flex-direction: column;
+    max-width: 100%;
+    margin-top: 1.5rem;
+    align-items: stretch;
+  }
+
+  .btn-search {
+    width: 100%;
+  }
+
+  .product-table th,
+  .product-table td {
+    font-size: 0.7rem;
+    padding: 0.5rem 0.4rem;
+  }
 }
 </style>

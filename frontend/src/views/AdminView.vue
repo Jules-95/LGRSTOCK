@@ -299,7 +299,7 @@ async function handleLogout() {
     height: 100vh;
     z-index: 100;
     transition: left 0.25s ease;
-    overflow-y:auto;
+    overflow-y: auto;
     overscroll-behavior: contain;
   }
 
@@ -310,5 +310,7 @@ async function handleLogout() {
   .admin-content {
     padding: 1rem;
   }
+
+
 }
 </style>

@@ -13,6 +13,7 @@
             type="text"
             placeholder="3700523456789"
             maxlength="13"
+            @focus="$event.target.select()"
           />
         </div>
         <div class="search-field">

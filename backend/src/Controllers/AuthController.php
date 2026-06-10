@@ -43,52 +43,75 @@ class AuthController {
      * Verifie les identifiants et démare la session si corrects.
      * Appelé par api/login.php 
      */
-    public function login(): void {
-        $username = trim($_POST['username'] ?? '');
-        $password = trim($_POST['password'] ?? '');
+public function login(): void {
+    $username = trim($_POST['username'] ?? '');
+    $password = trim($_POST['password'] ?? '');
 
-        if (empty($username) || empty($password)) {
-            http_response_code(400);
-            echo json_encode(['error' => true, 'message' => 'Identifiants manquants']);
+    $ip = $_SERVER['REMOTE_ADDR'];
+
+    // Nettoyage des vieilles tentatives (> 1 jour)
+    $this->pdo->exec("DELETE FROM login_attempts WHERE created_at < NOW() - INTERVAL 1 DAY");
+
+    // Compter les tentatives des 15 dernières minutes
+    $stmt = $this->pdo->prepare(
+        "SELECT COUNT(*) FROM login_attempts 
+         WHERE ip = :ip AND created_at > NOW() - INTERVAL 15 MINUTE"
+    );
+    $stmt->execute([':ip' => $ip]);
+    $attempts = $stmt->fetchColumn();
+
+    // Bloquer si 5 tentatives ou plus
+    if ($attempts >= 5) {
+        http_response_code(429);
+        echo json_encode(['error' => true, 'message' => 'Trop de tentatives, réessayez dans 15 minutes']);
+        exit;
+    }
+
+    if (empty($username) || empty($password)) {
+        http_response_code(400);
+        echo json_encode(['error' => true, 'message' => 'Identifiants manquants']);
+        return;
+    }
+
+    try {
+        $userModel = new User($this->pdo);
+        $found     = $userModel->findByUsername($username);
+
+        if (!$found || !$userModel->verifyPassword($password, $found['password_hash'])) {
+            // Enregistrer la tentative échouée
+            $stmt = $this->pdo->prepare("INSERT INTO login_attempts (ip) VALUES (:ip)");
+            $stmt->execute([':ip' => $ip]);
+
+            http_response_code(401);
+            echo json_encode(['error' => true, 'message' => 'Identifiants incorrects']);
             return;
         }
 
-        try {
-            $userModel  = new User($this->pdo);
-            $found      = $userModel->findByUsername($username);
+        // Connexion réussie — supprimer les tentatives de cette IP
+        $stmt = $this->pdo->prepare("DELETE FROM login_attempts WHERE ip = :ip");
+        $stmt->execute([':ip' => $ip]);
 
-            // Même message pour les deux cas
-            // username ou password faux
-            if (!$found || !$userModel->verifyPassword($password, $found['password_hash'])) {
-                http_response_code(401);
-                echo json_encode(['error' => true, 'message' => 'Identifiants incorrects']);
-                return;
-            }
+        Auth::startSession();
+        session_regenerate_id(true);
 
-            Auth::startSession();
+        $_SESSION['user_id']  = $found['id'];
+        $_SESSION['username'] = $found['username'];
+        $_SESSION['role']     = $found['role'];
+        $_SESSION['magasin']  = $found['magasin'];
 
-            // Regénère l'ID de la session après connexion réussie 
-            // -> Protection la session fixation attack 
-            session_regenerate_id(true);
+        http_response_code(200);
+        echo json_encode([
+            'error'    => false,
+            'role'     => $found['role'],
+            'magasin'  => $found['magasin'],
+            'username' => $found['username'],
+        ]);
 
-            $_SESSION['user_id']   = $found['id'];
-            $_SESSION['username']  = $found['username'];
-            $_SESSION['role']      = $found['role'];
-            $_SESSION['magasin']   = $found['magasin'];
-
-            http_response_code(200); 
-            echo json_encode([
-                'error'    => false, 
-                'role'     => $found['role'],
-                'magasin'  => $found['magasin'],
-                'username' => $found['username'],
-            ]);
-
-        } catch (PDOException $e) {
-            http_response_code(500);
-            echo json_encode(['error' => true, 'message' => 'Erreur coté serveur']);
-        }
+    } catch (PDOException $e) {
+        http_response_code(500);
+        echo json_encode(['error' => true, 'message' => 'Erreur côté serveur']);
     }
+}
 
     /**
      * Détruit la session active.

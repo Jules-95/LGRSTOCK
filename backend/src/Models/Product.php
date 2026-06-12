@@ -44,8 +44,8 @@ class Product {
         $ean             = $data['ean']                        ?? null;
         $fournisseur     = $data['fournisseur']                ?? null;
         $quantite        = $data['quantite']                   ?? 0;
-        $prix            = $prix['prix']                       ?? null;
-        $ref_fournisseur = $ref_fournisseur['ref_fournisseur'] ?? null;
+        $prix            = $data['prix']                       ?? null;
+        $ref_fournisseur = $data['ref_fournisseur'] ?? null;
 
         // Validation : Champs obligatoires 
         if (empty($libelle)) {
@@ -76,8 +76,8 @@ class Product {
             ':ean'         => $ean,
             ':fournisseur' => $fournisseur,
             ':quantite'    => (int) $quantite,
-            ':ref_fournisseur' => $data['ref_fournisseur'] ?? null,
-            ':prix' => isset($data['prix']) && $data['prix'] !== '' ? (float) $data['prix'] : null,
+            ':ref_fournisseur' => $ref_fournisseur,
+            ':prix' => $prix !== null && $prix !== '' ? (float) $prix : null,
         ]);
 
         // Inutilisé pour l'instant : Sert à récupérer la dernière ligne insérée (pour afficher la nouvelle fiche détaillée en cas d'ajout de produit) -> Conservé au cas où pour plus tard
@@ -142,8 +142,8 @@ class Product {
         $ean             = $data['ean']                        ?? null;
         $fournisseur     = $data['fournisseur']                ?? null;
         $quantite        = $data['quantite']                   ?? null;
-        $ref_fournisseur = $ref_fournisseur['ref_fournisseur'] ?? null;
-        $prix            = $prix['prix']                       ?? null;
+        $ref_fournisseur = $data['ref_fournisseur'] ?? null;
+        $prix            = $data['prix']                       ?? null;
 
         if (empty($libelle)) {
             throw new Exception("Le libellé est obligatoire");
@@ -178,8 +178,8 @@ class Product {
             ':ean' => $ean,
             ':fournisseur' => $fournisseur,
             ':quantite' => (int) $quantite,
-            ':ref_fournisseur' => $data['ref_fournisseur'] ?? null,
-            ':prix' => isset($data['prix']) && $data['prix'] !== '' ? (float) $data['prix'] : null,
+            ':ref_fournisseur' => $ref_fournisseur,
+            ':prix' => $prix !== null && $prix !== '' ? (float) $prix : null,
             ':id' => (int) $id
         ]);
         } catch (PDOException $e) {

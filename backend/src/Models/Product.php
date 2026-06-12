@@ -39,7 +39,7 @@ class Product {
      * @return int L'ID du produit crée
      * @throws Exception si données invalides
      */
-    public function create($data) {
+    public function create($data, $depot) {
         $libelle         = $data['libelle']                    ?? null;
         $ean             = $data['ean']                        ?? null;
         $fournisseur     = $data['fournisseur']                ?? null;
@@ -80,8 +80,21 @@ class Product {
             ':prix' => $prix !== null && $prix !== '' ? (float) $prix : null,
         ]);
 
-        // Inutilisé pour l'instant : Sert à récupérer la dernière ligne insérée (pour afficher la nouvelle fiche détaillée en cas d'ajout de produit) -> Conservé au cas où pour plus tard
-        return $this->pdo->lastInsertId();
+        $newId = $this->pdo->lastInsertId();
+
+        //Insertion dans le dépot 
+        $stmtDepot = $this->pdo->prepare(
+            "INSERT INTO product_depot (product_id, depot, quantite) VALUES (:product_id, :depot, :quantite)"
+        );
+
+        $stmtDepot->execute([
+            ':product_id' => $newId,
+            ':depot' => $depot,
+            ':quantite' => (int) $quantite,
+        ]);
+
+        return $newId;
+
 
         } catch (PDOException $e) {
             // Code 23000 = Violation de contrainte unique qui se déclenche quand un code EAN existe déjà

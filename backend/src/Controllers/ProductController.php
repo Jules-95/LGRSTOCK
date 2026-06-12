@@ -120,6 +120,8 @@ class ProductController
             $prix = $_POST['prix'] ?? null;
             $ref_fournisseur = $_POST['ref_fournisseur'] ?? null;
 
+            $depot = $_SESSION['magasin'] ?? null;
+
             // On passe toutes les données au Model dans un tableau
             $newId = $this->productModel->create([
                 'libelle' => $libelle,
@@ -128,7 +130,8 @@ class ProductController
                 'quantite' => $quantite,
                 'prix' => $prix,
                 'ref_fournisseur' => $ref_fournisseur
-            ]);
+            ], 
+            $depot);
 
             //Renvoyer l'ID du nouveau produit 
             //Vue pourra rediriger vers /product/$newId

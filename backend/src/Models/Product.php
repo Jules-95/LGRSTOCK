@@ -40,79 +40,115 @@ class Product {
      * @throws Exception si données invalides
      */
     public function create($data, $depot) {
-        $libelle         = $data['libelle']                    ?? null;
-        $ean             = $data['ean']                        ?? null;
-        $fournisseur     = $data['fournisseur']                ?? null;
-        $quantite        = $data['quantite']                   ?? 0;
-        $prix            = $data['prix']                       ?? null;
-        $ref_fournisseur = $data['ref_fournisseur'] ?? null;
+    $libelle         = $data['libelle']         ?? null;
+    $ean             = $data['ean']             ?? null;
+    $fournisseur     = $data['fournisseur']     ?? null;
+    $quantite        = $data['quantite']        ?? 0;
+    $prix            = $data['prix']            ?? null;
+    $ref_fournisseur = $data['ref_fournisseur'] ?? null;
 
-        // Validation : Champs obligatoires 
-        if (empty($libelle)) {
-            throw new Exception("Le libellé est obligatoire");
-        }
-
-        if (empty($ean)) {
-            throw new Exception("Le code EAN est obligatoire");
-        }
-
-        // Réutilisation de la validation EAN 
-        $this->validateEan($ean);
-
-        // Double Validation front/back pour la valeur et et le type de "quantite"
-        if (!is_numeric($quantite) || $quantite < 0) {
-            throw new Exception("La quantité doit être un nombre positif ou nul");
-        }
-
-        try {
-        // Requête préparée INSERT 
-        // NOW() remplit automatiuement created_at et updated_at
-
-        $sql = "INSERT INTO products (libelle, ean, fournisseur, quantite,ref_fournisseur, prix, created_at, updated_at) VALUES (:libelle, :ean, :fournisseur, :quantite, :ref_fournisseur, :prix, NOW(), NOW())";
-
-        $stmt= $this->pdo->prepare($sql);
-        $stmt->execute([
-            ':libelle'     => $libelle,
-            ':ean'         => $ean,
-            ':fournisseur' => $fournisseur,
-            ':quantite'    => (int) $quantite,
-            ':ref_fournisseur' => $ref_fournisseur,
-            ':prix' => $prix !== null && $prix !== '' ? (float) $prix : null,
-        ]);
-
-        $newId = $this->pdo->lastInsertId();
-
-        //Insertion dans le dépot 
-        $stmtDepot = $this->pdo->prepare(
-            "INSERT INTO product_depot (product_id, depot, quantite) VALUES (:product_id, :depot, :quantite)"
-        );
-
-        $stmtDepot->execute([
-            ':product_id' => $newId,
-            ':depot' => $depot,
-            ':quantite' => (int) $quantite,
-        ]);
-
-        return $newId;
-
-
-        } catch (PDOException $e) {
-            // Code 23000 = Violation de contrainte unique qui se déclenche quand un code EAN existe déjà
-            if ($e->getCode() === '23000') {
-                // Recherche du libelle du produit qui existe pour l'afficher dans le message d'erreur
-                $stmt = $this->pdo->prepare("SELECT libelle FROM products WHERE ean= :ean");
-                $stmt->execute([':ean' => $ean]);
-                $productAlreadyExist = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                $existProduct = $productAlreadyExist ? $productAlreadyExist['libelle'] : 'inconnu';
-
-                throw new Exception("Référence EAN déjà présente en stock / Produit : " . $existProduct);
-            } 
-
-            // Si c'est une autre erreur PDO, on la remonte telle quelle 
-            throw new Exception("Erreur technique : " . $e->getMessage());
-        }
+    if (empty($libelle)) {
+        throw new Exception("Le libellé est obligatoire");
     }
+    if (empty($ean)) {
+        throw new Exception("Le code EAN est obligatoire");
+    }
+    $this->validateEan($ean);
+    if (!is_numeric($quantite) || $quantite < 0) {
+        throw new Exception("La quantité doit être un nombre positif ou nul");
+    }
+    if (!in_array($depot, ['tours_nord', 'tours_centre'], true)) {
+        throw new Exception("Dépot invalide");
+    }
+
+    $autreDepot = $depot === 'tours_nord' ? 'tours_centre' : 'tours_nord';
+
+    try {
+        $this->pdo->beginTransaction();
+
+        // Le produit existe-t-il déjà (par son EAN) ?
+        $stmt = $this->pdo->prepare("SELECT id, libelle FROM products WHERE ean = :ean");
+        $stmt->execute([':ean' => $ean]);
+        $existing = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($existing) {
+            // CAS A : EAN existant → on ne recrée pas, on fixe la quantité du dépôt
+            $productId   = (int) $existing['id'];
+            $libelleReel = $existing['libelle'];   // le vrai libellé en base
+            $action      = 'updated';
+
+            $sqlDepot = "INSERT INTO product_depot (product_id, depot, quantite)
+                         VALUES (:product_id, :depot, :quantite)
+                         ON DUPLICATE KEY UPDATE quantite = :quantite_update";
+            $stmtDepot = $this->pdo->prepare($sqlDepot);
+            $stmtDepot->execute([
+                ':product_id'      => $productId,
+                ':depot'           => $depot,
+                ':quantite'        => (int) $quantite,
+                ':quantite_update' => (int) $quantite,
+            ]);
+
+        } else {
+            // CAS B : nouveau produit → création + 2 lignes dépôt
+            $libelleReel = $libelle;
+            $action      = 'created';
+
+            $sql = "INSERT INTO products (libelle, ean, fournisseur, quantite, ref_fournisseur, prix, created_at, updated_at)
+                    VALUES (:libelle, :ean, :fournisseur, :quantite, :ref_fournisseur, :prix, NOW(), NOW())";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':libelle'         => $libelle,
+                ':ean'             => $ean,
+                ':fournisseur'     => $fournisseur,
+                ':quantite'        => (int) $quantite,
+                ':ref_fournisseur' => $ref_fournisseur,
+                ':prix'            => $prix !== null && $prix !== '' ? (float) $prix : null,
+            ]);
+            $productId = (int) $this->pdo->lastInsertId();
+
+            // Ligne du dépôt de l'admin (avec la quantité)
+            $stmtDepot = $this->pdo->prepare(
+                "INSERT INTO product_depot (product_id, depot, quantite) VALUES (:product_id, :depot, :quantite)"
+            );
+            $stmtDepot->execute([
+                ':product_id' => $productId,
+                ':depot'      => $depot,
+                ':quantite'   => (int) $quantite,
+            ]);
+
+            // Ligne de l'autre dépôt (à 0)
+            $stmtAutre = $this->pdo->prepare(
+                "INSERT INTO product_depot (product_id, depot, quantite) VALUES (:product_id, :depot, 0)"
+            );
+            $stmtAutre->execute([
+                ':product_id' => $productId,
+                ':depot'      => $autreDepot,
+            ]);
+        }
+
+        // Recalcul du total (somme des 2 dépôts)
+        $sqlTotal = "UPDATE products
+                     SET quantite = (SELECT SUM(quantite) FROM product_depot WHERE product_id = :pid)
+                     WHERE id = :id";
+        $stmtTotal = $this->pdo->prepare($sqlTotal);
+        $stmtTotal->execute([':pid' => $productId, ':id' => $productId]);
+
+        $this->pdo->commit();
+
+        // On renvoie ce qui s'est passé, pour le message côté Vue
+        return [
+            'id'       => $productId,
+            'action'   => $action,        // 'created' ou 'updated'
+            'libelle'  => $libelleReel,
+            'depot'    => $depot,
+            'quantite' => (int) $quantite,
+        ];
+
+    } catch (PDOException $e) {
+        $this->pdo->rollBack();
+        throw new Exception("Erreur technique : " . $e->getMessage());
+    }
+}
 
 
     /**
@@ -146,7 +182,7 @@ class Product {
      * @return bool true si la mise à jour a réussi
      * @throws Exception si données invalides
      */
-    public function update($id, $data) {
+    public function update($id, $data, $depot) {
         if (empty($id) || !is_numeric($id)) {
             throw new Exception("L'ID du produit doit être valide");
         }
@@ -174,11 +210,24 @@ class Product {
             throw new Exception("La quantité doit être un nombre positif ou nul");
         }
 
+        //Check de l'existance du produit 
+        $check = $this->pdo->prepare("SELECT id FROM products WHERE id = :id");
+        $check->execute([':id' => (int) $id]);
+        if (!$check->fetch()) {
+            throw new Exception("Produit introuvable");
+        }
+
+        // validation du dépot
+        if (!in_array($depot, ['tours_nord', 'tours_centre'], true)) {
+            throw new Exception("Dépot invalide");
+        }
+
+
+
         $sql = "UPDATE products SET 
             libelle = :libelle,
             ean = :ean,
-            fournisseur = :fournisseur,
-            quantite = :quantite, 
+            fournisseur = :fournisseur, 
             ref_fournisseur = :ref_fournisseur,
             prix = :prix,
             updated_at = NOW() 
@@ -190,21 +239,41 @@ class Product {
             ':libelle' => $libelle,
             ':ean' => $ean,
             ':fournisseur' => $fournisseur,
-            ':quantite' => (int) $quantite,
             ':ref_fournisseur' => $ref_fournisseur,
             ':prix' => $prix !== null && $prix !== '' ? (float) $prix : null,
             ':id' => (int) $id
         ]);
+
+        // Mise à jour ou création de la ligne dépot
+        $sqlDepot = "INSERT INTO product_depot(product_id, depot, quantite)
+        VALUES (:product_id, :depot, :quantite)
+        ON DUPLICATE KEY UPDATE quantite = :quantite_update";
+        $stmtDepot = $this->pdo->prepare($sqlDepot);
+        $stmtDepot->execute([
+            ':product_id' => (int) $id,
+            ':depot'      => $depot,
+            ':quantite'   => (int) $quantite,
+            ':quantite_update' => (int) $quantite,
+        ]);
+
+        // Calcul du total (somme des dépots)
+        $sqlTotal = "UPDATE products
+        SET quantite = (SELECT SUM(quantite) FROM product_depot WHERE product_id = :pid)
+        WHERE id = :id";
+        $stmtTotal = $this->pdo->prepare($sqlTotal);
+        $stmtTotal->execute([
+            ':pid' => (int) $id,
+            ':id'  => (int) $id,
+        ]);
+
+
+
+
         } catch (PDOException $e) {
             if ($e->getCode() === '23000') {
                 throw new Exception("Ce code EAN est déja utilisé pour un autre produit");
             }
-        }
-
-        //rowCountretourne le nombre de lignes affectées par l'UPDATE
-        // Si 0 : l'ID n'existe pas en BDD
-        if ($stmt->rowCount() === 0) {
-            throw new Exception("Produit introuvable");
+            throw new Exception("Erreur technique : " . $e->getMessage());
         }
 
         return true;

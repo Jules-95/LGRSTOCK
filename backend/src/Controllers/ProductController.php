@@ -183,6 +183,7 @@ class ProductController
     public function editProduct() {
          try {
             $id = $_POST['id'] ?? null;
+            $depot = $_SESSION['magasin'] ?? null;
 
             $this->productModel->update($id, [
                 'libelle'         => $_POST['libelle'] ?? null,
@@ -191,7 +192,8 @@ class ProductController
                 'quantite'        => $_POST['quantite'] ?? 0,
                 'prix'            => $_POST['prix'] ?? null,
                 'ref_fournisseur' => $_POST['ref_fournisseur'] ?? null,
-            ]);
+            ],
+            $depot);
 
             $this->sendResponse(200, [
                 'error' => false,

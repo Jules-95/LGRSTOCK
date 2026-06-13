@@ -72,7 +72,7 @@
       </div>
 
       <div class="form-group">
-        <label for="quantite">Quantité initiale</label>
+        <label for="quantite">Quantité - {{ depotLabel(user?.magasin) }}</label>
         <input
           id="quantite"
           v-model="form.quantite"
@@ -96,6 +96,7 @@
 
 <script setup>
 import { ref } from "vue";
+import { useAuth } from "@/composables/useAuth";
 import { addProduct } from "@/services/productApi";
 import MessageBox from "@/components/MessageBox.vue";
 
@@ -103,6 +104,7 @@ import "@/assets/admin.css";
 import "@/assets/form.css";
 
 const emit = defineEmits(["success", "cancel"]);
+const { user } = useAuth();
 
 const form = ref({
   libelle: "",

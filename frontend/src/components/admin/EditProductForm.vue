@@ -61,7 +61,9 @@
     </div>
 
     <div class="form-group">
-      <label for="edit-quantite">Quantité</label>
+      <label for="edit-quantite"
+        >Quantité - {{ depotLabel(user?.magasin) }}</label
+      >
       <input
         id="edit-quantite"
         v-model="form.quantite"
@@ -84,6 +86,7 @@
 
 <script setup>
 import { ref } from "vue";
+import { useAuth } from "@/composables/useAuth";
 import { editProduct } from "@/services/productApi";
 import MessageBox from "@/components/MessageBox.vue";
 
@@ -97,13 +100,23 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["success", "cancel"]);
+const { user } = useAuth();
 
-// On initialise le formulaire avec les valeurs du produit reçu en prop
+function depotLabel(depot) {
+  return depot === "tours_nord" ? "Tours Nord" : "Tours Centre";
+}
+
+// La quantité du dépôt de l'admin connecté (pas le total)
+const maQuantite =
+  user.value?.magasin === "tours_nord"
+    ? (props.product.qte_nord ?? 0)
+    : (props.product.qte_centre ?? 0);
+
 const form = ref({
   libelle: props.product.libelle,
   ean: props.product.ean,
   fournisseur: props.product.fournisseur ?? "",
-  quantite: props.product.quantite,
+  quantite: maQuantite,
   ref_fournisseur: props.product.ref_fournisseur ?? "",
   prix: props.product.prix ?? "",
 });

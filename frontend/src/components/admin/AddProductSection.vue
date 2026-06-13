@@ -8,9 +8,9 @@
       <MessageBox v-if="loading" type="loading" message="Ajout en cours..." />
       <MessageBox v-if="error" type="error" :message="error" />
       <MessageBox
-        v-if="success"
+        v-if="successMessage"
         type="info"
-        message="Produit ajouté avec succès !"
+        :message="successMessage"
       />
 
       <div class="form-group">
@@ -114,8 +114,13 @@ const form = ref({
 });
 
 const loading = ref(false);
-const success = ref(false);
+const successMessage = ref("");
 const error = ref(null);
+
+// helper pour afficher "Tours Nord/Centre" au lieu de "tours_nord/_centre"
+function depotLabel(depot) {
+  return depot === "tours_nord" ? "Tours Nord" : "Tours Centre";
+}
 
 async function handleSubmit() {
   error.value = null;
@@ -139,11 +144,19 @@ async function handleSubmit() {
 
   try {
     const result = await addProduct(form.value);
-    success.value = true;
+
+    // Message dynamique selon ce que fait le backend
+    if (result.action === "updated") {
+      successMessage.value =
+        `Produit déjà connu : « ${result.libelle} ». Stock ${depotLabel(result.depot)} mis à jour : ${result.quantite}. Les autres informations restent inchangées`;
+    } else {
+      successMessage.value = "Produit ajouté avec succès !";
+    }
+
     window.scrollTo({ top: 0, behavior: "smooth" });
     setTimeout(() => {
-      success.value = false;
-    }, 3000);
+      successMessage.value = false;
+    }, 10000);
     form.value = {
       libelle: "",
       ean: "",

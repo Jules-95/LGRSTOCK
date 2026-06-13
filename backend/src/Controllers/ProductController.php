@@ -14,8 +14,6 @@ class ProductController
 {
     private $productModel;
     
-
-
     /**
      * Constructeur 
      * @param PDO $pdo Connexion à la BDD
@@ -123,7 +121,7 @@ class ProductController
             $depot = $_SESSION['magasin'] ?? null;
 
             // On passe toutes les données au Model dans un tableau
-            $newId = $this->productModel->create([
+            $result = $this->productModel->create([
                 'libelle' => $libelle,
                 'ean' => $ean,
                 'fournisseur' => $fournisseur,
@@ -133,12 +131,13 @@ class ProductController
             ], 
             $depot);
 
-            //Renvoyer l'ID du nouveau produit 
-            //Vue pourra rediriger vers /product/$newId
             $this->sendResponse(200, [
                 'error' => false,
-                'message' => 'Produit ajouté avec succès',
-                'id' => $newId
+                'action' => $result['action'],
+                'id' => $result['id'],
+                'libelle' => $result['libelle'],
+                'depot' => $result['depot'],
+                'quantite' => $result['quantite'],
             ]);
 
         } catch (Exception $e) {

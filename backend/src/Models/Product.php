@@ -36,7 +36,8 @@ class Product {
     /**
      * Ajouter un nouveau produit en BDD
      * @param array $data ['libelle' => '', 'ean' => '', 'fournisseur' => '', 'quantite' => 0]
-     * @return int L'ID du produit crée
+     * @param string $depot 'tours_nord' ou 'tours_centre' (magasin de l'admin connecté)
+     * @return array ['id' => int, 'action' => 'created'|'updated', 'libelle' => string, 'depot' => string, 'quantite' => int]
      * @throws Exception si données invalides
      */
     public function create($data, $depot) {

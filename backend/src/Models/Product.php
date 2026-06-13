@@ -280,79 +280,79 @@ class Product {
         return true;
     }
 
+/**
+ * Recherche d'un produit selon critères
+ * @param array $filters ['ean' => '', 'libelle' => '', 'fournisseur' => '']
+ * @return array Tableau de produits avec qte_nord et qte_centre (peut être vide)
+ */
+public function search($filters, $page = 1, $limit = 20) {
+    $ean = $filters['ean'] ?? null;
+    $libelle = $filters['libelle'] ?? null;
+    $fournisseur = $filters['fournisseur'] ?? null;
 
-    /**
-     * Recherche d'un produit selon critères
-     * @param array $filters ['ean' => '', 'libelle' => '', 'fournisseur' => '']
-     * @return array Tableau de produit (Peut etre vide)
-     */
-    public function search($filters, $page = 1, $limit = 20) {
-        $ean = $filters['ean'] ?? null;
-        $libelle = $filters['libelle'] ?? null;
-        $fournisseur = $filters['fournisseur'] ?? null;
-
-        // Vérification qu'au moin un critère soit fourni 
-        if (empty($ean) && empty($libelle) && empty($fournisseur)) {
-            throw new Exception("Veuillez fournir au moins un critère de recherche");
-        }
-
-        // Si recherche par ean -> Validation 
-        if ($ean) {
-            $this->validateEan($ean);
-        }
-
-        //Construction de la reqête SQL dynamique (1=1 -> Astuce pour faciliter l'ajout de conditions dynamiques)
-        $sql = "SELECT * FROM products WHERE 1=1";
-        $params = [];
-        // Ajouter les conditions selon les critères fournis
-        if ($ean) {
-            $sql .= " AND ean = :ean";
-            $params[':ean'] = $ean;
-        }
-
-        if ($libelle) {
-            $escaped = addcslashes($libelle, '%_');
-            $sql .= " AND libelle LIKE :libelle";
-            $params[':libelle'] = '%' . $escaped . '%';
-        }
-
-        if ($fournisseur) {
-            $escaped = addcslashes($fournisseur, '%_');
-            $sql .= " AND fournisseur LIKE :fournisseur";
-            $params[':fournisseur'] = '%' . $escaped . '%';
-        }
-
-        // Tri des résulats de la recherche
-        $sql .= " ORDER BY libelle ASC"; 
-
-        // Compter le total avant LIMIT/OFFSET
-        $sqlCount = str_replace("SELECT *", "SELECT COUNT(*)", $sql);
-        $stmtCount = $this->pdo->prepare($sqlCount);
-        $stmtCount->execute($params);
-        $total = (int) $stmtCount->fetchColumn();
-
-        // Ajout de LIMIT et OFFSET
-        $offset = ($page - 1) * $limit;
-        $sql .= " LIMIT :limit OFFSET :offset";
-
-        $stmt = $this->pdo->prepare($sql);
-        foreach ($params as $key => $value) {
-            $stmt->bindValue($key, $value);
-        }
-
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-        $stmt->execute();
-
-        // Retourner le tableau structuré 
-        return [
-            'data' => $stmt->fetchAll(PDO::FETCH_ASSOC),
-            'total' => $total,
-            'page' => $page,
-            'limit' => $limit
-        ];
+    // Au moins un critère requis
+    if (empty($ean) && empty($libelle) && empty($fournisseur)) {
+        throw new Exception("Veuillez fournir au moins un critère de recherche");
     }
 
+    if ($ean) {
+        $this->validateEan($ean);
+    }
+
+    //  Pour chaque produit, sa quantité dans chaque dépôt
+    $sql = "SELECT products.*,
+            (SELECT quantite FROM product_depot WHERE product_id = products.id AND depot = 'tours_nord')   AS qte_nord,
+            (SELECT quantite FROM product_depot WHERE product_id = products.id AND depot = 'tours_centre') AS qte_centre
+            FROM products WHERE 1=1";
+
+    $params = [];
+
+    if ($ean) {
+        $sql .= " AND ean = :ean";
+        $params[':ean'] = $ean;
+    }
+    if ($libelle) {
+        $escaped = addcslashes($libelle, '%_');
+        $sql .= " AND libelle LIKE :libelle";
+        $params[':libelle'] = '%' . $escaped . '%';
+    }
+    if ($fournisseur) {
+        $escaped = addcslashes($fournisseur, '%_');
+        $sql .= " AND fournisseur LIKE :fournisseur";
+        $params[':fournisseur'] = '%' . $escaped . '%';
+    }
+
+    $sql .= " ORDER BY libelle ASC";
+
+    // COUNT séparé
+    $sqlCount = "SELECT COUNT(*) FROM products WHERE 1=1";
+    if ($ean)         $sqlCount .= " AND ean = :ean";
+    if ($libelle)     $sqlCount .= " AND libelle LIKE :libelle";
+    if ($fournisseur) $sqlCount .= " AND fournisseur LIKE :fournisseur";
+
+    $stmtCount = $this->pdo->prepare($sqlCount);
+    $stmtCount->execute($params);
+    $total = (int) $stmtCount->fetchColumn();
+
+    // Pagination
+    $offset = ($page - 1) * $limit;
+    $sql .= " LIMIT :limit OFFSET :offset";
+
+    $stmt = $this->pdo->prepare($sql);
+    foreach ($params as $key => $value) {
+        $stmt->bindValue($key, $value);
+    }
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+    $stmt->execute();
+
+    return [
+        'data'  => $stmt->fetchAll(PDO::FETCH_ASSOC),
+        'total' => $total,
+        'page'  => $page,
+        'limit' => $limit
+    ];
+}
 
 
 

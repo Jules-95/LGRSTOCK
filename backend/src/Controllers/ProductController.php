@@ -14,8 +14,6 @@ class ProductController
 {
     private $productModel;
     
-
-
     /**
      * Constructeur 
      * @param PDO $pdo Connexion à la BDD
@@ -120,22 +118,26 @@ class ProductController
             $prix = $_POST['prix'] ?? null;
             $ref_fournisseur = $_POST['ref_fournisseur'] ?? null;
 
+            $depot = $_SESSION['magasin'] ?? null;
+
             // On passe toutes les données au Model dans un tableau
-            $newId = $this->productModel->create([
+            $result = $this->productModel->create([
                 'libelle' => $libelle,
                 'ean' => $ean,
                 'fournisseur' => $fournisseur,
                 'quantite' => $quantite,
                 'prix' => $prix,
                 'ref_fournisseur' => $ref_fournisseur
-            ]);
+            ], 
+            $depot);
 
-            //Renvoyer l'ID du nouveau produit 
-            //Vue pourra rediriger vers /product/$newId
             $this->sendResponse(200, [
                 'error' => false,
-                'message' => 'Produit ajouté avec succès',
-                'id' => $newId
+                'action' => $result['action'],
+                'id' => $result['id'],
+                'libelle' => $result['libelle'],
+                'depot' => $result['depot'],
+                'quantite' => $result['quantite'],
             ]);
 
         } catch (Exception $e) {
@@ -180,6 +182,7 @@ class ProductController
     public function editProduct() {
          try {
             $id = $_POST['id'] ?? null;
+            $depot = $_SESSION['magasin'] ?? null;
 
             $this->productModel->update($id, [
                 'libelle'         => $_POST['libelle'] ?? null,
@@ -188,7 +191,8 @@ class ProductController
                 'quantite'        => $_POST['quantite'] ?? 0,
                 'prix'            => $_POST['prix'] ?? null,
                 'ref_fournisseur' => $_POST['ref_fournisseur'] ?? null,
-            ]);
+            ],
+            $depot);
 
             $this->sendResponse(200, [
                 'error' => false,

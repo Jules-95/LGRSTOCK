@@ -54,7 +54,9 @@
           <th class="th-fournisseur">Fournisseur</th>
           <th class="th-ref">Réf. fourn</th>
           <th class="th-prix">Prix</th>
-          <th class="th-qte">Qté</th>
+          <th class="th-qte">Qté Nord</th>
+          <th class="th-qte">Qté Centre</th>
+          <th class="th-qte">Total</th>
           <th class="th-actions">Actions</th>
         </tr>
       </thead>
@@ -71,7 +73,9 @@
           <td class="td-secondary td-prix" data-label="Prix">
             {{ product.prix ? product.prix + " €" : "—" }}
           </td>
-          <td class="td-qte" data-label="Qté">{{ product.quantite }}</td>
+          <td class="td-qte" data-label="Nord"> {{ product.qte_nord ?? 0 }}</td>
+          <td class="td-qte" data-label="Centre"> {{ product.qte_centre ?? 0 }}</td>
+          <td class="td-qte" data-label="Total">{{ product.quantite }}</td>
 
           <td class="td-actions" data-label="">
             <div

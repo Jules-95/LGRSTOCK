@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : mer. 10 juin 2026 à 13:50
+-- Généré le : ven. 12 juin 2026 à 15:39
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -49,6 +49,18 @@ CREATE TABLE `bob_products` (
 -- --------------------------------------------------------
 
 --
+-- Structure de la table `login_attempts`
+--
+
+CREATE TABLE `login_attempts` (
+  `id` int(11) NOT NULL,
+  `ip` varchar(45) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Structure de la table `products`
 --
 
@@ -62,6 +74,19 @@ CREATE TABLE `products` (
   `quantite` int(11) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `product_depot`
+--
+
+CREATE TABLE `product_depot` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `depot` enum('tours_nord','tours_centre') NOT NULL,
+  `quantite` int(10) UNSIGNED NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -90,6 +115,12 @@ ALTER TABLE `bob_products`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Index pour la table `login_attempts`
+--
+ALTER TABLE `login_attempts`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Index pour la table `products`
 --
 ALTER TABLE `products`
@@ -98,6 +129,13 @@ ALTER TABLE `products`
   ADD KEY `idx_ean` (`ean`),
   ADD KEY `idx_libelle` (`libelle`),
   ADD KEY `idx_fournisseur` (`fournisseur`);
+
+--
+-- Index pour la table `product_depot`
+--
+ALTER TABLE `product_depot`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_product_depot` (`product_id`,`depot`);
 
 --
 -- Index pour la table `users`
@@ -117,16 +155,38 @@ ALTER TABLE `bob_products`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT pour la table `login_attempts`
+--
+ALTER TABLE `login_attempts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT pour la table `products`
 --
 ALTER TABLE `products`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT pour la table `product_depot`
+--
+ALTER TABLE `product_depot`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
   MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- Contraintes pour les tables déchargées
+--
+
+--
+-- Contraintes pour la table `product_depot`
+--
+ALTER TABLE `product_depot`
+  ADD CONSTRAINT `product_depot_ibfk_1` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

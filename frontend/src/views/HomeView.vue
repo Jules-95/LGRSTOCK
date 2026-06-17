@@ -5,8 +5,10 @@
 
       <form @submit.prevent="handleSearch">
         <div class="form-group">
-          <label>Code EAN</label>
+          <label for="home-ean">Code EAN</label>
           <input
+            id="home-ean"
+            name="ean"
             v-model="searchEAN"
             type="text"
             placeholder="3700523456789"
@@ -16,8 +18,10 @@
         </div>
 
         <div class="form-group">
-          <label>Libellé du produit</label>
+          <label for="home-libelle">Libellé du produit</label>
           <input
+            id="home-libelle"
+            name="libelle"
             v-model="searchLibelle"
             type="text"
             placeholder="Ex: Flip 7, Lego..."
@@ -25,8 +29,10 @@
         </div>
 
         <div class="form-group">
-          <label>Fournisseur</label>
+          <label for="home-fournisseur">Fournisseur</label>
           <input
+            id="home-fournisseur"
+            name="fournisseur"
             v-model="searchFournisseur"
             type="text"
             placeholder="Ex: Mattel, Blackrock..."
@@ -272,6 +278,5 @@ h2 {
   font-weight: 600;
   margin-top: 0.5rem;
 }
-
 </style>
 

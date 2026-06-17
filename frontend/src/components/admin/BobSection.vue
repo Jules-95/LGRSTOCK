@@ -7,8 +7,10 @@
     <form @submit.prevent="handleSearch">
       <div class="search-fields">
         <div class="search-field">
-          <label>Code EAN</label>
+          <label for="bob-ean">Code EAN</label>
           <input
+            id="bob-ean"
+            name="ean"
             v-model="filters.ean"
             type="text"
             placeholder="3700523456789"
@@ -17,16 +19,20 @@
           />
         </div>
         <div class="search-field">
-          <label>Libellé</label>
+          <label for="bob-libelle">Libellé</label>
           <input
+            id="bob-libelle"
+            name="libelle"
             v-model="filters.libelle"
             type="text"
             placeholder="Ex: Lego, Pokemon..."
           />
         </div>
         <div class="search-field">
-          <label>Fournisseur</label>
+          <label for="bob-fournisseur">Fournisseur</label>
           <input
+            id="bob-fournisseur"
+            name="fournisseur"
             v-model="filters.fournisseur"
             type="text"
             placeholder="Ex: Mattel, Hasbro..."

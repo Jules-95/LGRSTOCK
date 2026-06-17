@@ -56,11 +56,11 @@ defineProps({
 }
 
 .btn-back {
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 1rem;
   background: white;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-btn);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   color: var(--color-text-medium);

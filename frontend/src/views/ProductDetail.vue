@@ -47,8 +47,13 @@
         </div>
 
         <div class="detail-row">
-          <span class="detail-label">Quantité en stock</span>
-          <span class="detail-value">{{ product.quantite }} unités</span>
+          <span class="detail-label">Stock Tours Nord</span>
+          <span class="detail-value">{{ product.qte_nord ?? 0 }} unités</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Stock Tours Centre</span>
+          <span class="detail-value">{{ product.qte_centre ?? 0 }} unités</span>
         </div>
 
         <div class="detail-row">
@@ -144,8 +149,9 @@ onMounted(() => {
 /* Header avec titre et badge stock */
 .product-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
   margin-bottom: 2rem;
   padding-bottom: 1.5rem;
   border-bottom: 2px solid var(--color-border);
@@ -155,13 +161,15 @@ onMounted(() => {
   font-size: 1.75rem;
   color: var(--color-text-dark);
   margin: 0;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .stock-badge {
-  padding: 0.5rem 1rem;
+  padding: 0.3rem 0.75rem;   
   border-radius: var(--radius-btn);
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-weight: 500;          
+  font-size: 0.8rem;         
 }
 
 .stock-badge.stock-ok {
@@ -187,6 +195,7 @@ onMounted(() => {
 .detail-row {
   display: flex;
   justify-content: space-between;
+  gap: 1rem;
   padding: 1rem 0;
   border-bottom: 1px solid var(--color-border);
 }
@@ -198,11 +207,16 @@ onMounted(() => {
 .detail-label {
   font-weight: 600;
   color: var(--color-text-light);
+  flex-shrink: 0;
 }
 
 .detail-value {
   color: var(--color-text-dark);
   font-weight: 500;
+  min-width: 0;
+  max-width: 100%;             
+  overflow-wrap: break-word;
+  text-align: right;
 }
 
 /* Actions */
@@ -222,5 +236,26 @@ onMounted(() => {
   font-weight: 600;
   cursor: not-allowed;
   font-size: 0.95rem;
+}
+
+@media (max-width: 1000px) {
+  .product-header h1 {
+    font-size: 1.35rem;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .detail-label {
+    font-size: 0.85rem;
+  }
+
+  .detail-value {
+    font-size: 0.9rem;
+    text-align: left; 
+  }
 }
 </style>

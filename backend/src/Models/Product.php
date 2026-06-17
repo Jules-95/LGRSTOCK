@@ -14,7 +14,7 @@ class Product {
     /**
      * Recherche d'un produit par son ID
      * @param int $id
-     * @return array|null Le produit trouvé ou null
+     * @return array|null Le produit (qté Nord et qté Centre) ou null
      * @throws Exception si ID invalide
      */
     public function findById($id) {
@@ -23,7 +23,10 @@ class Product {
             throw new Exception("L'ID du produit doit etre valide");
         }
 
-        $sql = "SELECT * FROM products WHERE id = :id LIMIT 1";
+    $sql = "SELECT products.*,
+            (SELECT quantite FROM product_depot WHERE product_id = products.id AND depot = 'tours_nord')   AS qte_nord,
+            (SELECT quantite FROM product_depot WHERE product_id = products.id AND depot = 'tours_centre') AS qte_centre
+            FROM products WHERE id = :id LIMIT 1";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $id]);
 

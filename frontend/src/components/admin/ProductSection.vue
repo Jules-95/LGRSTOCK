@@ -9,8 +9,10 @@
     <form @submit.prevent="handleSearch">
       <div class="search-fields">
         <div class="search-field">
-          <label>Code EAN</label>
+          <label for="search-ean">Code EAN</label>
           <input
+            id="search-ean"
+            name="ean"
             v-model="filters.ean"
             type="text"
             placeholder="3700523456789"
@@ -19,16 +21,20 @@
           />
         </div>
         <div class="search-field">
-          <label>Libellé</label>
+          <label for="search-libelle">Libellé</label>
           <input
+            id="search-libelle"
+            name="libelle"
             v-model="filters.libelle"
             type="text"
             placeholder="Ex: Flip 7, Lego..."
           />
         </div>
         <div class="search-field">
-          <label>Fournisseur</label>
+          <label for="search-fournisseur">Fournisseur</label>
           <input
+            id="search-fournisseur"
+            name="fournisseur"
             v-model="filters.fournisseur"
             type="text"
             placeholder="Ex: Mattel, Hasbro..."
@@ -73,8 +79,10 @@
           <td class="td-secondary td-prix" data-label="Prix">
             {{ product.prix ? product.prix + " €" : "—" }}
           </td>
-          <td class="td-qte" data-label="Nord"> {{ product.qte_nord ?? 0 }}</td>
-          <td class="td-qte" data-label="Centre"> {{ product.qte_centre ?? 0 }}</td>
+          <td class="td-qte" data-label="Nord">{{ product.qte_nord ?? 0 }}</td>
+          <td class="td-qte" data-label="Centre">
+            {{ product.qte_centre ?? 0 }}
+          </td>
           <td class="td-qte" data-label="Total">{{ product.quantite }}</td>
 
           <td class="td-actions" data-label="">

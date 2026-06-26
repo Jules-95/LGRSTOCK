@@ -37,6 +37,9 @@
 
             </form>
         </AppCard>
+        <p class="legal-link">
+            <a href="/mentions-legales.html">Mentions légales</a>
+        </p>
     </LayoutEmploye>
 </template>
 
@@ -120,6 +123,17 @@ async function handleLogin() {
 .btn-login:disabled {
     opacity: 0.6;
     cursor: not-allowed;
+}
+
+.legal-link {
+    text-align: center;
+    margin-top: 1rem;
+    font-size: 0.85rem;
+}
+
+.legal-link a {
+    color: var(--color-text-light);
+    text-decoration: underline;
 }
 
 </style>

@@ -140,8 +140,11 @@ async function handleSubmit() {
   loading.value = true;
 
   try {
-    await editProduct(props.product.id, form.value);
-    emit("success", { id: props.product.id, ...form.value });
+    const result = await editProduct(props.product.id, form.value);
+    // On émet le produit renvoyé par l'API (qte_nord, qte_centre et total à
+    // jour), source de vérité, plutôt que les valeurs du formulaire qui ne
+    // connaissent que la quantité du dépôt courant.
+    emit("success", result.data);
   } catch (err) {
     error.value = err.message;
   } finally {

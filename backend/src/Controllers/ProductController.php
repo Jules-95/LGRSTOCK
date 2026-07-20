@@ -194,9 +194,14 @@ class ProductController
             ],
             $depot);
 
+            // On relit le produit à jour (avec qte_nord, qte_centre et le total
+            // recalculé) pour que le frontend affiche l'état réel sans deviner.
+            $product = $this->productModel->findById($id);
+
             $this->sendResponse(200, [
                 'error' => false,
-                'message' => 'Produit mit à jour avec succès'
+                'message' => 'Produit mit à jour avec succès',
+                'data' => $product
             ]);
         } catch (Exception $e) {
             $this->sendResponse(400, [

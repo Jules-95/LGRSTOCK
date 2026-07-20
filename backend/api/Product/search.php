@@ -2,7 +2,7 @@
 /**
  * API : Recherche de produits
  * 
- * Utilisation : GET /api/search.php?ean=...&libelle=...&fournisseur=...
+ * Utilisation : GET /Product/search.php?ean=...&libelle=...&fournisseur=...
  */
 
 require_once __DIR__ . '/../../config/cors.php';

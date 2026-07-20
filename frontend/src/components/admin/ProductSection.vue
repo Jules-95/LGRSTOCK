@@ -80,9 +80,7 @@
             {{ product.prix ? product.prix + " €" : "—" }}
           </td>
           <td class="td-qte" data-label="Nord">{{ product.qte_nord ?? 0 }}</td>
-          <td class="td-qte" data-label="Centre">
-            {{ product.qte_centre ?? 0 }}
-          </td>
+          <td class="td-qte" data-label="Centre">{{ product.qte_centre ?? 0 }}</td>
           <td class="td-qte" data-label="Total">{{ product.quantite }}</td>
 
           <td class="td-actions" data-label="">
@@ -143,7 +141,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { ref, onMounted } from "vue";
 import { searchProducts, deleteProduct } from "@/services/productApi";
 import EditProductForm from "@/components/admin/EditProductForm.vue";
 import Modal from "@/components/Modal.vue";

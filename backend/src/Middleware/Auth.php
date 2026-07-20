@@ -46,7 +46,7 @@ class Auth {
     }
 
     /**
-     * Vérifie qu'une session active existe Et que Me role est admin. 
+     * Vérifie qu'une session active existe Et que le role est admin. 
      * Utilisé pour les actions de gestion (CRUD, import CSV )
      */
     public static function requireAdmin() : void {
@@ -64,17 +64,12 @@ class Auth {
 
     /**
      * Démarre la session si elle n'est pas déjà active.
-     * PHP interdit d'appeler session_start() deux fois 
-     * Cette vérification évite l'erreur si un autre fichier 
-     * a déja démarré la session.
      */
     public static function startSession() : void {
         if (session_status() === PHP_SESSION_NONE) {
-            // Durée de vie du cookie : Employé = 8h
-            // Durée admin plus courte gérée au login
-            ini_set('session.gc_maxlifetime', 28800);
+            ini_set('session.gc_maxlifetime', 28800); // Durée des données coté serveur (8h)
             session_set_cookie_params([
-                'lifetime' => 28800,
+                'lifetime' => 28800, // Durée du cookie coté navigateur (8h)
                 'httponly' => true, // Inaccessible au Javascript
                 'samesite' => 'Strict',
                 'secure'   => isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] === 'production' 

@@ -23,9 +23,9 @@ export async function searchProducts(filters, page = 1) {
     },
   );
 
-  if (response.status >= 500)
+  if (response.status >= 500) {
     throw new Error(`Erreur serveur : ${response.status}`);
-
+  }
   const data = await response.json();
 
   // Gestion des erreurs
@@ -172,24 +172,25 @@ export async function exportProducts() {
  * @throws {Error} Si erreur API ou validation
  */
 export async function importProducts(file) {
-  const formData = new FormData()
-  formData.append('csv', file)
+  const formData = new FormData();
+  formData.append("csv", file);
 
   const response = await fetch(`${API_BASE_URL}/import.php`, {
-    method: 'POST',
-    credentials: 'include',
+    method: "POST",
+    credentials: "include",
     body: formData,
-  })
+  });
 
-  if (response.status >= 500) throw new Error(`Erreur serveur : ${response.status}`)
+  if (response.status >= 500)
+    throw new Error(`Erreur serveur : ${response.status}`);
 
-  const result = await response.json()
+  const result = await response.json();
 
   if (result.error) {
-    throw new Error(result.message, { cause: result.details })
+    throw new Error(result.message, { cause: result.details });
   }
 
-  return result
+  return result;
 }
 
 /**
@@ -213,4 +214,3 @@ export async function getStats() {
 
   return data.data;
 }
-

@@ -4,6 +4,9 @@ class Product {
     // 1. PROPRIETES
     private $pdo;
 
+    // Liste de référence des dépots pour éviter les chaines en dur éparpillées
+    private const DEPOTS = ['tours_nord', 'tours_centre']; 
+
     // 2. CONSTRUCTEUR
     public function __construct($pdo) {
         $this->pdo = $pdo;
@@ -61,7 +64,7 @@ class Product {
     if (!is_numeric($quantite) || $quantite < 0) {
         throw new Exception("La quantité doit être un nombre positif ou nul");
     }
-    if (!in_array($depot, ['tours_nord', 'tours_centre'], true)) {
+    if (!in_array($depot, self::DEPOTS, true)) {
         throw new Exception("Dépot invalide");
     }
 
@@ -81,16 +84,7 @@ class Product {
             $libelleReel = $existing['libelle'];   // le vrai libellé en base
             $action      = 'updated';
 
-            $sqlDepot = "INSERT INTO product_depot (product_id, depot, quantite)
-                         VALUES (:product_id, :depot, :quantite)
-                         ON DUPLICATE KEY UPDATE quantite = :quantite_update";
-            $stmtDepot = $this->pdo->prepare($sqlDepot);
-            $stmtDepot->execute([
-                ':product_id'      => $productId,
-                ':depot'           => $depot,
-                ':quantite'        => (int) $quantite,
-                ':quantite_update' => (int) $quantite,
-            ]);
+            $this->setDepotQuantite($productId, $depot, $quantite);
 
         } else {
             // CAS B : nouveau produit → création + 2 lignes dépôt
@@ -110,32 +104,12 @@ class Product {
             ]);
             $productId = (int) $this->pdo->lastInsertId();
 
-            // Ligne du dépôt de l'admin (avec la quantité)
-            $stmtDepot = $this->pdo->prepare(
-                "INSERT INTO product_depot (product_id, depot, quantite) VALUES (:product_id, :depot, :quantite)"
-            );
-            $stmtDepot->execute([
-                ':product_id' => $productId,
-                ':depot'      => $depot,
-                ':quantite'   => (int) $quantite,
-            ]);
-
-            // Ligne de l'autre dépôt (à 0)
-            $stmtAutre = $this->pdo->prepare(
-                "INSERT INTO product_depot (product_id, depot, quantite) VALUES (:product_id, :depot, 0)"
-            );
-            $stmtAutre->execute([
-                ':product_id' => $productId,
-                ':depot'      => $autreDepot,
-            ]);
+           $this->setDepotQuantite($productId, $depot, $quantite);
+           $this->setDepotQuantite($productId, $autreDepot, 0);
         }
 
         // Recalcul du total (somme des 2 dépôts)
-        $sqlTotal = "UPDATE products
-                     SET quantite = (SELECT SUM(quantite) FROM product_depot WHERE product_id = :pid)
-                     WHERE id = :id";
-        $stmtTotal = $this->pdo->prepare($sqlTotal);
-        $stmtTotal->execute([':pid' => $productId, ':id' => $productId]);
+       $this->recalculerTotal($productId);
 
         $this->pdo->commit();
 
@@ -222,7 +196,7 @@ class Product {
         }
 
         // validation du dépot
-        if (!in_array($depot, ['tours_nord', 'tours_centre'], true)) {
+        if (!in_array($depot, self::DEPOTS, true)) {
             throw new Exception("Dépot invalide");
         }
 
@@ -248,27 +222,8 @@ class Product {
             ':id' => (int) $id
         ]);
 
-        // Mise à jour ou création de la ligne dépot
-        $sqlDepot = "INSERT INTO product_depot(product_id, depot, quantite)
-        VALUES (:product_id, :depot, :quantite)
-        ON DUPLICATE KEY UPDATE quantite = :quantite_update";
-        $stmtDepot = $this->pdo->prepare($sqlDepot);
-        $stmtDepot->execute([
-            ':product_id' => (int) $id,
-            ':depot'      => $depot,
-            ':quantite'   => (int) $quantite,
-            ':quantite_update' => (int) $quantite,
-        ]);
-
-        // Calcul du total (somme des dépots)
-        $sqlTotal = "UPDATE products
-        SET quantite = (SELECT SUM(quantite) FROM product_depot WHERE product_id = :pid)
-        WHERE id = :id";
-        $stmtTotal = $this->pdo->prepare($sqlTotal);
-        $stmtTotal->execute([
-            ':pid' => (int) $id,
-            ':id'  => (int) $id,
-        ]);
+        $this->setDepotQuantite($id, $depot, $quantite);
+        $this->recalculerTotal($id);
 
 
 
@@ -304,10 +259,15 @@ public function search($filters, $page = 1, $limit = 20) {
 
     //  Pour chaque produit, sa quantité dans chaque dépôt
     $sql = "SELECT products.*,
-            (SELECT quantite FROM product_depot WHERE product_id = products.id AND depot = 'tours_nord')   AS qte_nord,
-            (SELECT quantite FROM product_depot WHERE product_id = products.id AND depot = 'tours_centre') AS qte_centre
-            FROM products WHERE 1=1";
-
+            COALESCE(pd_nord.quantite, 0)   AS qte_nord,
+            COALESCE(pd_centre.quantite, 0) AS qte_centre
+            FROM products
+            LEFT JOIN product_depot AS pd_nord
+                   ON pd_nord.product_id = products.id AND pd_nord.depot = 'tours_nord'
+            LEFT JOIN product_depot AS pd_centre
+                   ON pd_centre.product_id = products.id AND pd_centre.depot = 'tours_centre'
+            WHERE 1=1";
+            
     $params = [];
 
     if ($ean) {
@@ -378,6 +338,52 @@ public function search($filters, $page = 1, $limit = 20) {
         }
 
         return true;
+    }
+
+    /**
+     * Fixer la quantité d'un produit à un dépot donné 
+     * Créer la ligne si elle n'existe pas ou mla remplacer sinon
+     * Garantit de ne jamais descendre sous 0 
+     * 
+     * @param int $productID
+     * @param string $depot 'tours_nord' ou 'tours_centre'
+     * @param int $quantite
+     * @throws Exception si le dépot est invalide
+     */
+    private function setDepotQuantite($productID, $depot, $quantite) {
+        if (!in_array($depot, self::DEPOTS, true)) {
+            throw new Exception("Dépôt invalide");
+        }
+
+        // product_depot.quantite est unsigned : Un negatif ferait échouer la requête. Plafond à 0 pour que ce soit vrai qu'importe l'appelant. 
+        $quantite = max(0, (int) $quantite); 
+
+        $sql = "INSERT INTO product_depot (product_id, depot, quantite) VALUES (:product_id, :depot, :quantite)
+        ON DUPLICATE KEY UPDATE quantite = :quantite_update";
+        $stmt = $this->pdo->prepare($sql); 
+        $stmt->execute([
+            ':product_id'      => (int) $productID,
+            ':depot'           => $depot,
+            ':quantite'        => $quantite,
+            ':quantite_update' => $quantite, 
+        ]);
+    }
+
+    /**
+     * Recalculer products.quantite comme la somme de tous les dépôts. 
+     * A appeler après toute écriture sur product_depot. 
+     * COALESCE pour l'import qui n'insère pas de ligne dans dépot. 
+     * 
+     * @param int $productId
+     */
+    private function recalculerTotal($productId) {
+        $sql = "UPDATE products 
+            SET quantite = COALESCE((SELECT SUM(quantite) FROM product_depot WHERE product_id = :pid), 0) WHERE id = :id";
+        $stmt = $this->pdo->prepare($sql); 
+        $stmt->execute([
+            ':pid' => (int) $productId,
+            ':id'  => (int) $productId,
+        ]);
     }
 
 }

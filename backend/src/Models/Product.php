@@ -64,9 +64,7 @@ class Product {
     if (!is_numeric($quantite) || $quantite < 0) {
         throw new Exception("La quantité doit être un nombre positif ou nul");
     }
-    if (!in_array($depot, self::DEPOTS, true)) {
-        throw new Exception("Dépot invalide");
-    }
+    $this->validateDepot($depot);
 
     $autreDepot = $depot === 'tours_nord' ? 'tours_centre' : 'tours_nord';
 
@@ -84,7 +82,7 @@ class Product {
             $libelleReel = $existing['libelle'];   // le vrai libellé en base
             $action      = 'updated';
 
-            $this->setDepotQuantite($productId, $depot, $quantite);
+            $this->ajusterDepotQuantite($productId, $depot, $quantite);
 
         } else {
             // CAS B : nouveau produit → création + 2 lignes dépôt
@@ -119,7 +117,7 @@ class Product {
             'action'   => $action,        // 'created' ou 'updated'
             'libelle'  => $libelleReel,
             'depot'    => $depot,
-            'quantite' => (int) $quantite,
+            'quantite' => $this->getDepotQuantite($productId, $depot),
         ];
 
     } catch (PDOException $e) {
@@ -196,9 +194,7 @@ class Product {
         }
 
         // validation du dépot
-        if (!in_array($depot, self::DEPOTS, true)) {
-            throw new Exception("Dépot invalide");
-        }
+        $this->validateDepot($depot);
 
 
 
@@ -323,7 +319,17 @@ public function search($filters, $page = 1, $limit = 20) {
     // 4. METHODES PRIVATE (utilitaires internes)
 
     /**
-     * Validité d'un code EAN 
+     * Valide qu'un dépôt fait partie des dépôts connus.
+     * @throws Exception si le dépôt est invalide
+     */
+    private function validateDepot($depot) {
+        if (!in_array($depot, self::DEPOTS, true)) {
+            throw new Exception("Dépôt invalide");
+        }
+    }
+
+    /**
+     * Validité d'un code EAN
      * @param string $ean Le code ean à Valider
      * @return bool true si valide
      * @throws Exception si EAN invalide
@@ -341,31 +347,29 @@ public function search($filters, $page = 1, $limit = 20) {
     }
 
     /**
-     * Fixer la quantité d'un produit à un dépot donné 
-     * Créer la ligne si elle n'existe pas ou mla remplacer sinon
-     * Garantit de ne jamais descendre sous 0 
-     * 
-     * @param int $productID
+     * Fixer (poser) la quantité absolue d'un produit dans un dépôt.
+     * Crée la ligne si elle n'existe pas, la remplace sinon.
+     * Garantit de ne jamais descendre sous 0.
+     *
+     * @param int $productId
      * @param string $depot 'tours_nord' ou 'tours_centre'
      * @param int $quantite
-     * @throws Exception si le dépot est invalide
+     * @throws Exception si le dépôt est invalide
      */
-    private function setDepotQuantite($productID, $depot, $quantite) {
-        if (!in_array($depot, self::DEPOTS, true)) {
-            throw new Exception("Dépôt invalide");
-        }
+    private function setDepotQuantite($productId, $depot, $quantite) {
+        $this->validateDepot($depot);
 
-        // product_depot.quantite est unsigned : Un negatif ferait échouer la requête. Plafond à 0 pour que ce soit vrai qu'importe l'appelant. 
-        $quantite = max(0, (int) $quantite); 
+        // product_depot.quantite est UNSIGNED : un négatif ferait échouer la requête. Plafond à 0 pour que ce soit vrai quel que soit l'appelant.
+        $quantite = max(0, (int) $quantite);
 
         $sql = "INSERT INTO product_depot (product_id, depot, quantite) VALUES (:product_id, :depot, :quantite)
         ON DUPLICATE KEY UPDATE quantite = :quantite_update";
-        $stmt = $this->pdo->prepare($sql); 
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            ':product_id'      => (int) $productID,
+            ':product_id'      => (int) $productId,
             ':depot'           => $depot,
             ':quantite'        => $quantite,
-            ':quantite_update' => $quantite, 
+            ':quantite_update' => $quantite,
         ]);
     }
 
@@ -386,4 +390,50 @@ public function search($filters, $page = 1, $limit = 20) {
         ]);
     }
 
+    /**
+     * Ajuster le stock d'un dépôt en lui appliquant une VARIATION signée,
+     * de façon atomique (l'addition est faite par la base, jamais lue puis
+     * réécrite en PHP). Delta positif = on ajoute, négatif = on retire.
+     * Le stock ne descend jamais sous 0 (GREATEST). Crée la ligne dépôt si
+     * elle n'existe pas encore.
+     *
+     * @param int $productId
+     * @param string $depot 'tours_nord' ou 'tours_centre'
+     * @param int $delta variation à appliquer (positive ou négative)
+     * @throws Exception si le dépôt est invalide
+     */
+    private function ajusterDepotQuantite($productId, $depot, $delta) {
+        $this->validateDepot($depot);
+
+        $delta = (int) $delta;
+
+        // Si la ligne n'existe pas encore, on part de max(0, delta) : un delta négatif ne doit pas insérer une valeur négative (colonne UNSIGNED).
+        $initiale = max(0, $delta);
+
+        $sql = "INSERT INTO product_depot (product_id, depot, quantite)
+                VALUES (:product_id, :depot, :initiale)
+                ON DUPLICATE KEY UPDATE quantite = GREATEST(0, quantite + :delta)";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':product_id' => (int) $productId,
+            ':depot'      => $depot,
+            ':initiale'   => $initiale,
+            ':delta'      => $delta,
+        ]);
+    }
+
+    /**
+     * Renvoyer la quantité actuelle d'un produit dans un dépôt (0 si aucune ligne)
+     * @param int $productId
+     * @param string $depot
+     * @return int 
+     */
+    private function getDepotQuantite($productId, $depot) {
+        $sql = "SELECT quantite FROM product_depot WHERE product_id = :pid AND depot = :depot";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':pid' => (int) $productId, ':depot' => $depot]);
+
+        $q = $stmt->fetchColumn();  // false si aucune ligne
+        return $q === false ? 0 : (int) $q;
+    }
 }

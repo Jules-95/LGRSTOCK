@@ -1,235 +1,124 @@
 # LGRSTOCK
 
-Outil interne de gestion et de visualisation des stocks, destiné aux équipes de La Grande Récré (Tours Centre et Tours Nord).
+Outil interne de gestion et de visualisation des stocks en réserve déportée, pour les magasins La Grande Récré de Tours Nord et Tours Centre.
 
 ---
 
 ## Description
 
-**LGRSTOCK** est une application web interne permettant de consulter, localiser et gérer les produits en réserve externe.
-L'objectif est de réduire le temps de recherche en magasin en centralisant les informations de stock dans une interface simple et accessible depuis n'importe quel appareil (PC, tablette).
+Application web interne permettant de consulter, localiser et ajuster les produits stockés en réserve externe. L'objectif est de réduire le temps de recherche en centralisant l'état des stocks dans une interface simple, accessible depuis un PC ou une tablette.
 
----
-
-## Contexte
-
-Projet réalisé dans le cadre d'une alternance de 2ème année de Bachelor DWWM.
-Il répond à un besoin réel de l'entreprise en proposant un outil adapté à un usage interne quotidien.
+Le stock est suivi **par dépôt** (Tours Nord et Tours Centre). Pour chaque produit, `products.quantite` est le **total**, maintenu automatiquement comme la somme des quantités de chaque dépôt (table `product_depot`).
 
 ---
 
 ## Fonctionnalités
 
-### Espace employé
-- Recherche de produits par code EAN (scan ou saisie manuelle), libellé ou fournisseur
-- Redirection automatique vers la fiche produit si un seul résultat est trouvé
-- Affichage d'une liste paginée en cas de résultats multiples
-- Fiche produit avec libellé, EAN, fournisseur et indicateur coloré de niveau de stock
+### Espace employé (lecture seule)
+- Recherche par code EAN (scan ou saisie), libellé ou fournisseur
+- Redirection directe vers la fiche si un seul résultat, sinon liste paginée
+- Fiche produit : libellé, EAN, fournisseur, prix, **stock par dépôt** (Nord / Centre) et indicateur de niveau
 
-### Espace admin (dashboard)
-- Vue d'ensemble : statistiques globales (produits, ruptures, utilisateurs, dernière mise à jour)
+### Espace admin
 - Gestion produits : recherche paginée, ajout, modification, suppression
+- **Ajustement de stock par dépôt** : ajout ou retrait ponctuel sur le dépôt de l'admin connecté, avec plancher à 0
 - Gestion utilisateurs : ajout, modification, suppression (protection anti-auto-suppression)
-- Export CSV (Excel-safe, BOM UTF-8, EAN protégé contre la troncature)
-- Import CSV (validation en 2 passes, mapping intelligent des colonnes, upsert par EAN)
+- Import / export CSV des produits (Excel-safe, upsert par EAN, validation en 2 passes)
+- Import et consultation du référentiel produits « BOB »
+- Vue d'ensemble : statistiques globales
 
 ---
 
 ## Stack technique
 
-### Frontend
-
-| Technologie | Rôle |
-|---|---|
-| Vue.js 3 (Composition API, `<script setup>`) | Framework JavaScript réactif |
-| Vue Router | Navigation et guards de routes |
-| Vite | Bundler et serveur de développement |
-
-### Backend
-
-| Technologie | Rôle |
-|---|---|
-| PHP 8 natif (architecture MVC maison) | Serveur HTTP et logique métier |
-| PDO | Accès sécurisé à la base de données |
-| Sessions PHP | Authentification (HttpOnly, SameSite=Lax, durée 8h) |
-
-### Base de données
-
-| Technologie | Rôle |
-|---|---|
-| MySQL 8.0 | Stockage des données produits et utilisateurs |
-
-### Outils de développement
-
-| Outil | Usage |
-|---|---|
-| XAMPP | Environnement de développement local |
-| Postman | Tests des endpoints API |
-| Looping | Modélisation de la base de données (MCD/MLD) |
-| npm | Gestion des dépendances JavaScript |
-| Git / GitHub | Versioning |
+- **Frontend** — Vue 3 (Composition API, `<script setup>`), Vue Router, Vite
+- **Backend** — PHP 8 natif (architecture MVC maison), PDO, authentification par sessions
+- **Base de données** — MariaDB (compatible MySQL)
+- **Outils** — XAMPP (développement local), Postman (tests API), Git / GitHub
 
 ---
 
 ## Architecture
 
-L'application suit une architecture trois tiers :
+Application trois tiers : le frontend Vue communique avec une API PHP (un fichier `.php` = une route) qui interroge la base via PDO. Toutes les requêtes transmettent le cookie de session (`credentials: 'include'`).
 
-- **Frontend** (Vue.js 3) — interface utilisateur, communique avec le backend via des requêtes HTTP/JSON
-- **Backend** (PHP natif) — API REST, traite les requêtes, applique la logique métier
-- **Base de données** (MySQL 8.0) — stockage des produits et utilisateurs, interrogée via PDO
+```
+backend/
+  api/            endpoints HTTP (Auth, Product, User, bob, export, import, stats)
+  config/         cors.php, database.php (⚠️ non versionné)
+  database/       schema.sql, seeds
+  src/
+    Controllers/  logique par ressource
+    Middleware/   Auth.php (requireAuth, requireAdmin)
+    Models/       accès aux données (Product, User, BobProduct)
+frontend/
+  src/
+    components/   admin/ et employe/
+    composables/  useAuth.js
+    services/     appels API (productApi, authApi, userApi)
+    views/        pages (Home, Admin, Login, ProductDetail…)
+    router/
+```
 
-Le frontend Vue.js communique avec le backend PHP via une API REST.
-Le backend expose des endpoints qui interrogent la base de données MySQL via PDO.
-Toutes les requêtes `fetch()` utilisent `credentials: 'include'` pour transmettre le cookie de session.
-
-### Arborescence
-
-**Backend**
-- `api/Auth/` — login.php, logout.php, check-auth.php
-- `api/Product/` — search.php, product.php, add-product.php, edit-product.php, delete-product.php
-- `api/User/` — users.php, add-user.php, edit-user.php, delete-user.php
-- `api/` — export.php, import.php, stats.php
-- `config/` — cors.php, database.example.php, database.php ⚠️ ne pas committer
-- `database/` — schema.sql, seed_products.sql, seed_users.sql
-- `src/Controllers/` — AuthController, ProductController, UserController, ExportController, ImportController, StatsController
-- `src/Middleware/` — Auth.php (requireAuth, requireAdmin)
-- `src/Models/` — Product.php, User.php
-
-**Frontend**
-- `assets/` — CSS global (main.css, admin.css, form.css)
-- `components/admin/` — sections du dashboard admin
-- `components/employe/` — layout et topbar espace employé
-- `composables/` — useAuth.js
-- `router/` — index.js
-- `services/` — productApi.js, authApi.js, userApi.js
-- `views/` — HomeView, AdminView, LoginView, ProductDetail, NotFoundView
----
-
-## Authentification et rôles
-
-Deux rôles utilisateur :
-- **employé** : accès en lecture seule (recherche + fiche produit)
-- **admin** : accès complet (CRUD produits, gestion utilisateurs, import/export, stats)
-
-Les sessions PHP durent 8 heures. Le cookie `PHPSESSID` est `HttpOnly` et `SameSite=Lax`.
-Les routes Vue sont protégées par des guards qui vérifient la session et le rôle avant chaque navigation.
-
----
-
-## Base de données
-
-### Table `products`
-| Colonne | Type | Description |
-|---|---|---|
-| id | INT AUTO_INCREMENT | Identifiant unique |
-| ean | VARCHAR(13) UNIQUE | Code EAN produit |
-| libelle | VARCHAR(255) | Nom du produit |
-| fournisseur | VARCHAR(255) | Nom du fournisseur |
-| ref_fournisseur | VARCHAR(255) | Référence fournisseur |
-| prix | DECIMAL | Prix du produit |
-| quantite | INT | Quantité en stock |
-| created_at | DATETIME | Date de création |
-| updated_at | DATETIME | Date de dernière modification |
-
-### Table `users`
-| Colonne | Type | Description |
-|---|---|---|
-| id | INT AUTO_INCREMENT | Identifiant unique |
-| username | VARCHAR(255) UNIQUE | Nom d'utilisateur |
-| password_hash | VARCHAR(255) | Mot de passe hashé (bcrypt) |
-| role | ENUM('employe','admin') | Rôle de l'utilisateur |
-| magasin | ENUM('tours_nord','tours_centre') | Magasin de rattachement |
-| created_at | DATETIME | Date de création |
+Le détail des tables (`products`, `product_depot`, `users`, `bob_products`, `login_attempts`) fait foi dans [`backend/database/schema.sql`](backend/database/schema.sql).
 
 ---
 
 ## Installation (développement local)
 
-### Prérequis
+**Prérequis** : PHP 8+, MariaDB/MySQL, Node.js 20+, un serveur local type XAMPP.
 
-- PHP 8+
-- MySQL 8.0
-- Node.js + npm
-- XAMPP
-
-### Backend
-
+**Backend**
 1. Cloner le dépôt dans le répertoire `htdocs`
-2. Créer la base de données et importer le schéma :
-```sql
-   SOURCE backend/database/schema.sql;
-```
-3. Copier le fichier de configuration et renseigner les identifiants :
-```bash
-   cp backend/config/database.example.php backend/config/database.php
-```
+2. Créer la base et importer le schéma : `SOURCE backend/database/schema.sql;`
+3. Copier la configuration et renseigner les identifiants :
+   `cp backend/config/database.example.php backend/config/database.php`
 
-### Frontend
-
+**Frontend**
 ```bash
 cd frontend
 npm install
-npm run dev
+npm run dev      # développement — http://localhost:5173
+npm run build    # build de production (dossier dist/)
 ```
-
-L'application est accessible sur `http://localhost:5173` en développement.
 
 ---
 
 ## API
 
-### Authentification
-| Méthode | Endpoint | Auth | Description |
-|---|---|---|---|
-| POST | `/api/Auth/login.php` | Non | Connexion |
-| POST | `/api/Auth/logout.php` | Oui | Déconnexion |
-| GET | `/api/Auth/check-auth.php` | Non | Vérification session |
+Endpoints REST sous `/api/`, un fichier `.php` par route. Les endpoints protégés passent par `requireAuth()` ou `requireAdmin()`. Les écritures se font en POST (`x-www-form-urlencoded`), les lectures en GET. Réponses en JSON de forme `{ error, message, data }`.
 
-### Produits
-| Méthode | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/api/Product/search.php` | Employé | Recherche paginée par EAN, libellé ou fournisseur |
-| GET | `/api/Product/product.php?id=` | Employé | Récupère un produit par ID |
-| POST | `/api/Product/add-product.php` | Admin | Ajoute un produit |
-| POST | `/api/Product/edit-product.php` | Admin | Modifie un produit |
-| POST | `/api/Product/delete-product.php` | Admin | Supprime un produit |
+- **Auth** — `Auth/login.php`, `logout.php`, `check-auth.php`
+- **Produits** — `Product/search.php`, `product.php`, `add-product.php`, `edit-product.php`, `delete-product.php`, `adjust-stock.php`
+- **Utilisateurs** — `User/` (liste, ajout, modification, suppression)
+- **Autres** — `stats.php`, `export.php`, `import.php`, `bob.php`, `bob_import.php`
 
-### Utilisateurs
-| Méthode | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/api/User/users.php` | Admin | Liste tous les utilisateurs |
-| POST | `/api/User/add-user.php` | Admin | Ajoute un utilisateur |
-| POST | `/api/User/edit-user.php` | Admin | Modifie un utilisateur |
-| POST | `/api/User/delete-user.php` | Admin | Supprime un utilisateur |
+---
 
-### Autres
-| Méthode | Endpoint | Auth | Description |
-|---|---|---|---|
-| GET | `/api/stats.php` | Admin | Statistiques globales |
-| GET | `/api/export.php` | Admin | Export CSV de tous les produits |
-| POST | `/api/import.php` | Admin | Import CSV de produits |
+## Authentification et rôles
+
+Deux rôles, plus un magasin de rattachement (`tours_nord` / `tours_centre`) déterminant le dépôt sur lequel l'admin agit :
+- **employé** — lecture seule (recherche + fiche produit)
+- **admin** — accès complet (produits, utilisateurs, import/export, stats)
+
+Les routes Vue sont protégées par des guards qui vérifient la session et le rôle avant chaque navigation.
 
 ---
 
 ## Sécurité
 
-- Authentification par sessions PHP (HttpOnly, SameSite=Lax)
-- Middleware `requireAuth()` et `requireAdmin()` sur tous les endpoints protégés
-- Requêtes SQL préparées via PDO (protection injection SQL)
-- Mots de passe hashés avec bcrypt
+- Sessions PHP (`HttpOnly`, `SameSite=Strict`, cookie `Secure` en production, durée 8 h)
+- Middleware `requireAuth` / `requireAdmin` sur les endpoints protégés
+- Requêtes préparées via PDO (protection contre l'injection SQL)
+- Mots de passe hachés (bcrypt)
+- Limitation des tentatives de connexion (rate limiting)
 - Guards Vue Router côté frontend
 
-**Limitations connues (usage interne uniquement) :**
-- Pas de protection CSRF (SameSite=Lax uniquement)
-- Pas de rate limiting
-- Les sessions actives ne sont pas invalidées à la suppression d'un utilisateur
+**Limites connues (usage interne)** : pas de jetons anti-CSRF dédiés — la protection repose sur le cookie `SameSite=Strict` ; les sessions actives ne sont pas invalidées à la suppression d'un utilisateur.
 
 ---
 
-## Évolutions prévues (v2)
+## Évolutions prévues
 
-- Système de listes de transfert entre le stock déporté et les magasins (Tours Nord / Tours Centre)
+- Listes de transfert entre la réserve déportée et les magasins (anticipation des mouvements, historique par magasin) -> en développement.
 - Export CSV filtré par fournisseur
-- Amélioration de la gestion des utilisateurs
-- Historique des transferts par magasin

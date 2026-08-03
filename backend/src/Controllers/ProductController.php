@@ -12,7 +12,7 @@ require_once __DIR__ . '/../Models/Product.php';
 
 class ProductController
 {
-    private $productModel;
+    private Product $productModel;
     
     /**
      * Constructeur 

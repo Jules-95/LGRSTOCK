@@ -135,6 +135,33 @@ export async function editProduct(id, data) {
 }
 
 /**
+ * Ajuste le stock du dépôt de l'admin connecté (ajout ou retrait ponctuel).
+ * @param {number} id - L'ID du produit
+ * @param {number} delta - Variation signée : positive = ajout, négative = retrait
+ * @returns {Promise<Object>} Le produit à jour (qte_nord, qte_centre, total)
+ * @throws {Error} Si erreur API
+ */
+export async function adjustStock(id, delta) {
+  const response = await fetch(`${API_BASE_URL}/Product/adjust-stock.php`, {
+    method: "POST",
+    credentials: "include",
+    body: new URLSearchParams({ id, delta }),
+  });
+
+  if (response.status >= 500)
+    throw new Error(`Erreur serveur : ${response.status}`);
+
+  const result = await response.json();
+
+  if (result.error) {
+    throw new Error(result.message);
+  }
+
+  return result.data;
+}
+
+
+/**
  * Exporte tous les produits en fichier CSV et déclenche le téléchargement
  * @returns {Promise<void>}
  * @throws {Error} Si erreur API

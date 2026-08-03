@@ -234,6 +234,52 @@ class Product {
         return true;
     }
 
+    /**
+     * Ajuster le stock d'un dépot d'une variation puis resynchroniser le total
+     * Les deux écritures dans une transaction (ok pour tout ou rollback)
+     * L'invariant "total = somme des dépôts" ne peut jamais "casser"
+     * Renvoyer le produit à jour (Sert de source de vérité pour le front)
+     * @param int $id ID du produit *
+     * @param string $depot 'tours_nord' ou 'tours_centre'
+     * @param int $delta variation : positive = ajout / Negative = retrait
+     * @return array Le produit complet (qt_nord, qt_centre, total à jour)
+     * @throws Exception si produit introuvable, dépot ou deltat invalide   
+     */
+    public function ajusterStock($id, $depot, $delta) {
+        if (empty($id) || !is_numeric($id)) {
+            throw new Exception("L'ID du produit doit être valide");
+        }
+        
+        if (!is_numeric($delta) || (int) $delta === 0) {
+            throw new Exception("La variation de stock doit être un nombre non nul");
+        }
+
+        $this->validateDepot($depot); 
+
+        // Le produit doit exister avant de pouvoir manipuler son stock
+        $check = $this->pdo->prepare("SELECT id FROM products WHERE id = :id");
+        $check->execute([':id' => (int) $id]);
+        if (!$check->fetch()) {
+            throw new Exception("Produit introuvable");
+        }
+
+        try {
+            $this->pdo->beginTransaction();
+
+            $this->ajusterDepotQuantite($id, $depot, $delta);
+            $this->recalculerTotal($id);
+
+            $this->pdo->commit();
+        } catch(PDOException $e) {
+            $this->pdo->rollBack();
+            throw new Exception("Erreur technique : " . $e->getMessage());
+        }
+
+        // Etat réel après opération : le front affiche sans deviner
+        return $this->findById($id);
+    }
+    
+
 /**
  * Recherche d'un produit selon critères
  * @param array $filters ['ean' => '', 'libelle' => '', 'fournisseur' => '']

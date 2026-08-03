@@ -211,6 +211,40 @@ class ProductController
         }
     }
 
+    /**
+     * Ajuster le stock d'un dépôt (Ajout ou retrait ponctuel)
+     * Utilisé par POST/api/Product/adjust-stock.php
+     */
+    public function ajusterStock() {
+        try {
+            $id    = $_POST['id']    ?? null;
+            $delta = $_POST['delta'] ?? null;
+           
+
+            // Depot provient de la session, un admin ne peut gérer que son dépot.
+            $depot = $_SESSION['magasin'] ?? null; 
+
+            if (!is_numeric($delta) || (int) $delta === 0) {
+                throw new Exception("La variation doit être un nombre non nul");
+            }
+
+            $product = $this->productModel->ajusterStock($id, $depot, (int) $delta);
+
+            $this->sendResponse(200, [
+                'error' => false,
+                'message' => 'Stock ajusté avec succès',
+                'data' => $product,
+            ]);
+
+        } catch (Exception $e) {
+            $this->sendResponse(400, [
+                'error' => true,
+                'message' => $e->getMessage(),
+            ]);
+
+        }
+    }
+
     // 2. METHODES PRIVATE (utilitaires)
 
     /**

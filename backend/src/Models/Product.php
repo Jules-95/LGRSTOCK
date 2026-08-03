@@ -35,7 +35,8 @@ class Product {
 
         $product = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        return $product ?: null;
+        return $product ? $this->castTypesProduit($product) : null;
+
     }
 
 
@@ -249,7 +250,7 @@ class Product {
         if (empty($id) || !is_numeric($id)) {
             throw new Exception("L'ID du produit doit être valide");
         }
-        
+
         if (!is_numeric($delta) || (int) $delta === 0) {
             throw new Exception("La variation de stock doit être un nombre non nul");
         }
@@ -351,8 +352,10 @@ public function search($filters, $page = 1, $limit = 20) {
     $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
     $stmt->execute();
 
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
     return [
-        'data'  => $stmt->fetchAll(PDO::FETCH_ASSOC),
+        'data'  => array_map([$this, 'castTypesProduit'], $rows),
         'total' => $total,
         'page'  => $page,
         'limit' => $limit
@@ -373,6 +376,24 @@ public function search($filters, $page = 1, $limit = 20) {
             throw new Exception("Dépôt invalide");
         }
     }
+
+    /**
+     * Normalise les types d'une ligne produit. PDO (prépares natives) renvoie
+     * les colonnes réelles en nombre, mais les expressions SQL comme
+     * COALESCE(...) en texte. On caste ici pour que le frontend reçoive TOUJOURS
+     * de vrais nombres, quelle que soit la requête d'origine.
+     *
+     * @param array $product une ligne produit issue d'un fetch
+     * @return array la même ligne, champs numériques correctement typés
+     */
+    private function castTypesProduit(array $product): array {
+        $product['id']         = (int) $product['id'];
+        $product['quantite']   = (int) ($product['quantite']   ?? 0);
+        $product['qte_nord']   = (int) ($product['qte_nord']   ?? 0);
+        $product['qte_centre'] = (int) ($product['qte_centre'] ?? 0);
+        return $product;
+    }
+
 
     /**
      * Validité d'un code EAN

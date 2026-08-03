@@ -80,7 +80,9 @@
             {{ product.prix ? product.prix + " €" : "—" }}
           </td>
           <td class="td-qte" data-label="Nord">{{ product.qte_nord ?? 0 }}</td>
-          <td class="td-qte" data-label="Centre">{{ product.qte_centre ?? 0 }}</td>
+          <td class="td-qte" data-label="Centre">
+            {{ product.qte_centre ?? 0 }}
+          </td>
           <td class="td-qte" data-label="Total">{{ product.quantite }}</td>
 
           <td class="td-actions" data-label="">
@@ -99,6 +101,22 @@
                   "
                 >
                   Modifier
+                </button>
+                <button
+                  @click="
+                    openAdjustModal(product, 'ajout');
+                    openDropdown = null;
+                  "
+                >
+                  Ajouter du stock
+                </button>
+                <button
+                  @click="
+                    openAdjustModal(product, 'retrait');
+                    openDropdown = null;
+                  "
+                >
+                  Soustraire du stock
                 </button>
                 <button
                   class="danger"
@@ -137,6 +155,20 @@
         @cancel="showEditModal = false"
       />
     </Modal>
+    <Modal
+      v-if="showAdjustModal"
+      :title="
+        adjustSens === 'ajout' ? 'Ajouter du stock' : 'Soustraire du stock'
+      "
+      @close="showAdjustModal = false"
+    >
+      <AdjustStockForm
+        :product="selectedProduct"
+        :sens="adjustSens"
+        @success="handleAdjustSuccess"
+        @cancel="showAdjustModal = false"
+      />
+    </Modal>
   </div>
 </template>
 
@@ -144,6 +176,7 @@
 import { ref, onMounted } from "vue";
 import { searchProducts, deleteProduct } from "@/services/productApi";
 import EditProductForm from "@/components/admin/EditProductForm.vue";
+import AdjustStockForm from "@/components/admin/AdjustStockForm.vue";
 import Modal from "@/components/Modal.vue";
 import MessageBox from "@/components/MessageBox.vue";
 import AppPagination from "@/components/AppPagination.vue";
@@ -157,6 +190,8 @@ const errorMessage = ref("");
 const searched = ref(false);
 const successMessage = ref("");
 const showEditModal = ref(false);
+const showAdjustModal = ref(false);
+const adjustSens = ref("ajout");
 const selectedProduct = ref(null);
 const currentPage = ref(1);
 const totalPages = ref(0);
@@ -216,6 +251,25 @@ function handleEditSuccess(updatedProduct) {
   showEditModal.value = false;
   window.scrollTo({ top: 0, behavior: "smooth" });
   successMessage.value = "Produit modifié avec succès";
+  setTimeout(() => {
+    successMessage.value = "";
+  }, 3000);
+}
+
+function openAdjustModal(product, sens) {
+  selectedProduct.value = product;
+  adjustSens.value = sens;
+  showAdjustModal.value = true;
+}
+
+function handleAdjustSuccess(updatedProduct) {
+  const index = products.value.findIndex((p) => p.id === updatedProduct.id);
+  if (index !== -1) {
+    products.value[index] = updatedProduct;
+  }
+  showAdjustModal.value = false;
+  successMessage.value = "Stock ajusté avec succès";
+  window.scrollTo({ top: 0, behavior: "smooth" });
   setTimeout(() => {
     successMessage.value = "";
   }, 3000);

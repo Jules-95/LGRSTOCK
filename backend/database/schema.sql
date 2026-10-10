@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1
--- Généré le : ven. 12 juin 2026 à 15:39
+-- Généré le : sam. 10 oct. 2026 à 12:21
 -- Version du serveur : 10.4.32-MariaDB
 -- Version de PHP : 8.2.12
 
@@ -44,6 +44,20 @@ CREATE TABLE `bob_products` (
   `code_recreaclub` varchar(50) DEFAULT NULL,
   `code_fournisseur` varchar(50) DEFAULT NULL,
   `imported_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `inventories`
+--
+
+CREATE TABLE `inventories` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `depot` enum('tours_nord','tours_centre') NOT NULL,
+  `started_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `ended_at` timestamp NULL DEFAULT NULL,
+  `started_by` int(10) UNSIGNED DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
@@ -115,6 +129,14 @@ ALTER TABLE `bob_products`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Index pour la table `inventories`
+--
+ALTER TABLE `inventories`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_depot_ended` (`depot`,`ended_at`),
+  ADD KEY `inventories_user_fk` (`started_by`);
+
+--
 -- Index pour la table `login_attempts`
 --
 ALTER TABLE `login_attempts`
@@ -155,6 +177,12 @@ ALTER TABLE `bob_products`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT pour la table `inventories`
+--
+ALTER TABLE `inventories`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT pour la table `login_attempts`
 --
 ALTER TABLE `login_attempts`
@@ -181,6 +209,12 @@ ALTER TABLE `users`
 --
 -- Contraintes pour les tables déchargées
 --
+
+--
+-- Contraintes pour la table `inventories`
+--
+ALTER TABLE `inventories`
+  ADD CONSTRAINT `inventories_user_fk` FOREIGN KEY (`started_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Contraintes pour la table `product_depot`

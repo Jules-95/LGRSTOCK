@@ -54,6 +54,13 @@
         >
           Gestion utilisateurs
         </button>
+        <button
+          class="nav-item"
+          :class="{ active: currentSection === 'inventaire' }"
+          @click="currentSection = 'inventaire', sidebarOpen = false"
+          >
+          Inventaire
+        </button>
         <button class="nav-item nav-item--disabled" disabled>
           Listes de transfert
         </button>
@@ -98,6 +105,8 @@
         @cancel="currentSection = 'produits'"
       />
 
+      <InventorySection v-if="currentSection === 'inventaire'" />
+
       <UserSection
         v-if="currentSection === 'utilisateurs'"
         ref="userSectionRef"
@@ -124,6 +133,7 @@ import ExportSection from "@/components/admin/ExportSection.vue";
 import ImportSection from "@/components/admin/ImportSection.vue";
 import OverviewSection from "@/components/admin/OverviewSection.vue";
 import BobSection from "@/components/admin/BobSection.vue";
+import InventorySection from "@/components/admin/InventorySection.vue";
 
 const { user, logout } = useAuth();
 
